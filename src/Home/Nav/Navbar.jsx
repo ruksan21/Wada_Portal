@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './Navbar.css';
 import HeroImage from '../../Image/Home.png';
+import Profile from '../Profile/profile.jsx';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,27 @@ const Navbar = () => {
                     <a href="#about" className="nav-link">About</a>
                     <a href="#contact" className="nav-link">Contact</a>
                 </div>
+                 {/* Dropdown Button */}
+                <div className="dropdown-container">
+                    <search className="search-bar"></search>
+                    <button className="dropdown-btn" onClick={toggleDropdown}>
+                        <span>📍 {selectedMuni}</span>
+                        <span className="arrow">▲</span>
+                    </button>
+                    {isOpen && (
+                        <ul className="dropdown-list">
+                            {municipalities.map((muni, index) => (
+                                <li
+                                    key={index}
+                                    className="dropdown-item"
+                                    onClick={() => selectOption(muni)}
+                                >
+                                    {muni}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
                 <div className="navbar-right">
                     <div className="language-selector">
                         <span>US</span>
@@ -60,27 +82,7 @@ const Navbar = () => {
                     </div>
                 </section>
 
-                {/* Dropdown Button */}
-                <div className="dropdown-container">
-                    <search className="search-bar"></search>
-                    <button className="dropdown-btn" onClick={toggleDropdown}>
-                        <span>📍 {selectedMuni}</span>
-                        <span className="arrow">▲</span>
-                    </button>
-                    {isOpen && (
-                        <ul className="dropdown-list">
-                            {municipalities.map((muni, index) => (
-                                <li
-                                    key={index}
-                                    className="dropdown-item"
-                                    onClick={() => selectOption(muni)}
-                                >
-                                    {muni}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+               
 
                 {/* Stats Cards */}
                 <section className="stats-section">
@@ -106,6 +108,7 @@ const Navbar = () => {
                     </div>
                 </section>
             </main>
+            <Profile />
         </div>
     );
 };

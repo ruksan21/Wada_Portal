@@ -1,10 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import Navbar from './Home/Nav/Navbar'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import Profile from "./Home/Profile/profile.jsx";
+import Navbar from "./Home/Nav/Navbar";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+   
     <Navbar />
-  </StrictMode>
-)
+    
+  </React.StrictMode>
+);
