@@ -45,9 +45,6 @@ const Navbar = () => {
                         <div className="selected-muni">{selectedMuni}</div>
                     </div>
                 </section>
-
-               
-
                 {/* Stats Cards */}
                 <section className="stats-section">
                     <div className="stat-card">
