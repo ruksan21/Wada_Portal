@@ -25,7 +25,7 @@ const Navbar = () => {
                 </div>
                 <div className="navbar-right">
                     <div className="language-selector">
-                        <span>US</span>
+                       <logo></logo>
                         <select>
                             <option>English</option>
                             <option>Nepali</option>

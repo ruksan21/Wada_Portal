@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './profile.css';
+import Works from './works';
 
 // Data for the profile, which you can later fetch from a backend.
 const profileData = {
@@ -23,7 +24,7 @@ const profileData = {
         email: "ram.shrestha@ktm.gov.np",
         address: "वडा नं. १, काठमाडौं"
     }
-};
+}; 
 
 // Star rating component
 const StarRating = ({ rating, reviews }) => {
@@ -42,6 +43,60 @@ const StarRating = ({ rating, reviews }) => {
 };
 
 const Profile = () => {
+    const [activeTab, setActiveTab] = useState('Details');
+
+    const renderActivePanel = () => {
+        if (activeTab === 'Details') {
+            return (
+                <div className="info-section">
+                    <div className="personal-info">
+                        <h2>Personal Information</h2>
+                        <div className="info-item">
+                            <label>Address</label>
+                            <p>{profileData.personalInfo.address}</p>
+                        </div>
+                        <div className="info-item">
+                            <label>Education</label>
+                            <p>{profileData.personalInfo.education}</p>
+                        </div>
+                        <div className="info-item">
+                            <label>Experience</label>
+                            <p>{profileData.personalInfo.experience}</p>
+                        </div>
+                        <div className="info-item">
+                            <label>Political Party</label>
+                            <p>{profileData.personalInfo.politicalParty}</p>
+                        </div>
+                         <div className="info-item">
+                            <label>Appointment Date</label>
+                            <p>{profileData.personalInfo.appointmentDate}</p>
+                        </div>
+                    </div>
+
+                    <div className="contact-details">
+                        <h2>Contact Details</h2>
+                        <div className="contact-item">
+                            <span>&#9742; {profileData.contactDetails.phone}</span>
+                        </div>
+                         <div className="contact-item">
+                            <span>&#9993; {profileData.contactDetails.email}</span>
+                        </div>
+                         <div className="contact-item">
+                            <span>&#128205; {profileData.contactDetails.address}</span>
+                        </div>
+                        <button className="download-button">Download Details</button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (activeTab === 'Works') {
+            return <Works />;
+        }
+
+        return <p className="tab-placeholder">Content coming soon for {activeTab}.</p>;
+    };
+
     return (
         <div className="profile-container">
             {/* Profile Header */}
@@ -66,57 +121,21 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* Profile Body */}
             <div className="profile-body">
                 <div className="tabs">
-                    <button className="tab-item ">Details</button>
-                    <button className="tab-item">Works</button>
-                    <button className="tab-item">Assets</button>
-                    <button className="tab-item">Activities</button>
-                    <button className="tab-item">Reviews</button>
-                    <button className="tab-item">Dashboard</button>
+                    {['Details', 'Works', 'Assets', 'Activities', 'Reviews', 'Dashboard'].map(tab => (
+                        <button
+                            key={tab}
+                            className={`tab-item ${activeTab === tab ? 'active' : ''}`}
+                            onClick={() => setActiveTab(tab)}
+                        >
+                            {tab}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="tab-content">
-                    <div className="info-section">
-                        <div className="personal-info">
-                            <h2>Personal Information</h2>
-                            <div className="info-item">
-                                <label>Address</label>
-                                <p>{profileData.personalInfo.address}</p>
-                            </div>
-                            <div className="info-item">
-                                <label>Education</label>
-                                <p>{profileData.personalInfo.education}</p>
-                            </div>
-                            <div className="info-item">
-                                <label>Experience</label>
-                                <p>{profileData.personalInfo.experience}</p>
-                            </div>
-                            <div className="info-item">
-                                <label>Political Party</label>
-                                <p>{profileData.personalInfo.politicalParty}</p>
-                            </div>
-                             <div className="info-item">
-                                <label>Appointment Date</label>
-                                <p>{profileData.personalInfo.appointmentDate}</p>
-                            </div>
-                        </div>
-
-                        <div className="contact-details">
-                            <h2>Contact Details</h2>
-                            <div className="contact-item">
-                                <span>&#9742; {profileData.contactDetails.phone}</span>
-                            </div>
-                             <div className="contact-item">
-                                <span>&#9993; {profileData.contactDetails.email}</span>
-                            </div>
-                             <div className="contact-item">
-                                <span>&#128205; {profileData.contactDetails.address}</span>
-                            </div>
-                            <button className="download-button">Download Details</button>
-                        </div>
-                    </div>
+                    {renderActivePanel()}
                 </div>
             </div>
         </div>

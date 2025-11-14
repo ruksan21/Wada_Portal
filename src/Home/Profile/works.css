@@ -1,0 +1,127 @@
+.works-section {
+  margin-top: 40px;
+}
+
+.works-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 15px 45px rgba(15, 64, 119, 0.1);
+  border: 1px solid #e1e7f0;
+}
+
+.works-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.works-label {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #6c7b95;
+  margin-bottom: 4px;
+}
+
+.works-subtitle {
+  margin-top: 4px;
+  color: #6c7b95;
+  font-size: 14px;
+}
+
+.status-pill {
+  font-size: 12px;
+  color: #52b788;
+  border: 1px solid #52b788;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ecfff4;
+}
+
+.works-image {
+  width: 100%;
+  border-radius: 12px;
+  margin: 20px 0;
+  height: 220px;
+  object-fit: cover;
+}
+
+.works-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.works-description {
+  font-size: 16px;
+  color: #2f3d4f;
+  line-height: 1.6;
+}
+
+.comments-panel {
+  margin-top: 30px;
+  background: #f5f7ff;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #dfe7fb;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.comments-input {
+  width: 100%;
+  height: 90px;
+  border-radius: 10px;
+  border: 1px solid #cbd7f4;
+  padding: 12px;
+  resize: none;
+  font-size: 14px;
+}
+.comments-input:disabled {
+  background: #eef1fb;
+  cursor: not-allowed;
+}
+
+.comments-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.rating-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  font-size: 18px;
+  color: #fdc830;
+}
+
+.login-comment {
+  background: #6e8cfd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.login-comment:disabled {
+  background: #a7b5f9;
+  cursor: not-allowed;
+}
+
+.comments-helper {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #8492b0;
+}
