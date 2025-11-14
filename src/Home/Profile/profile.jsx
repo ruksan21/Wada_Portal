@@ -69,7 +69,7 @@ const Profile = () => {
             {/* Profile Body */}
             <div className="profile-body">
                 <div className="tabs">
-                    <button className="tab-item active">Details</button>
+                    <button className="tab-item ">Details</button>
                     <button className="tab-item">Works</button>
                     <button className="tab-item">Assets</button>
                     <button className="tab-item">Activities</button>
