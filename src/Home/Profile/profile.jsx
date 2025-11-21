@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './profile.css';
 import Works from './works';
+import jsPDF from 'jspdf';
 
 // Data for the profile, which you can later fetch from a backend.
 const profileData = {
@@ -45,6 +46,89 @@ const StarRating = ({ rating, reviews }) => {
 const Profile = () => {
     const [activeTab, setActiveTab] = useState('Details');
 
+    const handleDownloadPDF = () => {
+        const doc = new jsPDF();
+        
+        // Set font and colors
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('Ward Chairperson Profile', 105, 20, { align: 'center' });
+        
+        // Add profile name
+        doc.setFontSize(14);
+        doc.text(profileData.name, 105, 35, { align: 'center' });
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(profileData.role, 105, 43, { align: 'center' });
+        
+        // Personal Information Section
+        let yPos = 60;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.text('Personal Information', 20, yPos);
+        
+        yPos += 10;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        
+        const personalInfo = [
+            { label: 'Address', value: profileData.personalInfo.address },
+            { label: 'Education', value: profileData.personalInfo.education },
+            { label: 'Experience', value: profileData.personalInfo.experience },
+            { label: 'Political Party', value: profileData.personalInfo.politicalParty },
+            { label: 'Appointment Date', value: profileData.personalInfo.appointmentDate }
+        ];
+        
+        personalInfo.forEach(item => {
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${item.label}:`, 20, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(item.value, 70, yPos);
+            yPos += 8;
+        });
+        
+        // Contact Details Section
+        yPos += 10;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.text('Contact Details', 20, yPos);
+        
+        yPos += 10;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        
+        const contactInfo = [
+            { label: 'Phone', value: profileData.contactDetails.phone },
+            { label: 'Email', value: profileData.contactDetails.email },
+            { label: 'Address', value: 'Ward No. 1, Kathmandu' }
+        ];
+        
+        contactInfo.forEach(item => {
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${item.label}:`, 20, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(item.value, 70, yPos);
+            yPos += 8;
+        });
+        
+        // Stats Section
+        yPos += 10;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.text('Statistics', 20, yPos);
+        
+        yPos += 10;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(`Rating: ${profileData.rating} (${profileData.reviews} reviews)`, 20, yPos);
+        yPos += 8;
+        doc.text(`Followers: ${profileData.followers}`, 20, yPos);
+        
+        // Save the PDF
+        doc.save(`${profileData.name.replace(/\s+/g, '_')}_Profile.pdf`);
+    };
+
     const renderActivePanel = () => {
         if (activeTab === 'Details') {
             return (
@@ -84,7 +168,7 @@ const Profile = () => {
                          <div className="contact-item">
                             <span>&#128205; {profileData.contactDetails.address}</span>
                         </div>
-                        <button className="download-button">Download Details</button>
+                        <button className="download-button" onClick={handleDownloadPDF}>Download Details</button>
                     </div>
                 </div>
             );
