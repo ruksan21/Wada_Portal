@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../../styles/auth.css';
+import './Forget.css';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');

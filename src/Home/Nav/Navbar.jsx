@@ -31,7 +31,7 @@ const Navbar = () => {
                             <option>Nepali</option>
                         </select>
                     </div>
-                    <button className="login-btn">login</button>
+                        <a href="/login" className="login-btn">login</a>
                 </div>
             </nav> 
             {/* Main Content */}
