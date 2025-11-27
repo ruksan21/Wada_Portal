@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 import Profile from "../Profile/profile.jsx";
 import WardSelector from "../Component/wadaselector.jsx";
+import Notification from "../Component/Notification.jsx";
+import UserMenu from "../Component/UserMenu.jsx";
 import HeroSection from "../Pages/HeroSection.jsx";
 import Status from "../Pages/Status.jsx";
 
@@ -13,9 +15,14 @@ const Navbar = ({ showHomeContent = false }) => {
     <div className="app">
       {/* Top Navigation Bar */}
       <nav className="navbar">
+        {/* Left Section - Logo */}
         <div className="navbar-left">
-          <span className="logo">वडा पोर्टल</span>
+          <Link to="/" className="logo">
+            वडा पोर्टल
+          </Link>
         </div>
+
+        {/* Center Section - Navigation Links */}
         <div className="navbar-center">
           <Link to="/" className="nav-link">
             Home
@@ -23,20 +30,21 @@ const Navbar = ({ showHomeContent = false }) => {
           <Link to="/about" className="nav-link">
             About
           </Link>
-          <a href="#contact" className="nav-link">
+          <Link to="/contact" className="nav-link">
             Contact
-          </a>
+          </Link>
         </div>
-        <div className="navbar-center">
+
+        {/* Right Section - Ward Selector, Notification, User Menu */}
+        <div className="navbar-right">
           <WardSelector
             onWardSelect={(muni, ward) =>
               setSelectedMuni(`${muni} - Ward ${ward}`)
             }
           />
+          <Notification />
+          <UserMenu />
         </div>
-        <Link to="/login" className="login-btn">
-          login
-        </Link>
       </nav>
 
       {/* Main Content - Only shown if showHomeContent is true */}

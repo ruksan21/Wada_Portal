@@ -5,85 +5,86 @@
 }
 
 .app {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f8f9fa;
 }
 
-/* Navbar */
+/* Navbar - Clean Flexbox Layout */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 12px 24px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 64px;
+}
+
+/* Left Section - Logo */
+.navbar-left {
+  flex-shrink: 0;
 }
 
 .navbar-left .logo {
   font-size: 24px;
-  font-weight: bold;
-  color: #0056b3;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s;
 }
 
+.navbar-left .logo:hover {
+  opacity: 0.8;
+}
+
+/* Center Section - Navigation Links */
 .navbar-center {
   display: flex;
-  gap: 20px;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 0 20px;
 }
 
 .nav-link {
   text-decoration: none;
-  color: #333;
+  color: #4b5563;
   font-weight: 500;
-  padding: 6px 12px;
-  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 6px;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.nav-link:hover,
+.nav-link:hover {
+  color: #667eea;
+  background: #f3f4f6;
+}
+
 .nav-link.active {
-  color: #0056b3;
-  border-bottom: 2px solid #0056b3;
+  color: #667eea;
+  background: #eff6ff;
 }
 
+/* Right Section - Actions */
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.language-selector {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 14px;
-}
-
-.language-selector select {
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.login-btn {
-  background-color: #0056b3;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.login-btn:hover {
-  background-color: #003f87;
-}
-
-
+/* Hero Section */
 .hero {
   position: relative;
   height: 400px;
@@ -128,71 +129,7 @@
   font-size: 1rem;
 }
 
-.dropdown-container {
-  position: relative;
-  margin: 20px auto;
-  width: 100%;
-  max-width: 400px;
-}
-
-.dropdown-btn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #0056b3;
-  color: rgb(255, 255, 255);
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  width: 100%;
-  text-align: left;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-btn:hover {
-  background-color: #003f87;
-}
-
-.arrow {
-  font-size: 12px;
-  transition: transform 0.2s;
-}
-
-.dropdown-btn:focus {
-  outline: none;
-}
-
-.dropdown-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: rgb(238, 231, 231);
-  border: 1px solid #ccc;
-  color: #000000;
-  border-top: none;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.dropdown-item {
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.dropdown-item:hover {
-  background-color: #f0f8ff;
-}
-
-
+/* Stats Section */
 .stats-section {
   display: flex;
   justify-content: center;
@@ -231,11 +168,56 @@
   font-size: 14px;
 }
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+
+  .navbar-center {
+    padding: 0 15px;
+  }
+
+  .navbar-left .logo {
+    font-size: 22px;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    padding: 7px 12px;
+  }
+}
 
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 10px 16px;
     gap: 10px;
+  }
+
+  .navbar-left {
+    order: 1;
+  }
+
+  .navbar-right {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .navbar-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .navbar-left .logo {
+    font-size: 20px;
   }
 
   .hero h1 {
@@ -248,5 +230,20 @@
 
   .stat-card {
     min-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-right {
+    gap: 6px;
+  }
+
+  .navbar-center {
+    gap: 6px;
+  }
+
+  .nav-link {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
