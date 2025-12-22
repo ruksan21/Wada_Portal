@@ -4,7 +4,7 @@ import "./Notification.css";
 const Notification = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Sample notifications - भविष्यमा यो API बाट आउनेछ
+  // Sample notifications - will come from API in the future
   const [notifications, setNotifications] = useState([
     {
       id: 1,

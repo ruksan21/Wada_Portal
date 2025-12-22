@@ -1,0 +1,428 @@
+import React, { useState } from "react";
+import OfficerLayout from "./OfficerLayout";
+import "../Home/Pages/Works.css";
+import "./OfficerWorks.css";
+import { useAuth } from "../Home/Context/AuthContext";
+
+const WorkCard = ({ work, onEdit, onDelete }) => {
+  return (
+    <div className="work-card" style={{ position: "relative" }}>
+      {/* Action Buttons and Status on Top Right */}
+      <div className="work-actions">
+        <span className={`status-badge status-${work.status.toLowerCase()}`}>
+          {work.status}
+        </span>
+        <button className="btn-edit-work" onClick={() => onEdit(work)}>
+          <span>✏️</span> Edit
+        </button>
+        <button className="btn-delete-work" onClick={() => onDelete(work.id)}>
+          <span>🗑️</span> Delete
+        </button>
+      </div>
+
+      <div className="work-header">
+        <div>
+          <div className="work-label">WORKS</div>
+          <h3 className="work-title">{work.title}</h3>
+          <p className="work-location">
+            {work.ward}, {work.municipality}
+          </p>
+        </div>
+      </div>
+
+      <div className="work-image-container">
+        <img
+          src={work.image}
+          alt={work.title}
+          className="work-image"
+          onError={(e) => {
+            e.target.src =
+              "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80";
+          }}
+        />
+      </div>
+
+      <div className="work-stats-grid">
+        <div className="stat-item">
+          <label>Start Date</label>
+          <div>{work.startDate}</div>
+        </div>
+        <div className="stat-item">
+          <label>End Date</label>
+          <div>{work.endDate}</div>
+        </div>
+        <div className="stat-item">
+          <label>Budget</label>
+          <div>Rs. {work.budget}</div>
+        </div>
+        <div className="stat-item">
+          <label>Beneficiaries</label>
+          <div>{work.beneficiaries}</div>
+        </div>
+      </div>
+
+      <div className="work-description">
+        <p>{work.description}</p>
+      </div>
+    </div>
+  );
+};
+
+export default function OfficerWorks() {
+  const { user } = useAuth();
+  const [works, setWorks] = useState([
+    {
+      id: 1,
+      title: "Road Repair Work",
+      municipality: "Kathmandu",
+      ward: "Ward No. 1",
+      status: "completed",
+      image:
+        "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1000&q=80",
+      startDate: "2022/08/17",
+      endDate: "2022/12/11",
+      budget: "20,00,000",
+      beneficiaries: "5,000",
+      description:
+        "Main road repair and improvement, including road cleaning and asphalt refinement.",
+      fiscalYear: "2022/23",
+      contractorName: "ABC Construction Pvt. Ltd.",
+    },
+    {
+      id: 2,
+      title: "Park Renovation",
+      municipality: "Kathmandu",
+      ward: "Ward No. 1",
+      status: "ongoing",
+      image:
+        "https://images.unsplash.com/photo-1596230529625-7ee54135a963?auto=format&fit=crop&w=1000&q=80",
+      startDate: "2023/01/15",
+      endDate: "2023/06/30",
+      budget: "15,00,000",
+      beneficiaries: "2,500",
+      description:
+        "Renovation of community park including new benches, planting trees, and installing playground equipment.",
+      fiscalYear: "2023/24",
+      contractorName: "Green Spaces Ltd.",
+    },
+  ]);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingWork, setEditingWork] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    status: "pending",
+    fiscalYear: "",
+    budget: "",
+    startDate: "",
+    endDate: "",
+    contractorName: "",
+    beneficiaries: "",
+    image: "",
+    imageFile: null,
+  });
+
+  const handleOpenForm = (work = null) => {
+    if (work) {
+      setEditingWork(work);
+      setFormData({
+        title: work.title,
+        description: work.description,
+        status: work.status,
+        fiscalYear: work.fiscalYear,
+        budget: work.budget,
+        startDate: work.startDate,
+        endDate: work.endDate,
+        contractorName: work.contractorName,
+        beneficiaries: work.beneficiaries,
+        image: work.image,
+      });
+    } else {
+      setEditingWork(null);
+      setFormData({
+        title: "",
+        description: "",
+        status: "pending",
+        fiscalYear: "",
+        budget: "",
+        startDate: "",
+        endDate: "",
+        contractorName: "",
+        beneficiaries: "",
+        image: "",
+      });
+    }
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingWork(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setFormData({ ...formData, image: imageUrl, imageFile: file });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const newWork = {
+      id: editingWork ? editingWork.id : Date.now(),
+      ...formData,
+      municipality: user?.municipality || "Kathmandu",
+      ward: user?.ward || "Ward No. 1",
+    };
+
+    if (editingWork) {
+      // Update existing work
+      setWorks(works.map((w) => (w.id === editingWork.id ? newWork : w)));
+    } else {
+      // Add new work
+      setWorks([...works, newWork]);
+    }
+
+    handleCloseForm();
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this work?")) {
+      setWorks(works.filter((w) => w.id !== id));
+    }
+  };
+
+  return (
+    <OfficerLayout title="Development Works">
+      <div className="officer-works-header">
+        <p style={{ color: "#718096", margin: 0 }}>
+          Manage development works and projects for your ward
+        </p>
+        <button className="btn-create-work" onClick={() => handleOpenForm()}>
+          + Create New Work
+        </button>
+      </div>
+
+      {/* Form Modal */}
+      {isFormOpen && (
+        <div className="work-form-overlay">
+          <div className="work-form-modal">
+            <div className="form-modal-header">
+              <h2>{editingWork ? "Edit Work" : "Create New Work"}</h2>
+              <button className="btn-close-modal" onClick={handleCloseForm}>
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="work-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Title <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Road Repair Work"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Status <span className="required">*</span>
+                  </label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>
+                  Description <span className="required">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  required
+                  rows="3"
+                  placeholder="Describe the work project..."
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Fiscal Year <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="fiscalYear"
+                    value={formData.fiscalYear}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., 2023/24"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Allocated Budget (Rs.) <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="budget"
+                    value={formData.budget}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., 20,00,000"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Start Date <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="YYYY/MM/DD"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    End Date <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="YYYY/MM/DD"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Contractor Name</label>
+                  <input
+                    type="text"
+                    name="contractorName"
+                    value={formData.contractorName}
+                    onChange={handleInputChange}
+                    placeholder="e.g., ABC Construction Pvt. Ltd."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>
+                    Beneficiaries <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="beneficiaries"
+                    value={formData.beneficiaries}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., 5,000"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Work Image</label>
+                <div className="image-upload-container">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="file-input"
+                    id="work-image-upload"
+                  />
+                  <label
+                    htmlFor="work-image-upload"
+                    className="file-upload-label"
+                  >
+                    <span className="upload-icon">📷</span>
+                    <span>
+                      {formData.imageFile
+                        ? formData.imageFile.name
+                        : "Choose Image"}
+                    </span>
+                  </label>
+                  {formData.image && (
+                    <div className="image-preview">
+                      <img src={formData.image} alt="Preview" />
+                    </div>
+                  )}
+                </div>
+                <small style={{ color: "#718096", fontSize: "0.85rem" }}>
+                  Upload an image or leave blank for default
+                </small>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleCloseForm}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-submit">
+                  {editingWork ? "Update Work" : "Create Work"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Works List */}
+      <div className="works-list">
+        {works.length === 0 ? (
+          <div className="empty-state">
+            <p>No works created yet. Click "Create New Work" to get started.</p>
+          </div>
+        ) : (
+          works.map((work) => (
+            <WorkCard
+              key={work.id}
+              work={work}
+              onEdit={handleOpenForm}
+              onDelete={handleDelete}
+            />
+          ))
+        )}
+      </div>
+    </OfficerLayout>
+  );
+}

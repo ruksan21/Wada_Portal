@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 import "./Login.css";
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const API_URL = "http://localhost/api"; // Change to your PHP backend URL
 
   const resetErrors = () => setErrors({ email: "", password: "" });
 
@@ -27,17 +31,69 @@ export default function LoginPage() {
     return !newErrors.email && !newErrors.password;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     resetErrors();
-    if (validate()) {
+    
+    if (!validate()) return;
+
+    setIsLoading(true);
+
+    try {
+      // Call login API
+      const response = await fetch(`${API_URL}/login.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        // Handle error response
+        setErrors({
+          email: "",
+          password: data.message || "Login failed. Please try again.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Login successful
+      const userData = data.data.user;
+      const authToken = data.data.token;
+
+      // Save token and user to localStorage
+      localStorage.setItem("authToken", authToken);
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      // Update context
+      login(userData);
       setShowSuccess(true);
-      localStorage.setItem("isLoggedIn", "true");
-      console.log("Login successful", { email, password });
-      // Navigate to portal after 1.5 seconds
+
+      // Redirect after showing success
       setTimeout(() => {
-        navigate("/");
+        if (userData.role === "admin") {
+          navigate("/admin");
+        } else if (userData.role === "officer") {
+          navigate("/officer");
+        } else {
+          navigate("/");
+        }
       }, 1500);
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({
+        email: "",
+        password: "Network error. Please check your connection and try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,11 +106,6 @@ export default function LoginPage() {
 
       {showSuccess && (
         <div className="success-notification show">Login successful!</div>
-      )}
-      {Object.values(errors).some((error) => error) && (
-        <div className="error-notification show">
-          Please fix the errors above.
-        </div>
       )}
 
       <div className="login-container">
@@ -77,6 +128,7 @@ export default function LoginPage() {
                 maxLength={100}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <p className={`error-message ${errors.email ? "show" : ""}`}>
@@ -97,6 +149,7 @@ export default function LoginPage() {
                 maxLength={50}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <p className={`error-message ${errors.password ? "show" : ""}`}>
@@ -104,8 +157,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <button type="submit" className="btn-login">
-            Login
+          <button type="submit" className="btn-login" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 

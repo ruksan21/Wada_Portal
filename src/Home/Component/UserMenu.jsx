@@ -1,33 +1,25 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 import "./UserMenu.css";
 
 const UserMenu = () => {
+  const { user, isLoggedIn, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-
-  // यो भविष्यमा authentication state बाट आउनेछ
-  const [user, setUser] = useState({
-    name: "राम बहादुर",
-    role: "Ward Chairperson",
-    ward: "Ward 5",
-    municipality: "Kathmandu",
-    avatar: "👤",
-    isLoggedIn: true, // यो authentication बाट controlled हुनेछ
-  });
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   const handleLogout = () => {
-    // भविष्यमा यहाँ logout API call हुनेछ
-    console.log("Logging out...");
-    setUser({ ...user, isLoggedIn: false });
+    logout();
     setIsOpen(false);
+    navigate("/login");
   };
 
   // If not logged in, show login button
-  if (!user.isLoggedIn) {
+  if (!isLoggedIn) {
     return (
       <Link to="/login" className="login-btn">
         Login
@@ -39,8 +31,16 @@ const UserMenu = () => {
   return (
     <div className="user-menu-container">
       <button className="user-avatar-btn" onClick={toggleMenu}>
-        <span className="user-avatar">{user.avatar}</span>
-        <span className="user-name">{user.name}</span>
+        {user?.photoUrl ? (
+          <img
+            src={user.photoUrl}
+            alt={user.name}
+            className="user-avatar-img"
+          />
+        ) : (
+          <span className="user-avatar">👤</span>
+        )}
+        <span className="user-name">{user?.name || user?.email}</span>
         <span className={`dropdown-arrow ${isOpen ? "open" : ""}`}>▼</span>
       </button>
 
@@ -50,12 +50,22 @@ const UserMenu = () => {
           <div className="user-menu-dropdown">
             {/* User Info Section */}
             <div className="user-info-section">
-              <div className="user-avatar-large">{user.avatar}</div>
+              {user?.photoUrl ? (
+                <img
+                  src={user.photoUrl}
+                  alt={user.name}
+                  className="user-avatar-large-img"
+                />
+              ) : (
+                <div className="user-avatar-large">👤</div>
+              )}
               <div className="user-details">
-                <h3>{user.name}</h3>
-                <p className="user-role">{user.role}</p>
+                <h3>{user?.name || user?.email}</h3>
+                <p className="user-role">{user?.role || "User"}</p>
                 <p className="user-location">
-                  {user.ward}, {user.municipality}
+                  {user?.ward &&
+                    user?.municipality &&
+                    `${user.ward}, ${user.municipality}`}
                 </p>
               </div>
             </div>
@@ -69,24 +79,24 @@ const UserMenu = () => {
                 <span>My Profile</span>
               </Link>
 
-              <Link to="/dashboard" className="menu-item" onClick={toggleMenu}>
-                <span className="menu-icon">📊</span>
-                <span>Dashboard</span>
-              </Link>
-
               <Link to="/settings" className="menu-item" onClick={toggleMenu}>
                 <span className="menu-icon">⚙️</span>
                 <span>Settings</span>
               </Link>
 
-              <Link
-                to="/notifications"
-                className="menu-item"
-                onClick={toggleMenu}
-              >
-                <span className="menu-icon">🔔</span>
-                <span>All Notifications</span>
-              </Link>
+              {/* Role-based Panels */}
+              {user?.role === "officer" && (
+                <Link to="/officer" className="menu-item" onClick={toggleMenu}>
+                  <span className="menu-icon">👮</span>
+                  <span>Officer Panel</span>
+                </Link>
+              )}
+              {user?.role === "admin" && (
+                <Link to="/admin" className="menu-item" onClick={toggleMenu}>
+                  <span className="menu-icon">🛡️</span>
+                  <span>Admin Panel</span>
+                </Link>
+              )}
 
               <Link to="/help" className="menu-item" onClick={toggleMenu}>
                 <span className="menu-icon">❓</span>

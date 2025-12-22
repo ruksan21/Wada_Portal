@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 import Profile from "../Profile/profile.jsx";
@@ -7,9 +7,17 @@ import Notification from "../Component/Notification.jsx";
 import UserMenu from "../Component/UserMenu.jsx";
 import HeroSection from "../Pages/HeroSection.jsx";
 import Status from "../Pages/Status.jsx";
+import { useWard } from "../Context/WardContext";
 
 const Navbar = ({ showHomeContent = false }) => {
-  const [selectedMuni, setSelectedMuni] = useState("Select Municipality");
+  const { municipality, ward } = useWard();
+  const selectedMuni = useMemo(
+    () =>
+      municipality && ward
+        ? `${municipality} - Ward ${ward}`
+        : "Select Municipality",
+    [municipality, ward]
+  );
 
   return (
     <div className="app">
@@ -18,7 +26,7 @@ const Navbar = ({ showHomeContent = false }) => {
         {/* Left Section - Logo */}
         <div className="navbar-left">
           <Link to="/" className="logo">
-            वडा पोर्टल
+            Ward Portal
           </Link>
         </div>
 
@@ -26,6 +34,9 @@ const Navbar = ({ showHomeContent = false }) => {
         <div className="navbar-center">
           <Link to="/" className="nav-link">
             Home
+          </Link>
+          <Link to="/documents" className="nav-link">
+            Documents
           </Link>
           <Link to="/about" className="nav-link">
             About
@@ -37,11 +48,7 @@ const Navbar = ({ showHomeContent = false }) => {
 
         {/* Right Section - Ward Selector, Notification, User Menu */}
         <div className="navbar-right">
-          <WardSelector
-            onWardSelect={(muni, ward) =>
-              setSelectedMuni(`${muni} - Ward ${ward}`)
-            }
-          />
+          <WardSelector />
           <Notification />
           <UserMenu />
         </div>

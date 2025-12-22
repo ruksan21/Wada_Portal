@@ -1,0 +1,162 @@
+.works-page {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.works-page.embedded {
+  padding: 0;
+  background: transparent;
+  min-height: 0;
+}
+
+.works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Card Design */
+.work-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem; /* Reduced padding slightly from image to fit standard screens */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header Section */
+.work-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.work-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.work-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.25rem 0;
+}
+
+.work-location {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Status Badge */
+.work-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: lowercase;
+  border: 1px solid currentColor;
+}
+
+.status-completed {
+  color: #28a745;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.status-ongoing {
+  color: #007bff;
+  background-color: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.status-pending {
+  color: #d97706;
+  background-color: #fffbeb;
+  border-color: #fde68a;
+}
+
+/* Image */
+.work-image-container {
+  width: 100%;
+  height: 250px; /* Adjust height as needed */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #e9ecef;
+}
+
+.work-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stats Grid */
+.work-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-item label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.25rem;
+}
+
+.stat-item div {
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+/* Description */
+.work-description {
+  color: #495057;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.works-note {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .work-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .work-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .work-status {
+    align-self: flex-start;
+  }
+}

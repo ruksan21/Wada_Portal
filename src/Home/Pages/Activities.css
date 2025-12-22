@@ -1,0 +1,18 @@
+.activities-page { padding: 24px; }
+.section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.section-pin { font-size: 16px; }
+.section-title { font-weight: 700; font-size: 15px; }
+.activities-list { display: flex; flex-direction: column; gap: 12px; }
+.activity-item { display: flex; gap: 14px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.2s; }
+.activity-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.activity-icon { width: 48px; height: 48px; min-width: 48px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 22px; }
+.activity-content { flex: 1; }
+.activity-title { font-weight: 600; font-size: 15px; color: #111827; margin-bottom: 4px; }
+.activity-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 8px; line-height: 1.4; }
+.activity-footer { display: flex; gap: 16px; }
+.activity-date, .activity-time { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
+.activities-note { margin-top: 12px; font-size: 12px; color: #6b7280; }
+
+@media (max-width: 900px) {
+  .activities-page { padding: 16px; }
+}

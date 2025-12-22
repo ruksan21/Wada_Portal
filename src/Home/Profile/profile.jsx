@@ -2,6 +2,9 @@ import { useState } from "react";
 import "./profile.css";
 import Works from "./works";
 import jsPDF from "jspdf";
+import Dashboard from "../Pages/Dashboard";
+import Assets from "../Pages/Assets";
+import Activities from "../Pages/Activities";
 
 // Data for the profile, which you can later fetch from a backend.
 const profileData = {
@@ -14,16 +17,16 @@ const profileData = {
   reviews: 89,
   followers: 1250,
   personalInfo: {
-    address: "वडा नं. १, काठमाडौं",
-    education: "स्नातकोत्तर (राजनीति विज्ञान)",
-    experience: "१५ वर्ष स्थानीय राजनीतिमा",
-    politicalParty: "नेपाली कांग्रेस",
-    appointmentDate: "२०७९/०५/१५",
+    address: "Ward No. 1, Kathmandu",
+    education: "Master's Degree (Political Science)",
+    experience: "15 years in local politics",
+    politicalParty: "Nepali Congress",
+    appointmentDate: "2022/08/31",
   },
   contactDetails: {
     phone: "9841234567",
     email: "ram.shrestha@ktm.gov.np",
-    address: "वडा नं. १, काठमाडौं",
+    address: "Ward No. 1, Kathmandu",
   },
 };
 
@@ -58,7 +61,8 @@ const Profile = () => {
   const handleFollow = () => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (!isLoggedIn) {
-      alert("Please login to follow!");
+      // Show a more user-friendly message - could be replaced with a notification system
+      console.log("Please login to follow!");
       return;
     }
 
@@ -164,7 +168,6 @@ const Profile = () => {
     doc.save(`${profileData.name.replace(/\s+/g, "_")}_Profile.pdf`);
   };
 
-
   const renderActivePanel = () => {
     if (activeTab === "Details") {
       return (
@@ -215,6 +218,16 @@ const Profile = () => {
     if (activeTab === "Works") {
       return <Works />;
     }
+    if (activeTab === "Dashboard") {
+      return <Dashboard embedded={true} />;
+    }
+    if (activeTab === "Assets") {
+      return <Assets embedded={true} />;
+    }
+
+    if (activeTab === "Activities") {
+      return <Activities embedded={true} />;
+    }
 
     return (
       <p className="tab-placeholder">Content coming soon for {activeTab}.</p>
@@ -259,22 +272,17 @@ const Profile = () => {
 
       <div className="profile-body">
         <div className="tabs">
-          {[
-            "Details",
-            "Works",
-            "Assets",
-            "Activities",
-            "Reviews",
-            "Dashboard",
-          ].map((tab) => (
-            <button
-              key={tab}
-              className={`tab-item ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
+          {["Details", "Works", "Assets", "Activities", "Dashboard"].map(
+            (tab) => (
+              <button
+                key={tab}
+                className={`tab-item ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            )
+          )}
         </div>
 
         <div className="tab-content">{renderActivePanel()}</div>

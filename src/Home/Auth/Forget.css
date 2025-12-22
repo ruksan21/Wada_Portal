@@ -1,136 +1,142 @@
+/* Minimal & Clean Design - Forgot Password */
 .login-root {
-  font-family: Arial, sans-serif;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #f8fafc;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f4f4f4;
-}
-
-.success-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  display: none;
-}
-
-.success-notification.show {
-  display: block;
-}
-
-.error-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #ef4444;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  display: none;
-}
-
-.error-notification.show {
-  display: block;
+  font-family: "Inter", sans-serif;
+  padding: 1.5rem;
 }
 
 .login-container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .login-header h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #333;
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .login-header p {
-  margin: 5px 0 20px;
-  color: #666;
+  color: #64748b;
+  font-size: 0.95rem;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1.25rem;
 }
 
-.form-group label {
+label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
   display: block;
-  margin-bottom: 5px;
-  color: #333;
 }
 
+/* Input Styling */
 .input-wrapper {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
-}
-
-.input-wrapper i {
-  margin-right: 10px;
-  color: #888;
-}
-
-.form-control {
-  border: none;
-  outline: none;
-  flex: 1;
-}
-
-.form-control.error {
-  border-color: red;
-}
-
-.error-message {
-  color: red;
-  font-size: 12px;
-  display: none;
-}
-
-.error-message.show {
-  display: block;
-}
-
-.btn-login {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
+  position: relative;
   width: 100%;
 }
 
-.btn-login:hover {
-  background-color: #0056b3;
+.input-wrapper i {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 1rem;
+  pointer-events: none;
 }
 
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.95rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  color: #1e293b;
+  font-family: inherit;
+}
+
+.form-control:focus {
+  border-color: #009688;
+  box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.1);
+  outline: none;
+}
+
+/* Button */
+.btn-login {
+  width: 100%;
+  background-color: #009688;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-login:hover {
+  background-color: #00796b;
+}
+
+/* Links */
 .forgot-password {
-  margin-top: 10px;
   text-align: center;
+  margin-top: 1.5rem;
 }
 
 .forgot-password a {
-  color: #007bff;
+  color: #64748b;
+  font-size: 0.9rem;
   text-decoration: none;
 }
 
 .forgot-password a:hover {
+  color: #009688;
   text-decoration: underline;
 }
 
-.copyright {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 12px;
-  color: #888;
+/* Notifications */
+.success-notification,
+.error-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: white;
+  z-index: 1000;
+}
+
+.success-notification {
+  background-color: #10b981;
+}
+
+.error-notification {
+  background-color: #ef4444;
 }

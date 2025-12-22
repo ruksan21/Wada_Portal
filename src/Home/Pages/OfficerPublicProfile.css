@@ -1,0 +1,595 @@
+/* Officer Public Profile Page */
+
+.officer-public-profile {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 40px 20px 60px;
+}
+
+.officer-profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Tabs Navigation */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fafafa;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.profile-tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+.profile-tabs::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #4169e1;
+  background: #f8fafc;
+}
+
+.tab-btn.active {
+  color: #4169e1;
+  border-bottom-color: #4169e1;
+  background: white;
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+}
+
+/* Tab Content */
+.tab-content {
+  padding: 40px;
+}
+
+/* Details Section */
+.details-section {
+  width: 100%;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.info-column h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 25px 0;
+}
+
+/* Personal Information Items */
+.info-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-item label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.info-item p {
+  font-size: 1rem;
+  color: #1e293b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Contact Details */
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #334155;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.contact-item:hover {
+  background: #f1f5f9;
+  transform: translateX(3px);
+}
+
+.contact-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+/* Download Button */
+.download-btn {
+  width: 100%;
+  background: #4169e1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(65, 105, 225, 0.2);
+}
+
+.download-btn:hover {
+  background: #2d4ba2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+}
+
+.download-icon {
+  font-size: 1.2rem;
+}
+
+/* Content Placeholder */
+.content-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.content-placeholder h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 15px 0;
+}
+
+.content-placeholder p {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Works Section */
+.works-section h3,
+.assets-section h3,
+.activities-section h3,
+.reviews-section h3,
+.dashboard-section h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 25px 0;
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.work-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.work-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.work-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.work-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+  flex: 1;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.ongoing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.planned {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.work-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.work-detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.work-detail-item .label {
+  color: #64748b;
+}
+
+.work-detail-item .value {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Assets Section */
+.assets-table {
+  background: #f8fafc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.assets-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.assets-table thead {
+  background: #e2e8f0;
+}
+
+.assets-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.assets-table td {
+  padding: 15px;
+  border-top: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.value-col {
+  font-weight: 700;
+  color: #4169e1;
+}
+
+.total-assets {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background: #e0e7ff;
+  font-size: 1.1rem;
+}
+
+.total-assets strong {
+  color: #4169e1;
+  font-size: 1.3rem;
+}
+
+/* Activities Section */
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -35px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4169e1;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #4169e1;
+}
+
+.timeline-date {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.timeline-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+
+.timeline-content p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Reviews Section */
+.reviews-summary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.average-rating .rating-number {
+  font-size: 3rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.average-rating .stars {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.average-rating p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.review-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-header strong {
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.review-date {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.review-rating {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.review-comment {
+  margin: 0;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* Dashboard Section */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.dash-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dash-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dash-icon {
+  font-size: 2.5rem;
+  opacity: 0.9;
+}
+
+.dash-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dash-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.dash-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Dashboard styles */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.cards-row {
+  display: flex;
+  gap: 12px;
+}
+.card {
+  flex: 1 1 0;
+  padding: 18px;
+  border-radius: 10px;
+  color: #fff;
+}
+.card-label { font-size: 0.95rem; opacity: 0.9; }
+.card-value { font-weight: 800; font-size: 1.35rem; margin-top: 8px; }
+.card.blue { background: #1e88e5; }
+.card.green { background: #2f7a2f; }
+.card.purple { background: #6b21a8; }
+
+.main-row { display: flex; gap: 18px; }
+.progress-panel {
+  flex: 2 1 0;
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+}
+.progress-panel h4 { margin: 0 0 12px 0; }
+.progress-item { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.progress-title { width: 84px; color: #334155; font-weight: 600; }
+.progress-bar { flex: 1 1 auto; height: 12px; background: #eef2ff; border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; }
+.progress-fill.blue { background: linear-gradient(90deg,#60a5fa,#1e88e5); }
+.progress-fill.green { background: linear-gradient(90deg,#7dd3a2,#2f7a2f); }
+.progress-fill.orange { background: linear-gradient(90deg,#f59e0b,#fb7185); }
+.progress-pct { width: 48px; text-align: right; color: #334155; font-weight: 700; }
+
+.beneficiary-panel {
+  flex: 1 1 0;
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+}
+.beneficiary-panel h4 { margin: 0 0 6px 0; }
+.beneficiary-total { font-size: 2rem; color: #0ea5a6; font-weight: 800; margin: 6px 0 12px 0; }
+.beneficiary-breakdown { display: flex; justify-content: space-around; gap: 12px; }
+.ben-num { font-weight: 700; font-size: 1.05rem; }
+.ben-label { color: #64748b; font-size: 0.9rem; }
+
+@media (max-width: 900px) {
+  .cards-row { flex-direction: column; }
+  .main-row { flex-direction: column; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .officer-public-profile {
+    padding: 20px 10px 40px;
+  }
+
+  .tab-content {
+    padding: 25px 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .tab-btn {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+
+  .tab-icon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-content {
+    padding: 20px 15px;
+  }
+
+  .info-column h3 {
+    font-size: 1.1rem;
+  }
+
+  .tab-btn {
+    padding: 12px 12px;
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+}

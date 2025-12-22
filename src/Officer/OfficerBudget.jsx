@@ -1,0 +1,171 @@
+import React, { useEffect, useState } from "react";
+import "./Budget.css";
+import OfficerLayout from "./OfficerLayout";
+
+// Beginner-friendly OfficerBudget component
+// - Manages budget summary and beneficiary data in localStorage
+// - This is a frontend-only demo. Replace localStorage calls with API requests later.
+
+export default function OfficerBudget() {
+
+  // Beneficiary form state
+  const [benTotal, setBenTotal] = useState("");
+  const [benDirect, setBenDirect] = useState("");
+  const [benIndirect, setBenIndirect] = useState("");
+
+  // Budget summary form state
+  const [budgetAllocated, setBudgetAllocated] = useState("");
+  const [budgetSpent, setBudgetSpent] = useState("");
+
+  // Toast notification state
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ show: false, message: "", type: "success" });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
+  // Handle beneficiary form submission
+  function handleBeneficiarySubmit(e) {
+    e.preventDefault();
+    
+    // Validation: check if all fields are filled
+    if (!benTotal || !benDirect || !benIndirect) {
+      setToast({ show: true, message: "⚠️ Please fill all beneficiary fields!", type: "error" });
+      return;
+    }
+    
+    // Save beneficiary data to localStorage
+    const beneficiaryData = {
+      total: Number(benTotal) || 0,
+      direct: Number(benDirect) || 0,
+      indirect: Number(benIndirect) || 0,
+    };
+    localStorage.setItem("ward_beneficiaries", JSON.stringify(beneficiaryData));
+    setToast({ show: true, message: "Beneficiary data saved!", type: "success" });
+  }
+
+  function clearBeneficiaryForm() {
+    setBenTotal("");
+    setBenDirect("");
+    setBenIndirect("");
+  }
+
+  function handleBudgetSummarySubmit(e) {
+    e.preventDefault();
+    
+    // Validation: check if all fields are filled
+    if (!budgetAllocated || !budgetSpent) {
+      setToast({ show: true, message: "⚠️ Please fill all budget fields!", type: "error" });
+      return;
+    }
+    
+    // Save budget summary data to localStorage
+    const budgetSummaryData = {
+      allocated: Number(budgetAllocated) || 0,
+      spent: Number(budgetSpent) || 0,
+    };
+    localStorage.setItem("ward_budget_summary", JSON.stringify(budgetSummaryData));
+    setToast({ show: true, message: "Budget summary saved!", type: "success" });
+  }
+
+  function clearBudgetSummaryForm() {
+    setBudgetAllocated("");
+    setBudgetSpent("");
+  }
+
+  return (
+    <OfficerLayout title="Budgets">
+      <div className="budget-container">
+        <h2 className="budget-title">Officer Budgets</h2>
+
+        {toast.show && (
+          <div className={`toast toast-${toast.type}`}>
+            {toast.type === "success" && <span className="toast-icon">✓</span>}
+            {toast.message}
+          </div>
+        )}
+
+        <div className="summary">
+          <div className="summary-item">
+            <div className="summary-label">Total Allocated</div>
+            <div className="summary-value">Rs {budgetAllocated || "0"}</div>
+          </div>
+          <div className="summary-item">
+            <div className="summary-label">Total Spent</div>
+            <div className="summary-value">Rs {budgetSpent || "0"}</div>
+          </div>
+          <div className="summary-item">
+            <div className="summary-label">Remaining</div>
+            <div className="summary-value">Rs {(Number(budgetAllocated) - Number(budgetSpent)) || "0"}</div>
+          </div>
+        </div>
+
+        <div className="forms-row">
+          <form className="beneficiary-form" onSubmit={handleBudgetSummarySubmit}>
+            <label className="label">Total Allocated (Rs.)</label>
+            <input 
+              className="input" 
+              type="number"
+              placeholder="e.g., 30000000"
+              value={budgetAllocated}
+              onChange={(e) => setBudgetAllocated(e.target.value)}
+            />
+            
+            <label className="label">Total Spent (Rs.)</label>
+            <input 
+              className="input" 
+              type="number"
+              placeholder="e.g., 7000000"
+              value={budgetSpent}
+              onChange={(e) => setBudgetSpent(e.target.value)}
+            />
+
+            <div className="form-actions">
+              <button className="btn primary" type="submit">Save Budget</button>
+              <button className="btn" type="button" onClick={clearBudgetSummaryForm}>Clear</button>
+            </div>
+          </form>
+
+          <form className="beneficiary-form" onSubmit={handleBeneficiarySubmit}>
+            <label className="label">Total Beneficiaries</label>
+            <input 
+              className="input" 
+              type="number"
+              placeholder="e.g., 15000"
+              value={benTotal}
+              onChange={(e) => setBenTotal(e.target.value)}
+            />
+            
+            <label className="label">Direct</label>
+            <input 
+              className="input" 
+              type="number"
+              placeholder="e.g., 8000"
+              value={benDirect}
+              onChange={(e) => setBenDirect(e.target.value)}
+            />
+            
+            <label className="label">Indirect</label>
+            <input 
+              className="input" 
+              type="number"
+              placeholder="e.g., 7000"
+              value={benIndirect}
+              onChange={(e) => setBenIndirect(e.target.value)}
+            />
+
+            <div className="form-actions">
+              <button className="btn primary" type="submit">Save</button>
+              <button className="btn" type="button" onClick={clearBeneficiaryForm}>Clear</button>
+            </div>
+          </form>
+        </div>
+        </div>
+    </OfficerLayout>
+    );  }
