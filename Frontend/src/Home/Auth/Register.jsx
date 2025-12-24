@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import "./Register.css";
 
-export default function RegisterPage() {
+export default function RegisterPage({ initialRole = "citizen", hideRoleSelector = false }) {
   const { login } = useAuth();
   const navigate = useNavigate();
   const API_URL = "http://localhost/api"; // Change to your PHP backend URL
 
   // Role selection
-  const [role, setRole] = useState("citizen");
+  const [role, setRole] = useState(initialRole === "officer" ? "officer" : "citizen");
 
   // Common fields
   const [email, setEmail] = useState("");
@@ -95,6 +95,7 @@ export default function RegisterPage() {
   const validate = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    const citizenshipRegex = /^\d{2}-\d{2}-\d{2}-\d{5}$/;
 
     // Common validations
     if (!firstName.trim()) newErrors.firstName = "First name is required!";
@@ -108,14 +109,28 @@ export default function RegisterPage() {
       newErrors.password = "Password is required!";
     } else if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
+    } else if (!/(?=.*[A-Z])(?=.*[0-9])/.test(password)) {
+      newErrors.password = "Password must contain at least one uppercase letter and one number";
     }
-    if (confirmPassword !== password) {
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (confirmPassword !== password) {
       newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    // Location validations
+    if (!district) {
+      newErrors.district = "District is required!";
+    }
+    if (!city) {
+      newErrors.city = "Municipality is required!";
     }
 
     // Citizenship details validations
     if (!citizenshipNumber.trim()) {
       newErrors.citizenshipNumber = "Citizenship number is required!";
+    } else if (!citizenshipRegex.test(citizenshipNumber)) {
+      newErrors.citizenshipNumber = "Citizenship number format: XX-XX-XX-XXXXX";
     }
     if (!citizenshipIssueDate) {
       newErrors.citizenshipIssueDate = "Issue date is required!";
@@ -125,15 +140,29 @@ export default function RegisterPage() {
     }
     if (!citizenshipPhoto) {
       newErrors.citizenshipPhoto = "Citizenship photo is required";
+    } else if (!citizenshipPhoto.type.startsWith("image/")) {
+      newErrors.citizenshipPhoto = "File must be an image";
+    }
+
+    // Citizen-specific validations
+    if (role === "citizen") {
+      if (!wardNumber) {
+        newErrors.wardNumber = "Ward number is required!";
+      }
     }
 
     // Officer-specific validations
     if (role === "officer") {
       if (!officerId.trim()) newErrors.officerId = "Officer ID is required!";
       if (!department) newErrors.department = "Department is required!";
-      if (!assignedWard)
+      if (!assignedWard) {
         newErrors.assignedWard = "Ward assignment is required!";
-      if (!idCardPhoto) newErrors.idCardPhoto = "ID card photo is required!";
+      }
+      if (!idCardPhoto) {
+        newErrors.idCardPhoto = "ID card photo is required!";
+      } else if (!idCardPhoto.type.startsWith("image/")) {
+        newErrors.idCardPhoto = "File must be an image";
+      }
     }
 
     if (!termsAccepted) {
@@ -147,78 +176,87 @@ export default function RegisterPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      /*
-       * BACKEND INTEGRATION:
-       * ====================
-       * Endpoint: POST /api/register.php
-       *
-       * Use FormData for file uploads:
-       * const formData = new FormData();
-       * formData.append('role', role);
-       * formData.append('firstName', firstName);
-       * formData.append('lastName', lastName);
-       * formData.append('email', email);
-       * formData.append('password', password);
-       * formData.append('citizenshipNumber', citizenshipNumber);
-       * formData.append('citizenshipIssueDate', citizenshipIssueDate);
-       * formData.append('citizenshipIssueDistrict', citizenshipIssueDistrict);
-       * formData.append('citizenshipPhoto', citizenshipPhoto);
-       *
-       * if (role === 'officer') {
-       *   formData.append('officerId', officerId);
-       *   formData.append('department', department);
-       *   formData.append('assignedWard', assignedWard);
-       *   formData.append('idCardPhoto', idCardPhoto);
-       * }
-       *
-       * fetch('/api/register.php', {
-       *   method: 'POST',
-       *   body: formData
-       * })
-       * .then(res => res.json())
-       * .then(data => {
-       *   if (data.success) {
-       *     login(data.user);
-       *     navigate('/');
-       *   }
-       * });
-       */
+      try {
+        /*
+        * BACKEND INTEGRATION:
+        * ====================
+        * Endpoint: POST /api/register.php
+        *
+        * Use FormData for file uploads:
+        * const formData = new FormData();
+        * formData.append('role', role);
+        * formData.append('firstName', firstName);
+        * formData.append('lastName', lastName);
+        * formData.append('email', email);
+        * formData.append('password', password);
+        * formData.append('citizenshipNumber', citizenshipNumber);
+        * formData.append('citizenshipIssueDate', citizenshipIssueDate);
+        * formData.append('citizenshipIssueDistrict', citizenshipIssueDistrict);
+        * formData.append('citizenshipPhoto', citizenshipPhoto);
+        *
+        * if (role === 'officer') {
+        *   formData.append('officerId', officerId);
+        *   formData.append('department', department);
+        *   formData.append('assignedWard', assignedWard);
+        *   formData.append('idCardPhoto', idCardPhoto);
+        * }
+        *
+        * fetch('/api/register.php', {
+        *   method: 'POST',
+        *   body: formData
+        * })
+        * .then(res => res.json())
+        * .then(data => {
+        *   if (data.success) {
+        *     login(data.user);
+        *     navigate('/');
+        *   } else {
+        *     setErrors({ submit: data.message });
+        *   }
+        * })
+        * .catch(err => {
+        *   setErrors({ submit: 'Registration failed. Please try again.' });
+        * });
+        */
 
-      const userData = {
-        id: Date.now(),
-        email: email,
-        name: `${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
-        role: role,
-        phone: contactNumber,
-        dob: dob,
-        gender: gender,
-        ward: role === "officer" ? assignedWard : wardNumber,
-        municipality: city || "Kathmandu Metropolitan City",
-        address: `${city}, ${district}`,
-        joinedDate: new Date().toLocaleDateString("en-GB"),
-        citizenshipNumber: citizenshipNumber,
-        citizenshipIssueDate: citizenshipIssueDate,
-        citizenshipIssueDistrict: citizenshipIssueDistrict,
-        citizenshipPhotoUrl: URL.createObjectURL(citizenshipPhoto),
-        ...(role === "officer" && {
-          officerId: officerId,
-          department: department,
-          idCardPhotoUrl: URL.createObjectURL(idCardPhoto),
-        }),
-      };
+        const userData = {
+          id: Date.now(),
+          email: email,
+          name: `${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
+          role: role,
+          phone: contactNumber || "Not provided",
+          dob: dob || "Not provided",
+          gender: gender || "Not provided",
+          ward: role === "officer" ? assignedWard : wardNumber,
+          municipality: city || "Kathmandu Metropolitan City",
+          address: `${city}, ${district}`,
+          joinedDate: new Date().toLocaleDateString("en-GB"),
+          citizenshipNumber: citizenshipNumber,
+          citizenshipIssueDate: citizenshipIssueDate,
+          citizenshipIssueDistrict: citizenshipIssueDistrict,
+          status: role === "officer" ? "pending" : "active",
+          ...(role === "officer" && {
+            officerId: officerId,
+            department: department,
+          }),
+        };
 
-      login(userData);
-      setShowSuccess(true);
-      console.log("Registration successful", userData);
+        login(userData);
+        setShowSuccess(true);
+        console.log("Registration successful", userData);
 
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } catch (error) {
+        console.error("Registration error:", error);
+        setErrors({ submit: "An error occurred during registration. Please try again." });
+      }
     }
   };
 
   return (
-    <div className="login-root">
+    <div className="register-root">
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -229,54 +267,71 @@ export default function RegisterPage() {
           Registration successful!
         </div>
       )}
-      {Object.values(errors).some((error) => error) && (
+      {errors.submit && (
+        <div className="error-notification show">
+          {errors.submit}
+        </div>
+      )}
+      {Object.values(errors).some((error) => error && error !== errors.submit) && (
         <div className="error-notification show">
           Please fix the errors above.
         </div>
       )}
 
-      <div className="login-container">
-        <div className="login-header">
+      <div className="register-container">
+        <div className="register-header">
           <h1>Create Account</h1>
           <p>Join us today! It takes only few steps</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* Role Selection */}
-          <div className="role-selector">
-            <label className="role-label">Register as:</label>
-            <div className="role-options">
-              <label
-                className={`role-option ${role === "citizen" ? "active" : ""}`}
-              >
-                <input
-                  type="radio"
-                  name="role"
-                  value="citizen"
-                  checked={role === "citizen"}
-                  onChange={(e) => setRole(e.target.value)}
-                />
-                <span className="role-icon">👤</span>
-                <span className="role-text">Citizen</span>
-              </label>
-              <label
-                className={`role-option ${role === "officer" ? "active" : ""}`}
-              >
-                <input
-                  type="radio"
-                  name="role"
-                  value="officer"
-                  checked={role === "officer"}
-                  onChange={(e) => setRole(e.target.value)}
-                />
-                <span className="role-icon">👮</span>
-                <span className="role-text">Ward Officer</span>
-              </label>
+          {/* Role Selection / Display */}
+          {!hideRoleSelector && (
+            <div className="role-selector">
+              <label className="role-label">Register as:</label>
+              <div className="role-options">
+                <label
+                  className={`role-option ${role === "citizen" ? "active" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="citizen"
+                    checked={role === "citizen"}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <span className="role-icon">👤</span>
+                  <span className="role-text">Citizen</span>
+                </label>
+                <label
+                  className={`role-option ${role === "officer" ? "active" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="officer"
+                    checked={role === "officer"}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <span className="role-icon">👮</span>
+                  <span className="role-text">Ward Officer</span>
+                </label>
+              </div>
             </div>
-          </div>
+          )}
+
+          {hideRoleSelector && (
+            <div className="role-display">
+              <p className="role-display-label">You are registering as:</p>
+              <div className={`role-badge ${role === "citizen" ? "citizen-badge" : "officer-badge"}`}>
+                <span className="role-icon">{role === "citizen" ? "👤" : "👮"}</span>
+                <span className="role-text">{role === "citizen" ? "Citizen" : "Ward Officer"}</span>
+              </div>
+            </div>
+          )}
 
           {/* Names */}
-          <div className="form-row three-cols">
+          <div className="form-row two-cols">
             <div className="form-group">
               <label htmlFor="firstName">First Name *</label>
               <input
@@ -303,7 +358,9 @@ export default function RegisterPage() {
                 placeholder="Middle"
               />
             </div>
+          </div>
 
+          <div className="form-row half-width">
             <div className="form-group">
               <label htmlFor="lastName">Last Name *</label>
               <input
@@ -394,10 +451,10 @@ export default function RegisterPage() {
           {/* Address */}
           <div className="form-row three-cols">
             <div className="form-group">
-              <label htmlFor="district">District</label>
+              <label htmlFor="district">District *</label>
               <select
                 id="district"
-                className="form-control"
+                className={`form-control ${errors.district ? "error" : ""}`}
                 value={district}
                 onChange={handleDistrictChange}
               >
@@ -408,12 +465,15 @@ export default function RegisterPage() {
                   </option>
                 ))}
               </select>
+              <p className={`error-message ${errors.district ? "show" : ""}`}>
+                {errors.district}
+              </p>
             </div>
             <div className="form-group">
-              <label htmlFor="city">Municipality</label>
+              <label htmlFor="city">Municipality *</label>
               <select
                 id="city"
-                className="form-control"
+                className={`form-control ${errors.city ? "error" : ""}`}
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 disabled={!district}
@@ -427,14 +487,17 @@ export default function RegisterPage() {
                   </option>
                 ))}
               </select>
+              <p className={`error-message ${errors.city ? "show" : ""}`}>
+                {errors.city}
+              </p>
             </div>
             {role === "citizen" && (
               <div className="form-group">
-                <label htmlFor="wardNumber">Ward</label>
+                <label htmlFor="wardNumber">Ward *</label>
                 <input
                   type="text"
                   id="wardNumber"
-                  className="form-control"
+                  className={`form-control ${errors.wardNumber ? "error" : ""}`}
                   value={wardNumber}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -448,6 +511,9 @@ export default function RegisterPage() {
                   placeholder="Ward No. (1-35)"
                   inputMode="numeric"
                 />
+                <p className={`error-message ${errors.wardNumber ? "show" : ""}`}>
+                  {errors.wardNumber}
+                </p>
               </div>
             )}
           </div>
@@ -457,7 +523,7 @@ export default function RegisterPage() {
             <h3>Citizenship Details</h3>
           </div>
 
-          <div className="form-row three-cols">
+          <div className="form-row two-cols">
             <div className="form-group">
               <label htmlFor="citizenshipNumber">Citizenship Number *</label>
               <input
@@ -498,7 +564,9 @@ export default function RegisterPage() {
                 {errors.citizenshipIssueDate}
               </p>
             </div>
+          </div>
 
+          <div className="form-row half-width">
             <div className="form-group">
               <label htmlFor="citizenshipIssueDistrict">Issue District *</label>
               <select
@@ -531,7 +599,7 @@ export default function RegisterPage() {
               <label htmlFor="citizenshipPhoto">
                 Citizenship Front Page Photo *
               </label>
-              <div className="file-upload-wrapper">
+              <label htmlFor="citizenshipPhoto" className="file-upload-wrapper">
                 <input
                   type="file"
                   id="citizenshipPhoto"
@@ -549,7 +617,7 @@ export default function RegisterPage() {
                       : "Click to upload photo"}
                   </span>
                 </div>
-              </div>
+              </label>
               <p
                 className={`error-message ${
                   errors.citizenshipPhoto ? "show" : ""
@@ -567,7 +635,7 @@ export default function RegisterPage() {
                 <h3>Officer Information</h3>
               </div>
 
-              <div className="form-row three-cols">
+              <div className="form-row two-cols">
                 <div className="form-group">
                   <label htmlFor="officerId">Officer ID *</label>
                   <input
@@ -619,7 +687,9 @@ export default function RegisterPage() {
                     {errors.department}
                   </p>
                 </div>
+              </div>
 
+              <div className="form-row half-width">
                 <div className="form-group">
                   <label htmlFor="assignedWard">Assigned Ward *</label>
                   <input
@@ -654,7 +724,7 @@ export default function RegisterPage() {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="idCardPhoto">ID Card Photo *</label>
-                  <div className="file-upload-wrapper">
+                  <label htmlFor="idCardPhoto" className="file-upload-wrapper">
                     <input
                       type="file"
                       id="idCardPhoto"
@@ -672,7 +742,7 @@ export default function RegisterPage() {
                           : "Click to upload ID card"}
                       </span>
                     </div>
-                  </div>
+                  </label>
                   <p
                     className={`error-message ${
                       errors.idCardPhoto ? "show" : ""
@@ -750,11 +820,11 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <button type="submit" className="btn-login">
+          <button type="submit" className="btn-register">
             Register as {role === "citizen" ? "Citizen" : "Officer"}
           </button>
 
-          <div className="already-account">
+          <div className="form-footer">
             <p>
               Already have an account? <Link to="/login">Login here</Link>
             </p>

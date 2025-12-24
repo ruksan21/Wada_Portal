@@ -3,8 +3,7 @@ import { WardProvider } from "./Home/Context/WardContext";
 import Navbar from "./Home/Nav/Navbar";
 import Login from "./Home/Auth/Login";
 import RoleSelection from "./Home/Auth/RoleSelection";
-import CitizenRegister from "./Home/Auth/CitizenRegister";
-import OfficerRegister from "./Home/Auth/OfficerRegister";
+import Register from "./Home/Auth/Register";
 import Forget from "./Home/Auth/Forget";
 import About from "./Home/Pages/About";
 import Documents from "./Home/Pages/Documents";
@@ -60,8 +59,8 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RoleSelection />} />
-          <Route path="/register/citizen" element={<CitizenRegister />} />
-          <Route path="/register/officer" element={<OfficerRegister />} />
+          <Route path="/register/citizen" element={<Register initialRole="citizen" hideRoleSelector={true} />} />
+          <Route path="/register/officer" element={<Register initialRole="officer" hideRoleSelector={true} />} />
           <Route path="/forgot-password" element={<Forget />} />
           <Route path="/help" element={<HelpSupport />} />
           <Route path="/assets" element={<Assets />} />

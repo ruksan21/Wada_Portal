@@ -7,7 +7,7 @@ import Notification from "../Component/Notification.jsx";
 import UserMenu from "../Component/UserMenu.jsx";
 import HeroSection from "../Pages/HeroSection.jsx";
 import Status from "../Pages/Status.jsx";
-import { useWard } from "../Context/WardContext";
+import { useWard } from "../Context/WardContext.jsx";
 
 const Navbar = ({ showHomeContent = false }) => {
   const { municipality, ward } = useWard();
