@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [activities, setActivities] = useState([]);
+  const API_URL = "http://localhost/my-react-app/Backend/api";
 
   // Admin/Backend Simulation State
   const [allUsers, setAllUsers] = useState([]);
@@ -63,12 +64,21 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("allUsers", JSON.stringify(initialUsers));
     }
 
-    const storedPendingOfficers = localStorage.getItem("pendingOfficers");
-    if (storedPendingOfficers) {
-      setPendingOfficers(JSON.parse(storedPendingOfficers));
-    }
+    // 2. Load Pending Officers from Backend
+    const fetchPendingOfficers = async () => {
+      try {
+        const response = await fetch(`${API_URL}/get_pending_officers.php`);
+        const data = await response.json();
+        if (data.success) {
+          setPendingOfficers(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching pending officers:", error);
+      }
+    };
+    fetchPendingOfficers();
 
-    // 3. Load Wards Data
+    // 3. Load Wards Data (Mock for now)
     const storedWards = localStorage.getItem("wards");
     if (storedWards) {
       setWards(JSON.parse(storedWards));
@@ -205,41 +215,42 @@ export const AuthProvider = ({ children }) => {
     return { success: true, message: "Officer created successfully." };
   };
 
-  const approveOfficer = (officerId) => {
-    const officerToApprove = pendingOfficers.find((o) => o.id === officerId);
-    if (!officerToApprove) return;
-
-    // 1. Remove from pending
-    const updatedPending = pendingOfficers.filter((o) => o.id !== officerId);
-    setPendingOfficers(updatedPending);
-    localStorage.setItem("pendingOfficers", JSON.stringify(updatedPending));
-
-    // 2. Add to allUsers with 'active' status
-    const newOfficerUser = { ...officerToApprove, status: "active" };
-    const updatedUsers = [...allUsers, newOfficerUser];
-    setAllUsers(updatedUsers);
-    localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
-
-    addNotification("success", `${officerToApprove.name} has been approved.`);
+  const approveOfficer = async (officerId) => {
+    try {
+      const response = await fetch(`${API_URL}/update_officer_status.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: officerId, status: "active" }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setPendingOfficers(pendingOfficers.filter((o) => o.id !== officerId));
+        addNotification("success", "Officer approved successfully.");
+      } else {
+        addNotification("error", data.message);
+      }
+    } catch {
+      addNotification("error", "Failed to approve officer.");
+    }
   };
 
-  const rejectOfficer = (officerId) => {
-    const officerToReject = pendingOfficers.find((o) => o.id === officerId);
-    if (!officerToReject) return;
-
-    // 1. Remove from pending (or keep in a 'rejected' list, but for now we remove/update status)
-    const updatedPending = pendingOfficers.filter((o) => o.id !== officerId);
-    // Ideally we might want to keep a record, but simplifying for now or moving to a rejected list if needed.
-    // For this implementation, we'll just update the status in the pending list to 'rejected' for display purposes,
-    // although typically 'pending' list implies action needed.
-    // Let's keep them in pending list but mark status as rejected so Admin sees it?
-    // Or just remove them. Let's JUST Remove them for now to simulate "Done".
-
-    // Actually, user requirement often is to see rejected. Let's just remove for cleanup as per classic CRUD.
-    setPendingOfficers(updatedPending);
-    localStorage.setItem("pendingOfficers", JSON.stringify(updatedPending));
-
-    addNotification("info", `${officerToReject.name} application rejected.`);
+  const rejectOfficer = async (officerId) => {
+    try {
+      const response = await fetch(`${API_URL}/update_officer_status.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: officerId, status: "rejected" }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setPendingOfficers(pendingOfficers.filter((o) => o.id !== officerId));
+        addNotification("info", "Officer application rejected.");
+      } else {
+        addNotification("error", data.message);
+      }
+    } catch {
+      addNotification("error", "Failed to reject officer.");
+    }
   };
 
   const deleteUser = (userId) => {

@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const API_URL = "http://localhost/api"; // Change to your PHP backend URL
+  const API_URL = "http://localhost/my-react-app/Backend/api"; // Change to your PHP backend URL
 
   const resetErrors = () => setErrors({ email: "", password: "" });
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     resetErrors();
-    
+
     if (!validate()) return;
 
     setIsLoading(true);
@@ -78,13 +78,7 @@ export default function LoginPage() {
 
       // Redirect after showing success
       setTimeout(() => {
-        if (userData.role === "admin") {
-          navigate("/admin");
-        } else if (userData.role === "officer") {
-          navigate("/officer");
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       }, 1500);
     } catch (error) {
       console.error("Login error:", error);
