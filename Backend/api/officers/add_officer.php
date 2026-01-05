@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 0);
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -44,14 +45,14 @@ $first_name = $conn->real_escape_string($_POST['firstName']);
 $middle_name = $conn->real_escape_string($_POST['middleName'] ?? '');
 $last_name = $conn->real_escape_string($_POST['lastName']);
 $email = $conn->real_escape_string($_POST['email']);
-$password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : password_hash('password', PASSWORD_DEFAULT); // Default pass if empty? Or required.
+$password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : password_hash('password', PASSWORD_DEFAULT); 
 $contact_number = $conn->real_escape_string($_POST['contactNumber'] ?? '');
 $dob = $_POST['dob'] ? $conn->real_escape_string($_POST['dob']) : null;
 $gender = $conn->real_escape_string($_POST['gender'] ?? '');
-$address = $conn->real_escape_string($_POST['address'] ?? ''); // Address mapped to city/district or new field? Using city/district for now as per Register.
+$province = $conn->real_escape_string($_POST['province'] ?? ''); // Added Province
 $district = $conn->real_escape_string($_POST['district'] ?? 'Kathmandu');
 $city = $conn->real_escape_string($_POST['city'] ?? '');
-$ward_number = !empty($_POST['wardNumber']) ? intval($_POST['wardNumber']) : 1; // Default
+$ward_number = !empty($_POST['wardNumber']) ? intval($_POST['wardNumber']) : 1; 
 $officer_id = $conn->real_escape_string($_POST['officerId']);
 $department = $conn->real_escape_string($_POST['department']);
 $assigned_ward = !empty($_POST['assignedWard']) ? intval($_POST['assignedWard']) : 1;
@@ -74,32 +75,23 @@ if (isset($_FILES['idCardPhoto'])) {
     if ($res['success']) $id_card_photo = $res['filename'];
 }
 
-$profile_photo = ""; // If we want a separate profile photo? Register doesn't have it, assumes one of these? 
-// Or maybe id_card_photo is profile pic? 
-// Let's add support for profilePhoto if sent?
+$profile_photo = ""; 
 if (isset($_FILES['profilePhoto'])) {
     $res = handleFileUpload($_FILES['profilePhoto'], "profile", $upload_dir);
     if ($res['success']) $profile_photo = $res['filename'];
 }
-// Note: Users table has 'photoUrl' or similar? Register.php used 'citizenship_photo' and 'id_card_photo'.
-// Register.php does NOT insert 'profile_photo'. It inserts 'citizenship_photo' and 'id_card_photo'.
-// I will check schema... Users table likely doesn't have 'profile_photo' column unless I added it?
-// Step 335 (AuthContext) uses `updateProfilePhoto`.
-// The user wants "Profile Pic".
-// I'll try to use `id_card_photo` as the main visual or just check if I can add `profile_image` column.
-// For now, I'll stick to `register.php` schema to avoid DB errors: `citizenship_photo`, `id_card_photo`.
 
 $dob_val = $dob ? "'$dob'" : "NULL";
 $issue_date_val = $citizenship_issue_date ? "'$citizenship_issue_date'" : "NULL";
 
 $sql = "INSERT INTO users (
     first_name, middle_name, last_name, email, password, contact_number, dob, gender, 
-    district, city, ward_number, citizenship_number, citizenship_issue_date, citizenship_issue_district, 
-    citizenship_photo, role, officer_id, department, assigned_ward, id_card_photo, status
+    province, district, city, ward_number, citizenship_number, citizenship_issue_date, citizenship_issue_district, 
+    citizenship_photo, role, officer_id, department, assigned_ward, id_card_photo, status, photo
 ) VALUES (
     '$first_name', '$middle_name', '$last_name', '$email', '$password', '$contact_number', $dob_val, '$gender', 
-    '$district', '$city', $ward_number, '$citizenship_number', $issue_date_val, '$citizenship_issue_district', 
-    '$citizenship_photo', 'officer', '$officer_id', '$department', $assigned_ward, '$id_card_photo', 'active'
+    '$province', '$district', '$city', $ward_number, '$citizenship_number', $issue_date_val, '$citizenship_issue_district', 
+    '$citizenship_photo', 'officer', '$officer_id', '$department', $assigned_ward, '$id_card_photo', 'active', '$profile_photo'
 )";
 
 if ($conn->query($sql)) {

@@ -48,6 +48,7 @@ const OfficerManagement = () => {
   const [photoFiles, setPhotoFiles] = useState({
     citizenship: null,
     idCard: null,
+    profilePhoto: null,
   });
 
   // Dynamic Options State
@@ -141,6 +142,8 @@ const OfficerManagement = () => {
     if (photoFiles.citizenship)
       data.append("citizenshipPhoto", photoFiles.citizenship);
     if (photoFiles.idCard) data.append("idCardPhoto", photoFiles.idCard);
+    if (photoFiles.profilePhoto)
+      data.append("profilePhoto", photoFiles.profilePhoto);
 
     try {
       const res = await fetch(API_ENDPOINTS.officers.add, {
@@ -208,6 +211,20 @@ const OfficerManagement = () => {
               {/* 1. Personal Details */}
               <div className="form-section">
                 <h3 className="form-section-header">Personal Information</h3>
+
+                {/* Profile Photo Upload */}
+                <div style={{ marginBottom: "20px", textAlign: "center" }}>
+                  <label className="stat-label">Profile Photo</label>
+                  <input
+                    type="file"
+                    name="profilePhoto"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="form-input"
+                    style={{ maxWidth: "300px", margin: "0 auto" }}
+                  />
+                </div>
+
                 <div className="three-col-grid">
                   <div>
                     <label className="stat-label">First Name *</label>

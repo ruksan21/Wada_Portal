@@ -23,7 +23,14 @@ if ($tableCheck->num_rows == 0) {
     exit();
 }
 
-$query = "SELECT * FROM system_alerts ORDER BY created_at DESC";
+$ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
+
+if ($ward_id) {
+    $query = "SELECT * FROM system_alerts WHERE (ward_id = $ward_id OR ward_id IS NULL) ORDER BY created_at DESC";
+} else {
+    $query = "SELECT * FROM system_alerts ORDER BY created_at DESC";
+}
+
 $result = $conn->query($query);
 
 if (!$result) {

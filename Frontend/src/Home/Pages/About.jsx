@@ -1,7 +1,8 @@
 import React from "react";
 import "./About.css";
-import missionImage from "../../Image/Home.png";
 import Navbar from "../Nav/Navbar";
+import HomeImage from "../../Image/Home.png";
+import PhotoImage from "../../Image/photo.jpeg";
 
 const OBJECTIVES = [
   { icon: "🎯", text: "Bridge the gap between citizens and local government" },
@@ -68,6 +69,29 @@ const FEATURES = [
   },
 ];
 
+const TEAM_MEMBERS = [
+  {
+    name: "Ruksan Karki",
+    role: "Project Director",
+    image: PhotoImage,
+  },
+  {
+    name: "Ruksan Karki",
+    role: "Technical Director",
+    image: HomeImage,
+  },
+  {
+    name: "Ruksan Karki",
+    role: "Data Analyst",
+    image: HomeImage,
+  },
+  {
+    name: "Lokesh Bhau Karki",
+    role: "Community Coordinator",
+    image: PhotoImage,
+  },
+];
+
 export default function About() {
   return (
     <>
@@ -106,7 +130,7 @@ export default function About() {
               </div>
             </div>
             <div className="mission-image">
-              <img src={missionImage} alt="Mission" />
+              <img src={HomeImage} alt="Mission" />
             </div>
           </section>
 
@@ -149,6 +173,48 @@ export default function About() {
               </div>
             </div>
           </div>
+
+          <section className="about-team-section">
+            <h2>Our Team</h2>
+            <div className="team-grid">
+              {TEAM_MEMBERS.map((member, i) => (
+                <div key={i} className="team-card">
+                  <div className="team-image">
+                    <img src={member.image} alt={member.name} />
+                  </div>
+                  <h3>{member.name}</h3>
+                  <p>{member.role}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="about-contact-section">
+            <h2>Contact Us</h2>
+            <div className="about-contact-grid">
+              <div className="about-contact-card">
+                <div className="contact-icon-circle blue">
+                  <i className="fa-solid fa-location-dot"></i>
+                </div>
+                <h3>Address</h3>
+                <p>Singha Durbar, Kathmandu, Nepal</p>
+              </div>
+              <div className="about-contact-card">
+                <div className="contact-icon-circle green">
+                  <i className="fa-solid fa-phone"></i>
+                </div>
+                <h3>Phone</h3>
+                <p>+977-9767776999</p>
+              </div>
+              <div className="about-contact-card">
+                <div className="contact-icon-circle purple">
+                  <i className="fa-solid fa-envelope"></i>
+                </div>
+                <h3>Email</h3>
+                <p>info@wardportal.gov.np</p>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </>

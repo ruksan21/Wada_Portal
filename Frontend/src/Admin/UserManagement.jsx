@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../Home/Context/AuthContext";
+import { API_ENDPOINTS } from "../config/api";
 import "./UserManagement.css";
 
 const UserManagement = () => {
@@ -126,7 +127,23 @@ const UserManagement = () => {
           <div className="user-modal-content user-profile-content">
             <div className="profile-header-center">
               <div className="profile-avatar-large">
-                {(selectedUser.first_name || "U").charAt(0).toUpperCase()}
+                {selectedUser.photo ? (
+                  <img
+                    src={`${API_ENDPOINTS.authUploads}/${selectedUser.photo}`}
+                    alt="Profile"
+                    className="profile-img-fill"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.parentElement.innerHTML = (
+                        selectedUser.first_name || "U"
+                      )
+                        .charAt(0)
+                        .toUpperCase();
+                    }}
+                  />
+                ) : (
+                  (selectedUser.first_name || "U").charAt(0).toUpperCase()
+                )}
               </div>
               <h2 style={{ marginTop: "16px", marginBottom: "4px" }}>
                 {getUserDisplayName(selectedUser)}
@@ -308,7 +325,23 @@ const UserManagement = () => {
                   <td>
                     <div className="user-name-cell">
                       <div className="table-avatar-circle">
-                        {(user.first_name || "U").charAt(0).toUpperCase()}
+                        {user.photo ? (
+                          <img
+                            src={`${API_ENDPOINTS.authUploads}/${user.photo}`}
+                            alt=""
+                            className="table-img-fill"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                              e.target.parentElement.innerText = (
+                                user.first_name || "U"
+                              )
+                                .charAt(0)
+                                .toUpperCase();
+                            }}
+                          />
+                        ) : (
+                          (user.first_name || "U").charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div>
                         <div style={{ fontWeight: 500 }}>

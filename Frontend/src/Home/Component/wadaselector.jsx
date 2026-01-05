@@ -125,7 +125,6 @@ const WardSelector = ({ onWardSelect }) => {
               <>
                 <h3 className="dropdown-title">Municipality</h3>
                 <div className="search-box">
-                  <i className="icon-search">🔍</i>
                   <input
                     type="text"
                     className="search-input"

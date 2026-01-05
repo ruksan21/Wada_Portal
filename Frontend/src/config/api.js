@@ -1,12 +1,6 @@
-/**
- * Centralized API Configuration
- * All API endpoints are defined here for easy management
- */
-
-// Base API URL - Change this for different environments
 const BASE_URL = "http://localhost/my-react-app/Backend/api";
 
-// API Endpoints organized by category
+
 export const API_ENDPOINTS = {
   // Authentication
   auth: {
@@ -65,6 +59,7 @@ export const API_ENDPOINTS = {
 
   // Communication
   communication: {
+    submitComplaint: `${BASE_URL}/communication/submit_complaint.php`,
     getComplaints: `${BASE_URL}/communication/get_complaints.php`,
     updateComplaintStatus: `${BASE_URL}/communication/update_complaint_status.php`,
     getFeedback: `${BASE_URL}/communication/get_feedback.php`,
@@ -86,6 +81,7 @@ export const API_ENDPOINTS = {
 
   // Helper for uploads directory
   uploads: `${BASE_URL}/uploads`,
+  authUploads: `${BASE_URL}/auth/uploads`,
 };
 
 // Export base URL for custom endpoints

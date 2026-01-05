@@ -6,9 +6,9 @@
 
 /* Hero Section */
 .contact-hero {
-  height: 300px;
+  height: 400px;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200")
+    url("C:\xampp\htdocs\my-react-app\Frontend\src\Image\contact.png")
       center/cover;
   display: flex;
   align-items: center;
@@ -62,8 +62,8 @@
 }
 
 .contact-icon-wrapper {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -83,8 +83,17 @@
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
-.contact-icon {
-  font-size: 2.5rem;
+i.contact-icon {
+  font-size: 3rem;
+  color: white;
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 }
 
 .contact-info-card h3 {

@@ -95,6 +95,16 @@ if (isset($_FILES['citizenshipPhoto']) && $_FILES['citizenshipPhoto']['error'] =
 } else {
     echo json_encode(["success" => false, "message" => "Citizenship Photo is required."]);
     exit();
+    exit();
+}
+
+// Profile Photo (Optional but recommended)
+$profile_photo = "";
+if (isset($_FILES['profilePhoto']) && $_FILES['profilePhoto']['error'] === UPLOAD_ERR_OK) {
+    $upload_result = handleFileUpload($_FILES['profilePhoto'], "profile", $upload_dir);
+    if ($upload_result['success']) {
+        $profile_photo = $upload_result['filename'];
+    }
 }
 
 // Officer-specific logic
@@ -131,23 +141,37 @@ $issue_date_val = $citizenship_issue_date ? "'$citizenship_issue_date'" : "NULL"
 $query = "INSERT INTO users (
     first_name, middle_name, last_name, email, password, contact_number, dob, gender, 
     province, district, city, ward_number, citizenship_number, citizenship_issue_date, citizenship_issue_district, 
-    citizenship_photo, role, officer_id, department, assigned_ward, id_card_photo, status
+    citizenship_photo, role, officer_id, department, assigned_ward, id_card_photo, status, photo
 ) VALUES (
     '$first_name', '$middle_name', '$last_name', '$email', '$password', '$contact_number', $dob_val, '$gender', 
     '$province', '$district', '$city', $ward_number, '$citizenship_number', $issue_date_val, '$citizenship_issue_district', 
     '$citizenship_photo', '$role', '$officer_id', '$department', $assigned_ward, '$id_card_photo', 
-    " . ($role === 'officer' ? "'pending'" : "'active'") . "
+    " . ($role === 'officer' ? "'pending'" : "'active'") . ", '$profile_photo'
 )";
 
 try {
     if ($conn->query($query)) {
         
         // Create System Alert
+        // Create System Alert
         $alert_type = $role === 'officer' ? "info" : "success";
         $alert_title = $role === 'officer' ? "New Officer Application" : "New User Registration";
         $alert_message = "A new " . $role . " (" . $first_name . " " . $last_name . ") has registered.";
         
-        $alert_query = "INSERT INTO system_alerts (type, title, message, status) VALUES ('$alert_type', '$alert_title', '$alert_message', 'unread')";
+        // Determine Ward ID for the alert
+        $alert_ward_id = "NULL";
+        if ($role === 'officer' && $assigned_ward !== 'NULL') {
+            $alert_ward_id = $assigned_ward;
+        } elseif ($role === 'citizen' && $ward_number !== 'NULL') {
+             // Try to find the ward ID corresponding to this ward number
+             $w_query = $conn->query("SELECT id FROM wards WHERE ward_number = $ward_number LIMIT 1");
+             if ($w_query && $w_query->num_rows > 0) {
+                 $w_row = $w_query->fetch_assoc();
+                 $alert_ward_id = $w_row['id'];
+             }
+        }
+        
+        $alert_query = "INSERT INTO system_alerts (ward_id, type, title, message, status, created_at) VALUES ($alert_ward_id, '$alert_type', '$alert_title', '$alert_message', 'unread', NOW())";
         $conn->query($alert_query); 
 
         echo json_encode(array("success" => true, "message" => "Registration successful!"));

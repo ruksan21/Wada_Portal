@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Nav/Navbar";
 import "./Contact.css";
 import { useWard } from "../Context/WardContext";
+import { useAuth } from "../Context/AuthContext";
 import { API_ENDPOINTS } from "../../config/api";
 
 export default function Contact() {
@@ -10,6 +11,7 @@ export default function Contact() {
     ward: selectedWard,
     wardId,
   } = useWard();
+  const { user } = useAuth();
   const [wardInfo, setWardInfo] = useState({
     phone1: "---",
     phone2: "---",
@@ -116,12 +118,13 @@ export default function Contact() {
       subject: formData.subject,
       priority: formData.priority,
       message: formData.message,
+      userId: user?.id,
       created_at: new Date().toISOString(),
     };
 
     const endpoint =
       formData.subject === "complaint"
-        ? "/api/complaints.php"
+        ? "/api/communication/submit_complaint.php"
         : "/api/messages.php";
 
     setFormStatus({ type: "loading", message: "Sending..." });
@@ -209,7 +212,7 @@ export default function Contact() {
           <div className="contact-info-section">
             <div className="contact-info-card">
               <div className="contact-icon-wrapper blue">
-                <span className="contact-icon">📞</span>
+                <i className="fa-solid fa-phone contact-icon"></i>
               </div>
               <h3>Call Us</h3>
               <p className="contact-timing">
@@ -226,7 +229,7 @@ export default function Contact() {
             </div>
             <div className="contact-info-card">
               <div className="contact-icon-wrapper green">
-                <span className="contact-icon">📧</span>
+                <i className="fa-solid fa-envelope contact-icon"></i>
               </div>
               <h3>Email Us</h3>
               <p className="contact-timing">You can email us anytime</p>
@@ -244,7 +247,7 @@ export default function Contact() {
             </div>
             <div className="contact-info-card">
               <div className="contact-icon-wrapper purple">
-                <span className="contact-icon">📍</span>
+                <i className="fa-solid fa-location-dot contact-icon"></i>
               </div>
               <h3>Visit Us</h3>
               <p className="contact-timing">Office Hours: 9:00 AM - 5:00 PM</p>

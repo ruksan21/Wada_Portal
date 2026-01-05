@@ -52,6 +52,8 @@ export default function RegisterPage({
   // Preview URLs for images
   const [citizenshipPreview, setCitizenshipPreview] = useState(null);
   const [idCardPreview, setIdCardPreview] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
 
   const handleProvinceChange = (e) => {
     setProvince(e.target.value);
@@ -151,6 +153,11 @@ export default function RegisterPage({
       formData.append("citizenshipIssueDistrict", citizenshipIssueDistrict);
       formData.append("citizenshipPhoto", citizenshipPhoto);
 
+      // Append Profile Photo if exists
+      if (profilePhoto) {
+        formData.append("profilePhoto", profilePhoto);
+      }
+
       if (role === "officer") {
         formData.append("officerId", officerId);
         formData.append("department", department);
@@ -174,6 +181,23 @@ export default function RegisterPage({
       setErrors({ submit: "Network error: " + err.message });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleProfilePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ ...errors, profilePhoto: "File too large (Max 5MB)" });
+        return;
+      }
+      setProfilePhoto(file);
+      setProfilePreview(URL.createObjectURL(file));
+      if (errors.profilePhoto) {
+        const newErrors = { ...errors };
+        delete newErrors.profilePhoto;
+        setErrors(newErrors);
+      }
     }
   };
 
@@ -269,6 +293,9 @@ export default function RegisterPage({
 
           <div className="form-section">
             <h2 className="section-title">Personal Details</h2>
+
+            {/* Profile Picture Upload row removed from here */}
+
             <div className="form-row two-cols">
               <div className="form-group">
                 <label>First Name *</label>
@@ -380,7 +407,7 @@ export default function RegisterPage({
                 )}
               </div>
             </div>
-            <div className="form-row two-cols">
+            <div className="form-row two-cols align-center">
               <div className="form-group">
                 <label>Gender *</label>
                 <div className="input-wrapper">
@@ -390,7 +417,9 @@ export default function RegisterPage({
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
                   >
-                    <option value="">Select Gender</option>
+                    <option value="" disabled hidden>
+                      Select Gender
+                    </option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
@@ -398,6 +427,41 @@ export default function RegisterPage({
                 </div>
                 {errors.gender && (
                   <p className="error-message show">{errors.gender}</p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Profile Picture</label>
+                <label className="file-upload-wrapper">
+                  <input
+                    type="file"
+                    className="file-input"
+                    onChange={handleProfilePhotoChange}
+                    accept="image/*"
+                    hidden
+                  />
+                  <div className="file-upload-icon">
+                    {profilePreview ? (
+                      <div className="preview-container">
+                        <img
+                          src={profilePreview}
+                          alt="Profile"
+                          className="img-preview"
+                        />
+                        <span className="file-name">
+                          {profilePhoto ? profilePhoto.name : "Profile Photo"}
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <i className="fa-solid fa-camera"></i>
+                        <span>Click to Upload</span>
+                      </>
+                    )}
+                  </div>
+                </label>
+                {errors.profilePhoto && (
+                  <p className="error-message show">{errors.profilePhoto}</p>
                 )}
               </div>
             </div>

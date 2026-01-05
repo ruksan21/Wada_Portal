@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 import "./Navbar.css";
 import Profile from "../Profile/profile.jsx";
 import WardSelector from "../Component/wadaselector.jsx";
@@ -11,6 +12,7 @@ import { useWard } from "../Context/WardContext.jsx";
 
 const Navbar = ({ showHomeContent = false }) => {
   const { municipality, ward } = useWard();
+  const { user } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,6 +26,14 @@ const Navbar = ({ showHomeContent = false }) => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Logic to show/hide Notification Bell
+  // Show for Citizen and Officer, hide for Admin
+  const showNotificationBell =
+    user &&
+    (user.role === "citizen" ||
+      user.role === "user" ||
+      user.role === "officer");
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -61,7 +71,7 @@ const Navbar = ({ showHomeContent = false }) => {
         {/* Right Section - Ward Selector, Notification, User Menu */}
         <div className="navbar-right">
           <WardSelector />
-          <Notification />
+          {showNotificationBell && <Notification />}
           <UserMenu />
 
           {/* Hamburger Menu Icon (Mobile Only) */}

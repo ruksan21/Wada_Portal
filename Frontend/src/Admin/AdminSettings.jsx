@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import "./AdminSettings.css";
@@ -12,12 +12,20 @@ const AdminSettings = () => {
     language: "English",
   });
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("adminSettings");
+    if (saved) {
+      setSettings(JSON.parse(saved));
+    }
+  }, []);
+
   const handleChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
-    // In real app, save to backend
+    localStorage.setItem("adminSettings", JSON.stringify(settings));
     addNotification("success", "Settings saved successfully.");
   };
 

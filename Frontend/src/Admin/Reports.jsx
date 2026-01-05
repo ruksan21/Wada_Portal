@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+
 import React from "react";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../Home/Context/AuthContext";

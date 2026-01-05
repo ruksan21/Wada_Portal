@@ -16,7 +16,7 @@ require_once '../db_connect.php';
 // For now, fetching everything. Frontend can filter.
 $query = "SELECT id, first_name, middle_name, last_name, email, contact_number, role, status, 
           ward_number, officer_id, department, assigned_ward, gender, dob, 
-          district, city, citizenship_number 
+          district, city, citizenship_number, created_at, photo 
           FROM users 
           ORDER BY id DESC";
 

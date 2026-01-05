@@ -1,28 +1,22 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
+import { useAuth } from "../Home/Context/AuthContext";
 import "./Admin.css";
 import "./AdminLayout.css";
-import { useAuth } from "../Home/Context/AuthContext";
 
 const AdminLayout = ({ children, title }) => {
+  const { user, logout, pendingOfficers, notifications } = useAuth();
   const location = useLocation();
-  const { logout, user } = useAuth();
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const isActive = (path) => {
+    return (
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+    );
   };
 
-  const navItems = [
-    { path: "/", label: "Go to Home", icon: "🏠" },
-    { path: "/admin", label: "Dashboard", icon: "📊" },
-    { path: "/admin/users", label: "User Management", icon: "👥" },
-    { path: "/admin/alerts", label: "Alert Centre", icon: "🔔" },
-    { path: "/admin/officers", label: "Officer Applications", icon: "👮" },
-    { path: "/admin/wards", label: "Ward Management", icon: "🏙️" },
-    { path: "/admin/settings", label: "Settings", icon: "⚙️" },
-  ];
+  // Calculate total notifications count
+  const notifyCount =
+    (notifications?.length || 0) + (pendingOfficers?.length || 0);
 
   return (
     <div className="admin-layout">
@@ -32,39 +26,120 @@ const AdminLayout = ({ children, title }) => {
           <span>🛡️</span> Admin Panel
         </div>
         <nav className="admin-nav">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`admin-nav-item ${
-                location.pathname === item.path ? "active" : ""
-              }`}
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
-          <div className="admin-nav-item logout" onClick={handleLogout}>
-            <span>🚪</span> Logout
+          <Link
+            to="/admin"
+            className={`admin-nav-item ${
+              location.pathname === "/admin" ? "active" : ""
+            }`}
+          >
+            📊 Dashboard
+          </Link>
+          <div className="admin-nav-divider"></div>
+          <Link to="/" className="admin-nav-item home-link">
+            🏠 Go to Home
+          </Link>
+          <div className="admin-nav-divider"></div>
+          <Link
+            to="/admin/wards"
+            className={`admin-nav-item ${
+              isActive("/admin/wards") ? "active" : ""
+            }`}
+          >
+            🏘️ Wards
+          </Link>
+          <Link
+            to="/admin/officers"
+            className={`admin-nav-item ${
+              isActive("/admin/officers") ? "active" : ""
+            }`}
+          >
+            👮 Officers
+          </Link>
+          <Link
+            to="/admin/users"
+            className={`admin-nav-item ${
+              isActive("/admin/users") ? "active" : ""
+            }`}
+          >
+            👥 Users
+          </Link>
+
+          <Link
+            to="/admin/complaints"
+            className={`admin-nav-item ${
+              isActive("/admin/complaints") ? "active" : ""
+            }`}
+          >
+            💬 Complaints
+          </Link>
+          <Link
+            to="/admin/settings"
+            className={`admin-nav-item ${
+              isActive("/admin/settings") ? "active" : ""
+            }`}
+          >
+            ⚙️ Settings
+          </Link>
+          <div onClick={logout} className="admin-nav-item logout">
+            🚪 Logout
           </div>
         </nav>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="admin-main">
-        {/* Header */}
         <header className="admin-header">
-          <h1 className="admin-title">{title}</h1>
-          <div className="admin-user-profile">
-            <span>Welcome, {user?.name || "admin"}</span>
-            <div className="profile-avatar-circle">
-              {user?.name?.charAt(0).toUpperCase() || "A"}
+          <h2 className="admin-title">
+            {title ||
+              (location.pathname === "/admin"
+                ? "Dashboard"
+                : location.pathname.split("/").pop().charAt(0).toUpperCase() +
+                  location.pathname.split("/").pop().slice(1))}
+          </h2>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            {/* Conditional Notification Bell - Shows ONLY if there are notifications */}
+            {notifyCount > 0 && (
+              <div
+                className="admin-notification-bell"
+                style={{ position: "relative", cursor: "pointer" }}
+                onClick={() => (window.location.href = "/admin/officers")}
+                title="View Pending Applications"
+              >
+                <span style={{ fontSize: "1.5rem" }}>🔔</span>
+                <span
+                  className="notification-badge"
+                  style={{
+                    position: "absolute",
+                    top: "-5px",
+                    right: "-5px",
+                    background: "red",
+                    color: "white",
+                    borderRadius: "50%",
+                    width: "18px",
+                    height: "18px",
+                    fontSize: "0.75rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {notifyCount}
+                </span>
+              </div>
+            )}
+
+            <div className="admin-user-profile">
+              <span>{user?.name || "Admin"}</span>
+              <div className="profile-avatar-circle">
+                {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Content Body */}
-        <div className="admin-content">{children}</div>
+        <div className="admin-content">{children || <Outlet />}</div>
       </main>
     </div>
   );

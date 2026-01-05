@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import OfficerLayout from "./OfficerLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import { API_ENDPOINTS, API_BASE_URL } from "../config/api";
@@ -22,11 +22,7 @@ const OfficerAssets = () => {
     status: "active",
   });
 
-  useEffect(() => {
-    fetchAssets();
-  }, [wardId]);
-
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await fetch(
@@ -41,7 +37,11 @@ const OfficerAssets = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [wardId]);
+
+  useEffect(() => {
+    fetchAssets();
+  }, [fetchAssets]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

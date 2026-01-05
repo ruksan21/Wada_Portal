@@ -24,7 +24,12 @@ export const AuthProvider = ({ children }) => {
       const response = await fetch(API_ENDPOINTS.users.getAll);
       const data = await response.json();
       if (data.success) {
-        setAllUsers(data.data);
+        // Map created_at to joinedDate for frontend calculations
+        const formattedUsers = data.data.map((u) => ({
+          ...u,
+          joinedDate: u.created_at || u.joinedDate,
+        }));
+        setAllUsers(formattedUsers);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -224,7 +229,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const approveOfficer = async (officerId) => {
+  const approveOfficer = async (officerDataOrId) => {
+    // Check if we received an object or just an ID
+    const officerId =
+      typeof officerDataOrId === "object"
+        ? officerDataOrId.id
+        : officerDataOrId;
+    const officerDetails = pendingOfficers.find((o) => o.id === officerId);
+
     try {
       const response = await fetch(API_ENDPOINTS.users.updateOfficerStatus, {
         method: "POST",
@@ -232,8 +244,24 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ id: officerId, status: "active" }),
       });
       const data = await response.json();
+
       if (data.success) {
+        // Remove from pending
         setPendingOfficers(pendingOfficers.filter((o) => o.id !== officerId));
+
+        // Add to active users if valid details found
+        if (officerDetails) {
+          const newOfficer = {
+            ...officerDetails,
+            status: "active",
+            role: "officer",
+            joinedDate: new Date().toLocaleDateString("en-GB"),
+          };
+          const updatedUsers = [...allUsers, newOfficer];
+          setAllUsers(updatedUsers);
+          localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
+        }
+
         addNotification("success", "Officer approved successfully.");
         createSystemAlert(
           "success",
