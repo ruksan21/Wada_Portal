@@ -15,32 +15,26 @@ $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
 $ward_number = isset($_GET['ward_number']) ? intval($_GET['ward_number']) : null;
 $municipality = isset($_GET['municipality']) ? $conn->real_escape_string($_GET['municipality']) : null;
 
-// Build the query
+// Build the query - Use ward_id directly from development_works table
 $sql = "SELECT dw.*, w.ward_number, d.name as district_name, w.municipality 
         FROM development_works dw 
-        LEFT JOIN users u ON dw.officer_id = u.id 
-        LEFT JOIN wards w ON u.assigned_ward = w.id
+        LEFT JOIN wards w ON dw.ward_id = w.id
         LEFT JOIN districts d ON w.district_id = d.id
         WHERE 1=1";
 
 if ($ward_id) {
-    // Exact ID match
-    $sql .= " AND u.assigned_ward = $ward_id";
+    // Exact ID match - use ward_id from development_works table
+    $sql .= " AND dw.ward_id = $ward_id";
 } elseif ($ward_number) {
     // Filter by Ward Number
     $sql .= " AND w.ward_number = $ward_number";
     // Optional Municipality filter
     if ($municipality) {
         $sql .= " AND w.municipality = '$municipality'";
-    } else {
-         // Should we filter by district if known? 
-         // For now, if only ward_number is given, it might be ambiguous, but better than "ALL".
     }
 } else {
-    // If NO filters provided, and we are public facing...
-    // The previous behavior was "Show ALL".
-    // Is this desired? Maybe for "Recent Works" across the country.
-    // So we leave WHERE 1=1
+    // If NO filters provided, show all works
+    // For public facing pages showing recent works
 }
 
 $sql .= " ORDER BY dw.created_at DESC";

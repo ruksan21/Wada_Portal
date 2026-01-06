@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   works: {
     add: `${BASE_URL}/works/add_work.php`,
     getAll: `${BASE_URL}/works/get_works.php`,
+    delete: `${BASE_URL}/works/delete_work.php`,
   },
 
   // Communication

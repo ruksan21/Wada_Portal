@@ -4,23 +4,31 @@ import CommentSection from "../Component/CommentSection";
 import { useWard } from "../Context/WardContext";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 
-const Works = () => {
+const Works = ({ wardId: propWardId }) => {
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { wardId } = useWard();
+  const { wardId: contextWardId } = useWard();
+
+  // Use prop wardId if provided, otherwise use context wardId
+  const wardId = propWardId || contextWardId;
 
   useEffect(() => {
+    if (!wardId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetch(
       `${API_ENDPOINTS.works.getAll}?ward_id=${wardId}`
     )
       .then((res) => res.json())
       .then((data) => {
-        setWorks(data);
+        setWorks(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching works:", err);
+        setWorks([]);
         setLoading(false);
       });
   }, [wardId]);

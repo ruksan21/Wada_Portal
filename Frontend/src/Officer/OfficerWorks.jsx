@@ -194,6 +194,10 @@ export default function OfficerWorks() {
       });
 
       const data = await response.json();
+      console.log("Work add response:", data);
+      console.log("Officer ID:", user?.id);
+      console.log("Ward ID:", user?.assigned_ward);
+      
       if (data.status === "success") {
         alert("Work saved successfully!");
         fetchWorks();
@@ -207,9 +211,31 @@ export default function OfficerWorks() {
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this work?")) {
-      setWorks(works.filter((w) => w.id !== id));
+      try {
+        const response = await fetch(API_ENDPOINTS.works.delete, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+            officer_id: user?.id,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.status === "success") {
+          alert("Work deleted successfully!");
+          fetchWorks(); // Refresh the works list
+        } else {
+          alert("Error: " + data.message);
+        }
+      } catch (err) {
+        console.error("Error deleting work:", err);
+        alert("Failed to delete work.");
+      }
     }
   };
 

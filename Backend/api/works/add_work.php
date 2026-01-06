@@ -10,30 +10,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
-require_once 'verify_ward_access.php';
 
 // Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Attempt to decode JSON input first
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    if (!$data) {
-        // If JSON decoding fails, it might be a form-data request (e.g., with file upload)
-        // In this case, we'll try to get data from $_POST, but prioritize JSON for non-file fields
-        // For this specific change, we are moving to JSON for all non-file data.
-        // If the request is not JSON, it's an invalid input for this API.
-        echo json_encode(["status" => "error", "message" => "Invalid JSON input."]);
-        exit();
+    // Check if it's FormData (with file upload) or JSON
+    $content_type = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+    
+    if (stripos($content_type, 'multipart/form-data') !== false) {
+        // FormData request (with file upload)
+        $data = $_POST;
+    } else {
+        // JSON request
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!$data) {
+            echo json_encode(["status" => "error", "message" => "Invalid JSON input."]);
+            exit();
+        }
     }
 
     $title = $data['title'] ?? '';
     $description = $data['description'] ?? '';
-    $budget = $data['budget'] ?? 0; // Changed default from '' to 0 for budget
+    $budget = $data['budget'] ?? 0;
     $location = $data['location'] ?? '';
-    $start_date = $data['startDate'] ?? null; // Assuming frontend sends 'startDate'
-    $end_date = $data['endDate'] ?? null;     // Assuming frontend sends 'endDate'
+    $start_date = $data['start_date'] ?? null;
+    $end_date = $data['end_date'] ?? null;
     $beneficiaries = $data['beneficiaries'] ?? '';
-    $status = $data['status'] ?? 'Upcoming'; // Changed default status
+    $status = $data['status'] ?? 'Upcoming';
 
     $officer_id = $data['officer_id'] ?? 0;
 
@@ -65,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $image_path = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $target_dir = "uploads/works/";
+        $target_dir = "../uploads/works/";
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -74,12 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $target_file = $target_dir . $file_name;
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $image_path = $target_file;
+            // Store relative path from api directory
+            $image_path = "uploads/works/" . $file_name;
         }
     }
 
-    $stmt = $conn->prepare("INSERT INTO development_works (title, description, budget, location, start_date, end_date, beneficiaries, status, image, officer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssssssi", $title, $description, $budget, $location, $start_date, $end_date, $beneficiaries, $status, $image_path, $officer_id);
+    $stmt = $conn->prepare("INSERT INTO development_works (title, description, budget, location, start_date, end_date, beneficiaries, status, image, officer_id, ward_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssssii", $title, $description, $budget, $location, $start_date, $end_date, $beneficiaries, $status, $image_path, $officer_id, $ward_id);
 
     if ($stmt->execute()) {
         echo json_encode(["status" => "success", "message" => "Work added successfully"]);
