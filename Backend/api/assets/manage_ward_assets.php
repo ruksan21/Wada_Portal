@@ -14,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../wards/resolve_ward_id.php';
+require_once '../wards/verify_ward_access.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -35,26 +37,27 @@ if ($method === 'GET') {
     if ($ward_id > 0) {
         $query = "SELECT * FROM ward_assets WHERE ward_id = $ward_id ORDER BY created_at DESC";
     } else {
-        // Filter by work location
-        $query = "SELECT wa.* FROM ward_assets wa
-                  INNER JOIN wards w ON wa.ward_id = w.id
-                  INNER JOIN districts d ON w.district_id = d.id
-                  WHERE 1=1";
-        
-        if ($work_province) {
-            $query .= " AND d.province = '$work_province'";
+        if ($work_province && $work_district && $work_municipality && $work_ward) {
+            $resolvedWardId = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            if ($resolvedWardId === 0) {
+                http_response_code(422);
+                echo json_encode(array(
+                    "success" => false,
+                    "message" => "Ward not found for provided work location. Ask admin to create this ward.",
+                    "debug" => array(
+                        "work_province" => $work_province,
+                        "work_district" => $work_district,
+                        "work_municipality" => $work_municipality,
+                        "work_ward" => $work_ward
+                    )
+                ));
+                exit();
+            }
+            $query = "SELECT * FROM ward_assets WHERE ward_id = $resolvedWardId ORDER BY created_at DESC";
+        } else {
+            echo json_encode(array("success" => false, "message" => "Full work location (province, district, municipality, ward) required."));
+            exit();
         }
-        if ($work_district) {
-            $query .= " AND d.name = '$work_district'";
-        }
-        if ($work_municipality) {
-            $query .= " AND w.municipality = '$work_municipality'";
-        }
-        if ($work_ward) {
-            $query .= " AND w.ward_number = $work_ward";
-        }
-        
-        $query .= " ORDER BY wa.created_at DESC";
     }
     
     $result = $conn->query($query);
@@ -109,31 +112,37 @@ if ($method === 'POST') {
 
             $ward_id = isset($data->ward_id) ? intval($data->ward_id) : 0;
             if ($ward_id === 0) {
-                // Try to resolve from work location
+                // Resolve strictly from work location
                 $work_province = isset($data->work_province) && !empty($data->work_province) ? $data->work_province : null;
                 $work_district = isset($data->work_district) && !empty($data->work_district) ? $data->work_district : null;
                 $work_municipality = isset($data->work_municipality) && !empty($data->work_municipality) ? $data->work_municipality : null;
                 $work_ward = isset($data->work_ward) && !empty($data->work_ward) ? intval($data->work_ward) : null;
-                
+
                 if ($work_province && $work_district && $work_municipality && $work_ward) {
-                    $sql_resolve = "SELECT w.id FROM wards w INNER JOIN districts d ON w.district_id = d.id
-                                    WHERE d.province = ? AND d.name = ? AND w.municipality = ? AND w.ward_number = ? LIMIT 1";
-                    $stmt_res = $conn->prepare($sql_resolve);
-                    if ($stmt_res) {
-                        $stmt_res->bind_param("sssi", $work_province, $work_district, $work_municipality, $work_ward);
-                        $stmt_res->execute();
-                        $res = $stmt_res->get_result();
-                        if ($res && $res->num_rows > 0) {
-                            $row = $res->fetch_assoc();
-                            $ward_id = intval($row['id']);
-                        }
-                        $stmt_res->close();
-                    }
+                    $ward_id = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
                 }
             }
             if ($ward_id === 0) {
-                echo json_encode(array("success" => false, "message" => "Ward not resolved. Please provide valid work location or ward_id."));
+                http_response_code(422);
+                echo json_encode(array(
+                    "success" => false,
+                    "message" => "Ward not found for provided work location. Ask admin to create this ward.",
+                    "debug" => array(
+                        "work_province" => isset($work_province) ? $work_province : null,
+                        "work_district" => isset($work_district) ? $work_district : null,
+                        "work_municipality" => isset($work_municipality) ? $work_municipality : null,
+                        "work_ward" => isset($work_ward) ? $work_ward : null
+                    )
+                ));
                 exit();
+            }
+
+            // Optional: verify access if officer_id provided
+            $officer_id = isset($data->officer_id) ? intval($data->officer_id) : 0;
+            if ($officer_id > 0) {
+                if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
+                    sendUnauthorizedResponse();
+                }
             }
         $asset_type = $conn->real_escape_string($data->asset_type);
         $asset_name = $conn->real_escape_string($data->asset_name);

@@ -203,14 +203,11 @@ const WardManagement = () => {
   const handleSave = async (e) => {
     e.preventDefault();
 
-    // Comprehensive Validation - All fields required
+    // Comprehensive Validation - Required fields only
     const requiredFields = {
       ward_number: "Ward Number",
       district_id: "District",
       municipality: "Municipality",
-      location: "Location",
-      contact_phone: "Contact Phone",
-      contact_email: "Contact Email",
       chairperson_name: "Chairperson Name",
       chairperson_phone: "Chairperson Phone",
       chairperson_email: "Chairperson Email",
@@ -228,23 +225,23 @@ const WardManagement = () => {
       return;
     }
 
-    // Email validation
+    // Email validation - only if provided
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.contact_email)) {
+    if (formData.contact_email && !emailRegex.test(formData.contact_email)) {
       alert("Please enter a valid contact email.");
       return;
     }
-    if (!emailRegex.test(formData.chairperson_email)) {
+    if (formData.chairperson_email && !emailRegex.test(formData.chairperson_email)) {
       alert("Please enter a valid chairperson email.");
       return;
     }
 
-    // Phone validation
-    if (!/^[0-9\-\+\s]+$/.test(formData.contact_phone)) {
+    // Phone validation - only if provided
+    if (formData.contact_phone && !/^[0-9\-\+\s]+$/.test(formData.contact_phone)) {
       alert("Please enter a valid contact phone number.");
       return;
     }
-    if (!/^[0-9\-\+\s]+$/.test(formData.chairperson_phone)) {
+    if (formData.chairperson_phone && !/^[0-9\-\+\s]+$/.test(formData.chairperson_phone)) {
       alert("Please enter a valid chairperson phone number.");
       return;
     }
@@ -325,7 +322,7 @@ const WardManagement = () => {
     if (formProvince && formDistrictName && formData.municipality) {
       const munis = getMunicipalities(formProvince, formDistrictName);
       const selectedMuni = munis.find((m) => m.name === formData.municipality);
-      if (selectedMuni) {
+      if (selectedMuni && selectedMuni.wards > 0) {
         const nums = Array.from(
           { length: selectedMuni.wards },
           (_, i) => i + 1
@@ -339,17 +336,11 @@ const WardManagement = () => {
     }
   }, [formProvince, formDistrictName, formData.municipality]);
 
-  // Derived state for districts that actually have wards registered
+  // Derived state for ALL districts (not just ones with wards)
   const registeredDistricts = React.useMemo(() => {
-    const districtsWithWards = new Set();
-    wards.forEach((w) => {
-      if (w.district_id) districtsWithWards.add(parseInt(w.district_id));
-    });
-
     return districts
-      .filter((d) => districtsWithWards.has(parseInt(d.id)))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [wards, districts]);
+  }, [districts]);
 
   // Combined Filtering Logic
   const filteredWards = wards.filter((ward) => {
@@ -897,13 +888,6 @@ const WardManagement = () => {
                               </option>
                             ))}
                         </select>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingDistrict(true)}
-                          className="modern-btn-plus"
-                        >
-                          +
-                        </button>
                       </div>
                     </div>
                     <div className="form-field">
@@ -965,7 +949,7 @@ const WardManagement = () => {
                           setFormData({ ...formData, location: e.target.value })
                         }
                         className="modern-input"
-                        placeholder="e.g. Near Kalanki Chowk"
+                        placeholder="e.g. Near Kalanki Chowk (Optional)"
                       />
                     </div>
                     <div className="form-field">
@@ -980,7 +964,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
-                        placeholder="https://maps.app.goo.gl/..."
+                        placeholder="https://maps.app.goo.gl/... (Optional)"
                       />
                     </div>
                   </div>
@@ -998,7 +982,7 @@ const WardManagement = () => {
                         value={formData.contact_phone}
                         onChange={(e) => handleNumericInput(e, "contact_phone")}
                         className="modern-input"
-                        placeholder="98XXXXXXXX"
+                        placeholder="98XXXXXXXX (Optional)"
                       />
                     </div>
                     <div className="form-field">
@@ -1008,7 +992,7 @@ const WardManagement = () => {
                         value={formData.telephone}
                         onChange={(e) => handleNumericInput(e, "telephone")}
                         className="modern-input"
-                        placeholder="01-XXXXXXX"
+                        placeholder="01-XXXXXXX (Optional)"
                       />
                     </div>
                     <div className="form-field">
@@ -1023,7 +1007,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
-                        placeholder="office@ward.gov.np"
+                        placeholder="office@ward.gov.np (Optional)"
                       />
                     </div>
                   </div>
@@ -1036,7 +1020,7 @@ const WardManagement = () => {
                   </h3>
                   <div className="modern-grid-layout">
                     <div className="form-field">
-                      <label className="modern-label">Full Name</label>
+                      <label className="modern-label">Full Name *</label>
                       <input
                         type="text"
                         value={formData.chairperson_name}
@@ -1047,6 +1031,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
+                        placeholder="Chairperson's full name"
                       />
                     </div>
                     <div className="form-field">
@@ -1061,9 +1046,10 @@ const WardManagement = () => {
                         }}
                         className="modern-file-input"
                       />
+                      <small style={{ color: "#666" }}>(Optional)</small>
                     </div>
                     <div className="form-field">
-                      <label className="modern-label">Personal Phone</label>
+                      <label className="modern-label">Personal Phone *</label>
                       <input
                         type="text"
                         value={formData.chairperson_phone}
@@ -1071,10 +1057,11 @@ const WardManagement = () => {
                           handleNumericInput(e, "chairperson_phone")
                         }
                         className="modern-input"
+                        placeholder="98XXXXXXXX"
                       />
                     </div>
                     <div className="form-field">
-                      <label className="modern-label">Personal Email</label>
+                      <label className="modern-label">Personal Email *</label>
                       <input
                         type="email"
                         value={formData.chairperson_email}
@@ -1085,6 +1072,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
+                        placeholder="chairperson@example.com"
                       />
                     </div>
                     <div className="form-field">
@@ -1099,6 +1087,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
+                        placeholder="(Optional)"
                       />
                     </div>
                     <div className="form-field">
@@ -1114,6 +1103,7 @@ const WardManagement = () => {
                         }
                         className="modern-input"
                       />
+                      <small style={{ color: "#666" }}>(Optional)</small>
                     </div>
                     <div className="form-field">
                       <label className="modern-label">Education</label>
@@ -1127,6 +1117,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
+                        placeholder="e.g. Bachelor's (Optional)"
                       />
                     </div>
                     <div className="form-field">
@@ -1141,6 +1132,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-input"
+                        placeholder="e.g. 5 years in local governance (Optional)"
                       />
                     </div>
                     <div className="form-field field-full">
@@ -1155,6 +1147,7 @@ const WardManagement = () => {
                           })
                         }
                         className="modern-textarea"
+                        placeholder="Brief biography or message (Optional)"
                       />
                     </div>
                   </div>

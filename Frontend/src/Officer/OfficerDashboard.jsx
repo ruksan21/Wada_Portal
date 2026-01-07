@@ -1,11 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import OfficerLayout from "./OfficerLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import "./OfficerDashboard.css";
 
 const OfficerDashboard = () => {
-  const { getOfficerWorkLocation } = useAuth();
+  const { getOfficerWorkLocation, user } = useAuth();
   const workLocation = getOfficerWorkLocation();
+  const [wardExists, setWardExists] = useState(null); // null = checking, true = exists, false = doesn't exist
+
+  // Check if officer's assigned ward exists in the system
+  useEffect(() => {
+    const checkWardExists = async () => {
+      if (user && user.role === "officer" && workLocation) {
+        try {
+          const response = await fetch(
+            `http://localhost/my-react-app/Backend/api/wards/check_ward_exists.php?province=${encodeURIComponent(
+              workLocation.work_province
+            )}&district=${encodeURIComponent(
+              workLocation.work_district
+            )}&municipality=${encodeURIComponent(
+              workLocation.work_municipality
+            )}&ward_number=${workLocation.work_ward}`
+          );
+          const data = await response.json();
+          setWardExists(data.exists || false);
+        } catch (error) {
+          console.error("Error checking ward:", error);
+          setWardExists(false);
+        }
+      }
+    };
+
+    checkWardExists();
+  }, [user, workLocation]);
 
   const stats = [
     { label: "New Applications", value: "5", icon: "📝" },
@@ -20,16 +47,42 @@ const OfficerDashboard = () => {
         <div className="ward-assignment-badge">
           <span className="badge-icon">📍</span>
           <span className="badge-text">
-            तपाईंको Assignment: <strong>{workLocation.work_municipality}, Ward {workLocation.work_ward}</strong>
+            तपाईंको Assignment:{" "}
+            <strong>
+              {workLocation.work_municipality}, Ward {workLocation.work_ward}
+            </strong>
           </span>
         </div>
       )}
-      
+
       {!workLocation && (
         <div className="ward-assignment-badge warning">
           <span className="badge-icon">⚠️</span>
           <span className="badge-text">
             Ward assignment पेन्डिङ छ। Admin बाट approval पर्खनुहोस्।
+          </span>
+        </div>
+      )}
+
+      {/* Ward Not Created Warning */}
+      {workLocation && wardExists === false && (
+        <div
+          className="ward-assignment-badge error"
+          style={{
+            backgroundColor: "#fee2e2",
+            borderColor: "#ef4444",
+            color: "#991b1b",
+            marginTop: "15px",
+          }}
+        >
+          <span className="badge-icon">🚫</span>
+          <span className="badge-text">
+            <strong>तपाईंको Ward अझै Create भएको छैन!</strong>
+            <br />
+            Ward {workLocation.work_ward} in {workLocation.work_municipality},{" "}
+            {workLocation.work_district} अझै system मा create भएको छैन। तपाईं
+            Development Works, Complaints, वा Assets add गर्न सक्नुहुन्न। कृपया
+            Admin लाई सम्पर्क गर्नुहोस्।
           </span>
         </div>
       )}

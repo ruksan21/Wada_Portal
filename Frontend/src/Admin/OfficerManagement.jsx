@@ -62,11 +62,53 @@ const OfficerManagement = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [wardStatus, setWardStatus] = useState({}); // Track ward existence for each officer
 
   // Dynamic Options State
   const [districts, setDistricts] = useState([]);
   const [municipalities, setMunicipalities] = useState([]);
   const [wardsList, setWardsList] = useState([]);
+
+  // Check ward existence for all pending officers
+  useEffect(() => {
+    const checkWardsExistence = async () => {
+      const statusMap = {};
+      for (const officer of pendingOfficers) {
+        if (
+          officer.work_province &&
+          officer.work_district &&
+          officer.work_municipality &&
+          officer.work_ward
+        ) {
+          try {
+            const response = await fetch(
+              `${
+                API_ENDPOINTS.wards.base
+              }/check_ward_exists.php?province=${encodeURIComponent(
+                officer.work_province
+              )}&district=${encodeURIComponent(
+                officer.work_district
+              )}&municipality=${encodeURIComponent(
+                officer.work_municipality
+              )}&ward_number=${officer.work_ward}`
+            );
+            const data = await response.json();
+            statusMap[officer.id] = data.exists || false;
+          } catch (error) {
+            console.error("Error checking ward:", error);
+            statusMap[officer.id] = false;
+          }
+        } else {
+          statusMap[officer.id] = false;
+        }
+      }
+      setWardStatus(statusMap);
+    };
+
+    if (pendingOfficers.length > 0) {
+      checkWardsExistence();
+    }
+  }, [pendingOfficers]);
 
   // Initialize Dropdowns based on default/current selection
   useEffect(() => {
@@ -151,39 +193,55 @@ const OfficerManagement = () => {
     const newErrors = {};
 
     // Validation checks
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First name is required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    if (!emailRegex.test(formData.email)) newErrors.email = "Invalid email format";
+    if (!emailRegex.test(formData.email))
+      newErrors.email = "Invalid email format";
 
-    if (!formData.contactNumber.trim()) newErrors.contactNumber = "Mobile number is required";
+    if (!formData.contactNumber.trim())
+      newErrors.contactNumber = "Mobile number is required";
     if (!formData.dob) newErrors.dob = "Date of birth is required";
     if (!formData.gender) newErrors.gender = "Gender is required";
 
     // Citizenship validation
-    if (!formData.citizenshipNumber.trim()) newErrors.citizenshipNumber = "Citizenship number is required";
-    if (!formData.citizenshipIssueDate) newErrors.citizenshipIssueDate = "Citizenship issue date is required";
-    if (!formData.citizenshipIssueDistrict.trim()) newErrors.citizenshipIssueDistrict = "Issue district is required";
+    if (!formData.citizenshipNumber.trim())
+      newErrors.citizenshipNumber = "Citizenship number is required";
+    if (!formData.citizenshipIssueDate)
+      newErrors.citizenshipIssueDate = "Citizenship issue date is required";
+    if (!formData.citizenshipIssueDistrict.trim())
+      newErrors.citizenshipIssueDistrict = "Issue district is required";
 
     // Official details validation
-    if (!formData.officerId.trim()) newErrors.officerId = "Officer ID is required";
-    if (!formData.department.trim()) newErrors.department = "Department is required";
-    if (!formData.workProvince) newErrors.workProvince = "Work province is required";
-    if (!formData.workDistrict) newErrors.workDistrict = "Work district is required";
-    if (!formData.workMunicipality) newErrors.workMunicipality = "Work municipality is required";
+    if (!formData.officerId.trim())
+      newErrors.officerId = "Officer ID is required";
+    if (!formData.department.trim())
+      newErrors.department = "Department is required";
+    if (!formData.workProvince)
+      newErrors.workProvince = "Work province is required";
+    if (!formData.workDistrict)
+      newErrors.workDistrict = "Work district is required";
+    if (!formData.workMunicipality)
+      newErrors.workMunicipality = "Work municipality is required";
     if (!formData.workWard) newErrors.workWard = "Work ward is required";
 
     // Password validation
     if (!formData.password) newErrors.password = "Password is required";
-    if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
-    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password is required";
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+    if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+    if (!formData.confirmPassword)
+      newErrors.confirmPassword = "Confirm password is required";
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
 
     // Photo validation
-    if (!photoFiles.citizenship) newErrors.citizenship = "Citizenship photo is required";
-    if (!photoFiles.idCard) newErrors.idCard = "Officer ID card photo is required";
+    if (!photoFiles.citizenship)
+      newErrors.citizenship = "Citizenship photo is required";
+    if (!photoFiles.idCard)
+      newErrors.idCard = "Officer ID card photo is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -262,11 +320,13 @@ const OfficerManagement = () => {
       department: officer.department || "",
       workProvince: officer.work_province || "Bagmati Province",
       workDistrict: officer.work_district || "Kathmandu",
-      workMunicipality: officer.work_municipality || "Kathmandu Metropolitan City",
+      workMunicipality:
+        officer.work_municipality || "Kathmandu Metropolitan City",
       workWard: officer.work_ward || "1",
       workOfficeLocation: officer.work_office_location || "",
       contactNumber: officer.contactNumber || officer.contact_number || "",
-      citizenshipNumber: officer.citizenshipNumber || officer.citizenship_number || "",
+      citizenshipNumber:
+        officer.citizenshipNumber || officer.citizenship_number || "",
     }));
     setShowCreateModal(true);
   };
@@ -278,7 +338,14 @@ const OfficerManagement = () => {
   const renderErrorMessage = (fieldName) => {
     if (errors[fieldName]) {
       return (
-        <span style={{ color: "red", fontSize: "0.85rem", marginTop: "4px", display: "block" }}>
+        <span
+          style={{
+            color: "red",
+            fontSize: "0.85rem",
+            marginTop: "4px",
+            display: "block",
+          }}
+        >
           {errors[fieldName]}
         </span>
       );
@@ -340,13 +407,17 @@ const OfficerManagement = () => {
 
                 <div className="three-col-grid">
                   <div>
-                    <label className="stat-label">First Name <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      First Name <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.firstName ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.firstName ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("firstName")}
                   </div>
@@ -361,13 +432,17 @@ const OfficerManagement = () => {
                     />
                   </div>
                   <div>
-                    <label className="stat-label">Last Name <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Last Name <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.lastName ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.lastName ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("lastName")}
                   </div>
@@ -375,23 +450,31 @@ const OfficerManagement = () => {
 
                 <div className="two-col-grid">
                   <div>
-                    <label className="stat-label">Date of Birth <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Date of Birth <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="date"
                       name="dob"
                       value={formData.dob}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.dob ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.dob ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("dob")}
                   </div>
                   <div>
-                    <label className="stat-label">Gender <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Gender <span style={{ color: "red" }}>*</span>
+                    </label>
                     <select
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.gender ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.gender ? "input-error" : ""
+                      }`}
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -407,24 +490,32 @@ const OfficerManagement = () => {
                 <h3 className="form-section-header">Contact & Address</h3>
                 <div className="two-col-grid" style={{ marginTop: 0 }}>
                   <div>
-                    <label className="stat-label">Email <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Email <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.email ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.email ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("email")}
                   </div>
                   <div>
-                    <label className="stat-label">Mobile Number <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Mobile Number <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="contactNumber"
                       value={formData.contactNumber}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.contactNumber ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.contactNumber ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("contactNumber")}
                   </div>
@@ -465,7 +556,9 @@ const OfficerManagement = () => {
                 </div>
                 <div className="municipality-grid">
                   <div>
-                    <label className="stat-label">Municipality / Nagarpalika</label>
+                    <label className="stat-label">
+                      Municipality / Nagarpalika
+                    </label>
                     <select
                       name="city"
                       value={formData.city}
@@ -503,13 +596,17 @@ const OfficerManagement = () => {
                 <h3 className="form-section-header">OFFICIAL ASSIGNMENT</h3>
                 <div className="three-col-grid">
                   <div>
-                    <label className="stat-label">Officer ID <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Officer ID <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="officerId"
                       value={formData.officerId}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.officerId ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.officerId ? "input-error" : ""
+                      }`}
                       placeholder="OFF-202X-000"
                     />
                     {renderErrorMessage("officerId")}
@@ -527,10 +624,21 @@ const OfficerManagement = () => {
                 </div>
 
                 {/* Work/Office Location Section */}
-                <h4 style={{ marginTop: "25px", marginBottom: "15px", fontSize: "1rem", fontWeight: "600" }}>Work/Office Location</h4>
+                <h4
+                  style={{
+                    marginTop: "25px",
+                    marginBottom: "15px",
+                    fontSize: "1rem",
+                    fontWeight: "600",
+                  }}
+                >
+                  Work/Office Location
+                </h4>
                 <div className="three-col-grid">
                   <div>
-                    <label className="stat-label">Work Province <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Work Province <span style={{ color: "red" }}>*</span>
+                    </label>
                     <select
                       name="workProvince"
                       value={formData.workProvince}
@@ -558,13 +666,18 @@ const OfficerManagement = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="stat-label">Work District <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Work District <span style={{ color: "red" }}>*</span>
+                    </label>
                     <select
                       name="workDistrict"
                       value={formData.workDistrict}
                       onChange={(e) => {
                         const newDist = e.target.value;
-                        const newMuns = getMunicipalities(formData.workProvince, newDist);
+                        const newMuns = getMunicipalities(
+                          formData.workProvince,
+                          newDist
+                        );
                         const firstMun = newMuns[0] ? newMuns[0].name : "";
                         setFormData((prev) => ({
                           ...prev,
@@ -583,7 +696,9 @@ const OfficerManagement = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="stat-label">Work Municipality <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Work Municipality <span style={{ color: "red" }}>*</span>
+                    </label>
                     <select
                       name="workMunicipality"
                       value={formData.workMunicipality}
@@ -596,7 +711,10 @@ const OfficerManagement = () => {
                       }}
                       className="form-input"
                     >
-                      {getMunicipalities(formData.workProvince, formData.workDistrict).map((m) => (
+                      {getMunicipalities(
+                        formData.workProvince,
+                        formData.workDistrict
+                      ).map((m) => (
                         <option key={m.name} value={m.name}>
                           {m.name}
                         </option>
@@ -607,7 +725,9 @@ const OfficerManagement = () => {
 
                 <div className="three-col-grid" style={{ marginTop: "15px" }}>
                   <div>
-                    <label className="stat-label">Work Ward No <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Work Ward No <span style={{ color: "red" }}>*</span>
+                    </label>
                     <select
                       name="workWard"
                       value={formData.workWard}
@@ -615,9 +735,15 @@ const OfficerManagement = () => {
                       className="form-input"
                     >
                       {(() => {
-                        const mun = getMunicipalities(formData.workProvince, formData.workDistrict).find(m => m.name === formData.workMunicipality);
+                        const mun = getMunicipalities(
+                          formData.workProvince,
+                          formData.workDistrict
+                        ).find((m) => m.name === formData.workMunicipality);
                         const wardCount = mun ? mun.wards : 32;
-                        return Array.from({ length: wardCount }, (_, i) => i + 1).map((n) => (
+                        return Array.from(
+                          { length: wardCount },
+                          (_, i) => i + 1
+                        ).map((n) => (
                           <option key={n} value={n}>
                             Ward {n}
                           </option>
@@ -626,7 +752,9 @@ const OfficerManagement = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="stat-label">Office Location/Address</label>
+                    <label className="stat-label">
+                      Office Location/Address
+                    </label>
                     <input
                       type="text"
                       name="workOfficeLocation"
@@ -638,25 +766,33 @@ const OfficerManagement = () => {
                   </div>
                 </div>
                 <div className="password-section">
-                  <label className="stat-label">Login Password <span style={{ color: "red" }}>*</span></label>
+                  <label className="stat-label">
+                    Login Password <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="password"
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.password ? "input-error" : ""}`}
+                    className={`form-input ${
+                      errors.password ? "input-error" : ""
+                    }`}
                     placeholder="Set initial password (Min 8 characters)"
                   />
                   {renderErrorMessage("password")}
                 </div>
                 <div className="password-section">
-                  <label className="stat-label">Confirm Password <span style={{ color: "red" }}>*</span></label>
+                  <label className="stat-label">
+                    Confirm Password <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="password"
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`form-input ${errors.confirmPassword ? "input-error" : ""}`}
+                    className={`form-input ${
+                      errors.confirmPassword ? "input-error" : ""
+                    }`}
                     placeholder="Confirm password"
                   />
                   {renderErrorMessage("confirmPassword")}
@@ -668,59 +804,80 @@ const OfficerManagement = () => {
                 <h3 className="form-section-header">Documents</h3>
                 <div className="three-col-grid">
                   <div>
-                    <label className="stat-label">Citizenship No. <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Citizenship No. <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="citizenshipNumber"
                       value={formData.citizenshipNumber}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.citizenshipNumber ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.citizenshipNumber ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("citizenshipNumber")}
                   </div>
                   <div>
-                    <label className="stat-label">Issue Date <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Issue Date <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="date"
                       name="citizenshipIssueDate"
                       value={formData.citizenshipIssueDate}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.citizenshipIssueDate ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.citizenshipIssueDate ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("citizenshipIssueDate")}
                   </div>
                   <div>
-                    <label className="stat-label">Issue District <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Issue District <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="text"
                       name="citizenshipIssueDistrict"
                       value={formData.citizenshipIssueDistrict}
                       onChange={handleInputChange}
-                      className={`form-input ${errors.citizenshipIssueDistrict ? "input-error" : ""}`}
+                      className={`form-input ${
+                        errors.citizenshipIssueDistrict ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("citizenshipIssueDistrict")}
                   </div>
                 </div>
                 <div className="two-col-grid">
                   <div>
-                    <label className="stat-label">Citizenship Photo <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Citizenship Photo <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="file"
                       name="citizenship"
                       onChange={handleFileChange}
                       accept="image/*"
-                      className={`form-input file-input-wrapper ${errors.citizenship ? "input-error" : ""}`}
+                      className={`form-input file-input-wrapper ${
+                        errors.citizenship ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("citizenship")}
                   </div>
                   <div>
-                    <label className="stat-label">Officer ID Card Photo <span style={{ color: "red" }}>*</span></label>
+                    <label className="stat-label">
+                      Officer ID Card Photo{" "}
+                      <span style={{ color: "red" }}>*</span>
+                    </label>
                     <input
                       type="file"
                       name="idCard"
                       onChange={handleFileChange}
                       accept="image/*"
-                      className={`form-input file-input-wrapper ${errors.idCard ? "input-error" : ""}`}
+                      className={`form-input file-input-wrapper ${
+                        errors.idCard ? "input-error" : ""
+                      }`}
                     />
                     {renderErrorMessage("idCard")}
                   </div>
@@ -738,7 +895,11 @@ const OfficerManagement = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="action-btn approve btn-create" disabled={isLoading}>
+                <button
+                  type="submit"
+                  className="action-btn approve btn-create"
+                  disabled={isLoading}
+                >
                   {isLoading ? "Creating..." : "Create Officer Profile"}
                 </button>
               </div>
@@ -760,7 +921,11 @@ const OfficerManagement = () => {
             onClick={() => {
               setShowCreateModal(true);
               setFormData(initialFormState);
-              setPhotoFiles({ citizenship: null, idCard: null, profilePhoto: null });
+              setPhotoFiles({
+                citizenship: null,
+                idCard: null,
+                profilePhoto: null,
+              });
               setErrors({});
             }}
           >
@@ -781,6 +946,7 @@ const OfficerManagement = () => {
                 <th>Officer ID</th>
                 <th>Department</th>
                 <th>Work Location</th>
+                <th>Ward Status</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -794,10 +960,25 @@ const OfficerManagement = () => {
                   <td>{officer.department || "General"}</td>
                   <td>
                     {officer.work_municipality
-                      ? `${officer.work_municipality}, Ward ${officer.work_ward || ""}`
+                      ? `${officer.work_municipality}, Ward ${
+                          officer.work_ward || ""
+                        }`
                       : officer.work_ward
                       ? `Ward ${officer.work_ward}`
                       : "N/A"}
+                  </td>
+                  <td>
+                    {wardStatus[officer.id] === true ? (
+                      <span style={{ color: "#10b981", fontWeight: "600" }}>
+                        ✓ Ward Exists
+                      </span>
+                    ) : wardStatus[officer.id] === false ? (
+                      <span style={{ color: "#ef4444", fontWeight: "600" }}>
+                        ✗ Ward Not Created
+                      </span>
+                    ) : (
+                      <span style={{ color: "#6b7280" }}>Checking...</span>
+                    )}
                   </td>
                   <td>{getStatusBadge(officer.status)}</td>
                   <td>

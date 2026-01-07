@@ -76,10 +76,11 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
 };
 
 export default function OfficerWorks() {
-  const { getOfficerWorkLocation } = useAuth();
+  const { getOfficerWorkLocation, user } = useAuth();
   const workLocation = getOfficerWorkLocation();
   const [works, setWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [wardError, setWardError] = useState(null);
 
   useEffect(() => {
     if (workLocation) {
@@ -205,9 +206,16 @@ export default function OfficerWorks() {
       console.log("Officer ID:", user?.id);
       console.log("Ward ID:", user?.assigned_ward);
       
+      if (response.status === 422) {
+        setWardError(data.message || "Ward not found. Ask admin to create this ward.");
+        handleCloseForm();
+        return;
+      }
+      
       if (data.status === "success") {
+        setWardError(null);
         alert("Work saved successfully!");
-        fetchWorks();
+        fetchWorks(workLocation);
         handleCloseForm();
       } else {
         alert("Error: " + data.message);
@@ -248,6 +256,27 @@ export default function OfficerWorks() {
 
   return (
     <OfficerLayout title="Development Works">
+      {wardError && (
+        <div style={{
+          background: "linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.05))",
+          border: "2px solid rgba(220, 38, 38, 0.5)",
+          borderRadius: "12px",
+          padding: "16px 20px",
+          marginBottom: "20px",
+          color: "#dc2626",
+          fontWeight: 500,
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          backdropFilter: "blur(10px)"
+        }}>
+          <span style={{ fontSize: "24px" }}>⚠️</span>
+          <div>
+            <div style={{ fontWeight: 600, marginBottom: "4px" }}>Ward Not Found</div>
+            <div style={{ fontSize: "0.9em", opacity: 0.9 }}>{wardError}</div>
+          </div>
+        </div>
+      )}
       <div className="officer-works-header">
         <p style={{ color: "#718096", margin: 0 }}>
           Manage development works and projects for your ward

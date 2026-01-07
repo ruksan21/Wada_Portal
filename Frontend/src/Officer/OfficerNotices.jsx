@@ -16,6 +16,7 @@ const OfficerNotices = () => {
   const [documentFile, setDocumentFile] = useState(null);
   const [documentName, setDocumentName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [wardError, setWardError] = useState(null);
 
   // Fetch notices from backend
   useEffect(() => {
@@ -159,7 +160,13 @@ const OfficerNotices = () => {
       const result = await response.json();
       console.log("Notice API response:", result);
       
+      if (response.status === 422) {
+        setWardError(result.message || "Ward not found. Ask admin to create this ward.");
+        return;
+      }
+      
       if (result.success) {
+        setWardError(null);
         setFormData({ title: "", content: "" });
         setAttachment(null);
         if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
@@ -206,6 +213,27 @@ const OfficerNotices = () => {
   return (
     <OfficerLayout title="Notices">
       <div className="recent-activity">
+        {wardError && (
+          <div style={{
+            background: "linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.05))",
+            border: "2px solid rgba(220, 38, 38, 0.5)",
+            borderRadius: "12px",
+            padding: "16px 20px",
+            marginBottom: "20px",
+            color: "#dc2626",
+            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            backdropFilter: "blur(10px)"
+          }}>
+            <span style={{ fontSize: "24px" }}>⚠️</span>
+            <div>
+              <div style={{ fontWeight: 600, marginBottom: "4px" }}>Ward Not Found</div>
+              <div style={{ fontSize: "0.9em", opacity: 0.9 }}>{wardError}</div>
+            </div>
+          </div>
+        )}
         <div className="notices-header">
           <h2 className="section-title">Ward Notices</h2>
           <button

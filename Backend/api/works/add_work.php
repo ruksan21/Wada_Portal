@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../wards/resolve_ward_id.php';
+require_once '../wards/verify_ward_access.php';
 
 // Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -44,26 +46,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          exit();
     }
 
-    // Fetch assigned ward for this officer to strictly enforce ward assignment
-    $ward_query = "SELECT assigned_ward FROM users WHERE id = ? AND role = 'officer'";
-    $stmt_ward = $conn->prepare($ward_query);
-    $stmt_ward->bind_param("i", $officer_id);
-    $stmt_ward->execute();
-    $ward_result = $stmt_ward->get_result();
+    // Resolve ward_id from officer's work location strictly
+    $officer_query = "SELECT work_province, work_district, work_municipality, work_ward FROM users WHERE id = ? AND role = 'officer'";
+    $stmt_officer = $conn->prepare($officer_query);
+    $stmt_officer->bind_param("i", $officer_id);
+    $stmt_officer->execute();
+    $officer_result = $stmt_officer->get_result();
 
-    if ($ward_result->num_rows === 0) {
-         echo json_encode(["status" => "error", "message" => "Officer not found or no ward assigned."]);
-         $stmt_ward->close();
+    if ($officer_result->num_rows === 0) {
+         echo json_encode(["status" => "error", "message" => "Officer not found or work location missing."]);
+         $stmt_officer->close();
          exit();
     }
 
-    $officer_data = $ward_result->fetch_assoc();
-    $assigned_ward = $officer_data['assigned_ward'];
-    $stmt_ward->close();
+    $officer_data = $officer_result->fetch_assoc();
+    $stmt_officer->close();
 
-    // Explicitly use the retrieved assigned_ward, ignoring any frontend 'ward_id' (if sent)
-    // to prevent tampering. This implicitly verifies access because we ONLY use their assigned ward.
-    $ward_id = $assigned_ward; // Assign the verified ward_id
+    $ward_id = 0;
+    if (!empty($officer_data['work_province']) && !empty($officer_data['work_district']) && !empty($officer_data['work_municipality']) && !empty($officer_data['work_ward'])) {
+        $ward_id = resolveWardIdStrict($conn, $officer_data['work_province'], $officer_data['work_district'], $officer_data['work_municipality'], intval($officer_data['work_ward']));
+    }
+
+    if ($ward_id === 0) {
+        http_response_code(422);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Ward not found for officer's work location. Ask admin to create this ward.",
+            "debug" => [
+                "work_province" => $officer_data['work_province'] ?? null,
+                "work_district" => $officer_data['work_district'] ?? null,
+                "work_municipality" => $officer_data['work_municipality'] ?? null,
+                "work_ward" => $officer_data['work_ward'] ?? null
+            ]
+        ]);
+        exit();
+    }
+
+    // Verify access for this ward
+    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
+        sendUnauthorizedResponse();
+    }
 
     $image_path = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {

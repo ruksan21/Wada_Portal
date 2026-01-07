@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../wards/resolve_ward_id.php';
 
 $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
 $ward_number = isset($_GET['ward_number']) ? intval($_GET['ward_number']) : null;
@@ -39,18 +40,26 @@ if ($ward_id) {
         $sql .= " AND w.municipality = '$municipality'";
     }
 } elseif ($work_province || $work_district || $work_municipality || $work_ward) {
-    // Officer work location filtering
-    if ($work_province) {
-        $sql .= " AND d.province = '$work_province'";
-    }
-    if ($work_district) {
-        $sql .= " AND d.name = '$work_district'";
-    }
-    if ($work_municipality) {
-        $sql .= " AND w.municipality = '$work_municipality'";
-    }
-    if ($work_ward) {
-        $sql .= " AND w.ward_number = $work_ward";
+    if ($work_province && $work_district && $work_municipality && $work_ward) {
+        $resolvedWardId = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+        if ($resolvedWardId === 0) {
+            http_response_code(422);
+            echo json_encode([
+                "success" => false,
+                "message" => "Ward not found for provided work location. Ask admin to create this ward.",
+                "debug" => [
+                    "work_province" => $work_province,
+                    "work_district" => $work_district,
+                    "work_municipality" => $work_municipality,
+                    "work_ward" => $work_ward
+                ]
+            ]);
+            exit();
+        }
+        $sql .= " AND dw.ward_id = $resolvedWardId";
+    } else {
+        echo json_encode(["success" => false, "message" => "Full work location (province, district, municipality, ward) required"]);
+        exit();
     }
 } else {
     // If NO filters provided, show all works

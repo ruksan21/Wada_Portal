@@ -5,7 +5,7 @@ import "./Admin.css";
 import "./AdminLayout.css";
 
 const AdminLayout = ({ children, title }) => {
-  const { user, logout, pendingOfficers, notifications } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   const isActive = (path) => {
@@ -13,10 +13,6 @@ const AdminLayout = ({ children, title }) => {
       location.pathname === path || location.pathname.startsWith(`${path}/`)
     );
   };
-
-  // Calculate total notifications count
-  const notifyCount =
-    (notifications?.length || 0) + (pendingOfficers?.length || 0);
 
   return (
     <div className="admin-layout">
@@ -97,44 +93,10 @@ const AdminLayout = ({ children, title }) => {
                   location.pathname.split("/").pop().slice(1))}
           </h2>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            {/* Conditional Notification Bell - Shows ONLY if there are notifications */}
-            {notifyCount > 0 && (
-              <div
-                className="admin-notification-bell"
-                style={{ position: "relative", cursor: "pointer" }}
-                onClick={() => (window.location.href = "/admin/officers")}
-                title="View Pending Applications"
-              >
-                <span style={{ fontSize: "1.5rem" }}>🔔</span>
-                <span
-                  className="notification-badge"
-                  style={{
-                    position: "absolute",
-                    top: "-5px",
-                    right: "-5px",
-                    background: "red",
-                    color: "white",
-                    borderRadius: "50%",
-                    width: "18px",
-                    height: "18px",
-                    fontSize: "0.75rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {notifyCount}
-                </span>
-              </div>
-            )}
-
-            <div className="admin-user-profile">
-              <span>{user?.name || "Admin"}</span>
-              <div className="profile-avatar-circle">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
-              </div>
+          <div className="admin-user-profile">
+            <span>{user?.name || "Admin"}</span>
+            <div className="profile-avatar-circle">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "A"}
             </div>
           </div>
         </header>
