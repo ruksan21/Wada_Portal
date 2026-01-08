@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once '../db_connect.php';
 require_once '../wards/find_ward_by_location.php';
-require_once '../wards/verify_ward_access.php';
 
 // Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -25,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // JSON request
         $data = json_decode(file_get_contents("php://input"), true);
         if (!$data) {
-            echo json_encode(["status" => "error", "message" => "Invalid JSON input."]);
+            echo json_encode(["success" => false, "message" => "Invalid JSON input."]);
             exit();
         }
     }
@@ -52,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $officer_id = $data['officer_id'] ?? 0;
 
     if ($officer_id == 0) {
-         echo json_encode(["status" => "error", "message" => "Officer ID required."]);
+         echo json_encode(["success" => false, "message" => "Officer ID required."]);
          exit();
     }
 
@@ -64,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $officer_result = $stmt_officer->get_result();
 
     if ($officer_result->num_rows === 0) {
-         echo json_encode(["status" => "error", "message" => "Officer not found or work location missing."]);
+         echo json_encode(["success" => false, "message" => "Officer not found or work location missing."]);
          $stmt_officer->close();
          exit();
     }
@@ -80,21 +79,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($ward_id === 0) {
         http_response_code(422);
         echo json_encode([
-            "status" => "error",
-            "message" => "Ward not found for officer's work location. Ask admin to create this ward.",
-            "debug" => [
-                "work_province" => $officer_data['work_province'] ?? null,
-                "work_district" => $officer_data['work_district'] ?? null,
-                "work_municipality" => $officer_data['work_municipality'] ?? null,
-                "work_ward" => $officer_data['work_ward'] ?? null
-            ]
+            "success" => false,
+            "message" => "Ward not found for officer's work location. Ask admin to create this ward."
         ]);
         exit();
     }
 
     // Verify access for this ward
     if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        sendUnauthorizedResponse();
+    // Verify access for this ward
+    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
+        exit();
     }
 
     $image_path = '';
@@ -123,9 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt->close();
+
 } else {
-    echo json_encode(["status" => "error", "message" => "Invalid request method"]);
+    echo json_encode(["success" => false, "message" => "Invalid request method"]);
 }
 
 $conn->close();
+}
 ?>

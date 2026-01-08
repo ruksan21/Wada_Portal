@@ -86,7 +86,9 @@ else if ($method === 'POST') {
 
     // Verify access
     if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        sendUnauthorizedResponse();
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
+        exit();
     }
     
     $sql = "INSERT INTO ward_departments (ward_id, officer_id, name, head_name, phone, email, icon) 
@@ -141,7 +143,9 @@ else if ($method === 'PUT') {
 
     // Verify access
     if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        sendUnauthorizedResponse();
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
+        exit();
     }
     
     $sql = "UPDATE ward_departments SET name = ?, head_name = ?, phone = ?, email = ?, icon = ? WHERE id = ?";
@@ -179,7 +183,9 @@ else if ($method === 'DELETE') {
 
     if ($ward_id > 0) {
         if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-            sendUnauthorizedResponse();
+            http_response_code(403);
+            echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
+            exit();
         }
     }
     

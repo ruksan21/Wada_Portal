@@ -141,7 +141,9 @@ if ($method === 'POST') {
             $officer_id = isset($data->officer_id) ? intval($data->officer_id) : 0;
             if ($officer_id > 0) {
                 if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-                    sendUnauthorizedResponse();
+                    http_response_code(403);
+                    echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
+                    exit();
                 }
             }
         $asset_type = $conn->real_escape_string($data->asset_type);
