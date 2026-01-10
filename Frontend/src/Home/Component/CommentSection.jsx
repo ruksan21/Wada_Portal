@@ -359,6 +359,11 @@ const CommentSection = ({ workId }) => {
                                 <span className="reply-user-name">
                                   🔸 {reply.officer_name}
                                 </span>
+                                {reply.officer_location && (
+                                  <span className="reply-user-location">
+                                    {reply.officer_location}
+                                  </span>
+                                )}
                                 <span className="reply-date">
                                   {formatDate(reply.created_at)}
                                 </span>

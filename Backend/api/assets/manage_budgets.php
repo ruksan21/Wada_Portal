@@ -10,17 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../utils/ward_utils.php';
 
-// Helper function to verify ward access
-function verifyWardAccess($conn, $officer_id, $ward_id) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND ward_id = ? AND role = 'officer' AND status = 'approved'");
-    $stmt->bind_param("ii", $officer_id, $ward_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $has_access = $result->num_rows > 0;
-    $stmt->close();
-    return $has_access;
-}
+// Using shared verifyWardAccess from utils
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -108,36 +100,13 @@ else if ($method === 'POST') {
     $indirect_beneficiaries = isset($data['indirect_beneficiaries']) ? intval($data['indirect_beneficiaries']) : 0;
     $fiscal_year = isset($data['fiscal_year']) ? $conn->real_escape_string($data['fiscal_year']) : '';
     
-    // Allow resolving ward by work location if ward_id is missing
-    if ($ward_id === 0) {
-        $work_province = $data['work_province'] ?? null;
-        $work_district = $data['work_district'] ?? null;
-        $work_municipality = $data['work_municipality'] ?? null;
-        $work_ward = $data['work_ward'] ?? null;
-        if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $sql_resolve = "SELECT w.id FROM wards w INNER JOIN districts d ON w.district_id = d.id
-                            WHERE d.province = ? AND d.name = ? AND w.municipality = ? AND w.ward_number = ? LIMIT 1";
-            $stmt_res = $conn->prepare($sql_resolve);
-            $stmt_res->bind_param("sssi", $work_province, $work_district, $work_municipality, $work_ward);
-            $stmt_res->execute();
-            $res = $stmt_res->get_result();
-            if ($res && $res->num_rows > 0) {
-                $row = $res->fetch_assoc();
-                $ward_id = intval($row['id']);
-            }
-            $stmt_res->close();
-        }
+    // Allow resolving ward by officer work location if ward_id is missing
+    if ($ward_id === 0 && $officer_id > 0) {
+        $ward_id = getOfficerWardIdOrError($conn, $officer_id, true);
     }
 
     if ($ward_id === 0 || $officer_id === 0) {
         echo json_encode(["success" => false, "message" => "Ward ID/Work location and Officer ID required"]);
-        exit();
-    }
-
-    // Verify access
-    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward"]);
         exit();
     }
     

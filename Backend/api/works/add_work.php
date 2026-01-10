@@ -10,21 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
-
-// Helper function to resolve ward ID
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
+require_once '../utils/ward_utils.php';
 
 // Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -69,44 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          exit();
     }
 
-    // Resolve ward_id from officer's work location strictly
-    $officer_query = "SELECT work_province, work_district, work_municipality, work_ward FROM users WHERE id = ? AND role = 'officer'";
-    $stmt_officer = $conn->prepare($officer_query);
-    $stmt_officer->bind_param("i", $officer_id);
-    $stmt_officer->execute();
-    $officer_result = $stmt_officer->get_result();
-
-    if ($officer_result->num_rows === 0) {
-         echo json_encode(["success" => false, "message" => "Officer not found or work location missing."]);
-         $stmt_officer->close();
-         exit();
-    }
-
-    $officer_data = $officer_result->fetch_assoc();
-    $stmt_officer->close();
-
-    $ward_id = 0;
-    if (!empty($officer_data['work_province']) && !empty($officer_data['work_district']) && !empty($officer_data['work_municipality']) && !empty($officer_data['work_ward'])) {
-        $ward_id = resolveWardIdStrict($conn, $officer_data['work_province'], $officer_data['work_district'], $officer_data['work_municipality'], intval($officer_data['work_ward']));
-    }
-
-    if ($ward_id === 0) {
-        http_response_code(422);
-        echo json_encode([
-            "success" => false,
-            "message" => "Ward not found for officer's work location. Ask admin to create this ward."
-        ]);
-        exit();
-    }
-
-    // Verify access for this ward
-    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-    // Verify access for this ward
-    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
-        exit();
-    }
+    // Resolve ward using shared utils (flexible, validates officer and returns ward_id or exits with error)
+    $ward_id = getOfficerWardIdOrError($conn, $officer_id, true);
 
     $image_path = '';
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -150,5 +100,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
-}
+
 ?>

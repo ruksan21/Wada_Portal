@@ -10,32 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
-
-// Simple ward access verification function
-function verifyWardAccess($conn, $officer_id, $ward_id) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND ward_id = ? AND role = 'officer' AND status = 'approved'");
-    $stmt->bind_param("ii", $officer_id, $ward_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $has_access = $result->num_rows > 0;
-    $stmt->close();
-    return $has_access;
-}
-
-// Simple ward ID resolver
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
+require_once '../utils/ward_utils.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -51,7 +26,7 @@ if ($method === 'GET') {
 
     if ($ward_id === 0) {
         if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $ward_id = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            $ward_id = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
             if ($ward_id === 0) {
                 http_response_code(422);
                 echo json_encode(["success" => false, "message" => "Ward not found for work location."]);
@@ -86,13 +61,17 @@ else if ($method === 'POST') {
     $officer_id = isset($data['officer_id']) ? intval($data['officer_id']) : 0;
     
     if ($ward_id === 0) {
-        $work_province = $data['work_province'] ?? null;
-        $work_district = $data['work_district'] ?? null;
-        $work_municipality = $data['work_municipality'] ?? null;
-        $work_ward = $data['work_ward'] ?? null;
-        
-        if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $ward_id = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+        if ($officer_id > 0) {
+            $ward_id = getOfficerWardIdOrError($conn, $officer_id, true);
+        } else {
+            $work_province = $data['work_province'] ?? null;
+            $work_district = $data['work_district'] ?? null;
+            $work_municipality = $data['work_municipality'] ?? null;
+            $work_ward = $data['work_ward'] ?? null;
+            
+            if ($work_province && $work_district && $work_municipality && $work_ward) {
+                $ward_id = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            }
         }
     }
 
@@ -104,13 +83,6 @@ else if ($method === 'POST') {
     
     if ($ward_id === 0 || $officer_id === 0 || empty($name)) {
         echo json_encode(["success" => false, "message" => "Ward ID/location, Officer ID, and Department Name are required"]);
-        exit();
-    }
-
-    // Verify access
-    if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
         exit();
     }
     

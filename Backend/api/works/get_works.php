@@ -10,21 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../utils/ward_utils.php';
 
-// Helper function to resolve ward ID
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
 
 $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
 $ward_number = isset($_GET['ward_number']) ? intval($_GET['ward_number']) : null;
@@ -55,7 +42,7 @@ if ($ward_id) {
     }
 } elseif ($work_province || $work_district || $work_municipality || $work_ward) {
     if ($work_province && $work_district && $work_municipality && $work_ward) {
-        $resolvedWardId = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+        $resolvedWardId = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
         if ($resolvedWardId === 0) {
             http_response_code(422);
             echo json_encode([

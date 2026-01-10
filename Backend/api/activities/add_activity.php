@@ -5,38 +5,16 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once '../db_connect.php';
-
-// Helper function to resolve ward ID
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
+require_once '../utils/ward_utils.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
 if (!empty($data->title) && !empty($data->officer_id)) {
     
-    // 1. Resolve Ward ID
-    $ward_id = 0;
-    if (!empty($data->ward_id)) {
-         $ward_id = intval($data->ward_id);
-    } else if (!empty($data->work_province)) {
-         $ward_id = resolveWardIdStrict($conn, $data->work_province, $data->work_district, $data->work_municipality, intval($data->work_ward));
-    }
-
-    if ($ward_id === 0) {
-        echo json_encode(["success" => false, "message" => "Invalid Ward Location/ID."]);
-        exit;
-    }
+    // 1. Resolve Ward ID using shared utils
+    $ward_id = !empty($data->ward_id)
+        ? intval($data->ward_id)
+        : getOfficerWardIdOrError($conn, intval($data->officer_id), true);
 
     // Prepare data
     $title = $conn->real_escape_string($data->title);

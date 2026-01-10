@@ -14,32 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
-
-// Helper function to resolve ward ID
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
-
-// Helper function to verify ward access
-function verifyWardAccess($conn, $officer_id, $ward_id) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND ward_id = ? AND role = 'officer' AND status = 'approved'");
-    $stmt->bind_param("ii", $officer_id, $ward_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $has_access = $result->num_rows > 0;
-    $stmt->close();
-    return $has_access;
-}
+require_once '../utils/ward_utils.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -62,7 +37,7 @@ if ($method === 'GET') {
         $query = "SELECT * FROM ward_assets WHERE ward_id = $ward_id ORDER BY created_at DESC";
     } else {
         if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $resolvedWardId = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            $resolvedWardId = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
             if ($resolvedWardId === 0) {
                 http_response_code(422);
                 echo json_encode(array(
@@ -136,14 +111,19 @@ if ($method === 'POST') {
 
             $ward_id = isset($data->ward_id) ? intval($data->ward_id) : 0;
             if ($ward_id === 0) {
-                // Resolve strictly from work location
-                $work_province = isset($data->work_province) && !empty($data->work_province) ? $data->work_province : null;
-                $work_district = isset($data->work_district) && !empty($data->work_district) ? $data->work_district : null;
-                $work_municipality = isset($data->work_municipality) && !empty($data->work_municipality) ? $data->work_municipality : null;
-                $work_ward = isset($data->work_ward) && !empty($data->work_ward) ? intval($data->work_ward) : null;
-
-                if ($work_province && $work_district && $work_municipality && $work_ward) {
-                    $ward_id = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+                // Prefer officer-based resolution if officer_id provided
+                $officer_id = isset($data->officer_id) ? intval($data->officer_id) : 0;
+                if ($officer_id > 0) {
+                    $ward_id = getOfficerWardIdOrError($conn, $officer_id, true);
+                } else {
+                    // Resolve from provided work location (flexible)
+                    $work_province = isset($data->work_province) && !empty($data->work_province) ? $data->work_province : null;
+                    $work_district = isset($data->work_district) && !empty($data->work_district) ? $data->work_district : null;
+                    $work_municipality = isset($data->work_municipality) && !empty($data->work_municipality) ? $data->work_municipality : null;
+                    $work_ward = isset($data->work_ward) && !empty($data->work_ward) ? intval($data->work_ward) : null;
+                    if ($work_province && $work_district && $work_municipality && $work_ward) {
+                        $ward_id = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
+                    }
                 }
             }
             if ($ward_id === 0) {
@@ -163,13 +143,7 @@ if ($method === 'POST') {
 
             // Optional: verify access if officer_id provided
             $officer_id = isset($data->officer_id) ? intval($data->officer_id) : 0;
-            if ($officer_id > 0) {
-                if (!verifyWardAccess($conn, $officer_id, $ward_id)) {
-                    http_response_code(403);
-                    echo json_encode(["success" => false, "message" => "Unauthorized access to this ward."]);
-                    exit();
-                }
-            }
+
         $asset_type = $conn->real_escape_string($data->asset_type);
         $asset_name = $conn->real_escape_string($data->asset_name);
         $description = isset($data->description) ? $conn->real_escape_string($data->description) : '';

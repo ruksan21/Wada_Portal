@@ -52,32 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../db_connect.php';
+require_once '../utils/ward_utils.php';
 
-// Helper function to resolve ward ID
-function resolveWardIdStrict($conn, $province, $district, $municipality, $ward_number) {
-    $stmt = $conn->prepare("SELECT id FROM wards WHERE province = ? AND district = ? AND municipality = ? AND ward_number = ? LIMIT 1");
-    $stmt->bind_param("sssi", $province, $district, $municipality, $ward_number);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $ward_id = $row['id'];
-    } else {
-        $ward_id = 0;
-    }
-    $stmt->close();
-    return $ward_id;
-}
-
-// Helper function to verify ward access
-function verifyWardAccess($conn, $officer_id, $ward_id) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE id = ? AND ward_id = ? AND role = 'officer' AND status = 'approved'");
-    $stmt->bind_param("ii", $officer_id, $ward_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $has_access = $result->num_rows > 0;
-    $stmt->close();
-    return $has_access;
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -104,7 +80,7 @@ if ($method === 'GET') {
         $result = $stmt->get_result();
     } else {
         if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $resolvedWardId = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            $resolvedWardId = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
             if ($resolvedWardId === 0) {
                 http_response_code(422);
                 echo json_encode([
@@ -199,23 +175,10 @@ else if ($method === 'POST') {
     // If ward_id is 0, resolve strictly from provided work location or officer's work location
     if ($ward_id === 0) {
         if ($work_province && $work_district && $work_municipality && $work_ward) {
-            $ward_id = resolveWardIdStrict($conn, $work_province, $work_district, $work_municipality, $work_ward);
+            $ward_id = resolveWardIdFlexible($conn, $work_province, $work_district, $work_municipality, $work_ward);
         }
         if ($ward_id === 0 && $officer_id > 0) {
-            $sql_officer = "SELECT work_province, work_district, work_municipality, work_ward FROM users WHERE id = ?";
-            $stmt_off = $conn->prepare($sql_officer);
-            if ($stmt_off) {
-                $stmt_off->bind_param("i", $officer_id);
-                $stmt_off->execute();
-                $res_off = $stmt_off->get_result();
-                if ($res_off && $res_off->num_rows > 0) {
-                    $officer_data = $res_off->fetch_assoc();
-                    if (!empty($officer_data['work_province']) && !empty($officer_data['work_district']) && !empty($officer_data['work_municipality']) && !empty($officer_data['work_ward'])) {
-                        $ward_id = resolveWardIdStrict($conn, $officer_data['work_province'], $officer_data['work_district'], $officer_data['work_municipality'], intval($officer_data['work_ward']));
-                    }
-                }
-                $stmt_off->close();
-            }
+            $ward_id = getOfficerWardIdOrError($conn, $officer_id, true);
         }
     }
     
