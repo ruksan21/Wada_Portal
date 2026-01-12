@@ -10,7 +10,14 @@ require_once '../db_connect.php';
 $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : 0;
 
 if ($ward_id > 0) {
-    $sql = "SELECT r.id, r.rating, r.comment, r.created_at, u.first_name, u.last_name 
+    $sql = "SELECT 
+                r.id, 
+                r.rating, 
+                r.comment, 
+                r.created_at, 
+                u.first_name, 
+                u.last_name,
+                u.photo
             FROM reviews r
             JOIN users u ON r.user_id = u.id
             WHERE r.ward_id = $ward_id

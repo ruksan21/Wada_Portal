@@ -916,21 +916,30 @@ const OfficerManagement = () => {
               {pendingOfficers.length} pending applications
             </span>
           </div>
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setShowCreateModal(true);
-              setFormData(initialFormState);
-              setPhotoFiles({
-                citizenship: null,
-                idCard: null,
-                profilePhoto: null,
-              });
-              setErrors({});
-            }}
-          >
-            + Create New Officer
-          </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              className="btn-refresh"
+              onClick={() => fetchPendingOfficers && fetchPendingOfficers()}
+              title="Refresh List"
+            >
+              🔄 Refresh
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                setShowCreateModal(true);
+                setFormData(initialFormState);
+                setPhotoFiles({
+                  citizenship: null,
+                  idCard: null,
+                  profilePhoto: null,
+                });
+                setErrors({});
+              }}
+            >
+              + Create New Officer
+            </button>
+          </div>
         </div>
 
         {pendingOfficers.length === 0 ? (

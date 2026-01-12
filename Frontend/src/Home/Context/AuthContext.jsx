@@ -39,7 +39,9 @@ export const AuthProvider = ({ children }) => {
 
   const fetchPendingOfficers = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.users.getPendingOfficers);
+      const response = await fetch(
+        `${API_ENDPOINTS.users.getPendingOfficers}?t=${Date.now()}`
+      ); // Added cache buster
       const data = await response.json();
       if (data.success) {
         setPendingOfficers(data.data);
@@ -113,40 +115,41 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   // Load initial data
-  // Load initial data
   useEffect(() => {
-    // 1. Load Current User
-    const storedUser = localStorage.getItem("user");
-    const loggedIn = localStorage.getItem("isLoggedIn");
+    const loadData = async () => {
+      setLoading(true);
 
-    if (storedUser && loggedIn === "true") {
-      const userData = JSON.parse(storedUser);
+      // 1. Load Current User from LocalStorage
+      const storedUser = localStorage.getItem("user");
+      const loggedIn = localStorage.getItem("isLoggedIn");
 
-      // Fix for missing name or photoUrl in stored data
-      if (!userData.name && userData.first_name && userData.last_name) {
-        userData.name = `${userData.first_name} ${userData.last_name}`;
+      if (storedUser && loggedIn === "true") {
+        const userData = JSON.parse(storedUser);
+        if (!userData.name && userData.first_name && userData.last_name) {
+          userData.name = `${userData.first_name} ${userData.last_name}`;
+        }
+        if (!userData.photoUrl && userData.photo) {
+          userData.photoUrl = `${API_ENDPOINTS.authUploads}/${userData.photo}`;
+        }
+        setUser(userData);
+        setIsLoggedIn(true);
       }
-      if (!userData.photoUrl && userData.photo) {
-        userData.photoUrl = `${API_ENDPOINTS.authUploads}/${userData.photo}`;
+
+      // 2. Fetch all data in parallel
+      try {
+        await Promise.all([
+          fetchAllUsers(),
+          fetchPendingOfficers(),
+          refreshWards(),
+        ]);
+      } catch (err) {
+        console.error("Failed to load initial data:", err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setUser(userData);
-      setIsLoggedIn(true);
-
-      const storedActivities = localStorage.getItem(
-        `activities_${userData.id || "default"}`
-      );
-      if (storedActivities) {
-        setActivities(JSON.parse(storedActivities));
-      }
-    }
-
-    // 2. Load "Backend" Data
-    fetchAllUsers();
-    fetchPendingOfficers();
-    refreshWards();
-
-    setLoading(false);
+    loadData();
   }, []);
 
   // 3. Refresh session from DB to ensure latest location

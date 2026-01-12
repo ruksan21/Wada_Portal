@@ -466,9 +466,31 @@ const Profile = () => {
                   <div className="review-card-header">
                     <div className="reviewer-info">
                       <div className="reviewer-avatar">
-                        {review.first_name
-                          ? review.first_name.charAt(0).toUpperCase()
-                          : "U"}
+                        {review.photo ? (
+                          <img
+                            src={`${API_BASE_URL}/auth/uploads/${review.photo}`}
+                            alt={review.first_name}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "50%",
+                            }}
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                              e.target.nextSibling.style.display = "block";
+                            }}
+                          />
+                        ) : null}
+                        <span
+                          style={{
+                            display: review.photo ? "none" : "block",
+                          }}
+                        >
+                          {review.first_name
+                            ? review.first_name.charAt(0).toUpperCase()
+                            : "U"}
+                        </span>
                       </div>
                       <div className="reviewer-details">
                         <h4>
