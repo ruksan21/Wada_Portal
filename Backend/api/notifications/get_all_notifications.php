@@ -18,22 +18,20 @@ try {
     $status = isset($_GET['status']) ? $_GET['status'] : 'all';
     $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 100;
     
-    // Build query
-    $query = "SELECT n.*, 
-                     u.full_name as user_name,
-                     w.municipality, w.ward_number
+    // Build query using UNION to include system_alerts
+    $query = "(SELECT n.id, n.user_id, n.ward_id, n.title, n.message, n.type, 
+                     n.source_province, n.source_district, n.source_municipality, n.source_ward, 
+                     n.is_read, n.created_at,
+                     CONCAT(IFNULL(u.first_name,''), ' ', IFNULL(u.last_name,'')) as user_name,
+                     w.municipality, w.ward_number,
+                     'notification' as origin
               FROM notifications n
               LEFT JOIN users u ON n.user_id = u.id
               LEFT JOIN wards w ON n.ward_id = w.id
               WHERE 1=1";
     
-    $params = [];
-    $types = "";
-    
     if ($type !== 'all') {
-        $query .= " AND n.type = ?";
-        $params[] = $type;
-        $types .= "s";
+        $query .= " AND n.type = '$type'"; // Simple concatenation for UNION compatibility with bind_param being tricky
     }
     
     if ($status === 'read') {
@@ -42,22 +40,36 @@ try {
         $query .= " AND n.is_read = 0";
     }
     
-    $query .= " ORDER BY n.created_at DESC LIMIT ?";
-    $params[] = $limit;
-    $types .= "i";
-    
-    $stmt = $conn->prepare($query);
-    
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
+    $query .= ") UNION ALL 
+              (SELECT sa.id, sa.user_id, sa.ward_id, sa.title, sa.message, sa.type,
+                     NULL as source_province, NULL as source_district, w.municipality as source_municipality, w.ward_number as source_ward,
+                     (CASE WHEN sa.status = 'unread' THEN 0 ELSE 1 END) as is_read, sa.created_at,
+                     NULL as user_name,
+                     w.municipality, w.ward_number,
+                     'system_alert' as origin
+              FROM system_alerts sa
+              LEFT JOIN wards w ON sa.ward_id = w.id
+              WHERE 1=1";
+
+    if ($type !== 'all') {
+        $query .= " AND sa.type = '$type'";
     }
+
+    if ($status === 'read') {
+        $query .= " AND sa.status = 'read'";
+    } elseif ($status === 'unread') {
+        $query .= " AND sa.status = 'unread'";
+    }
+
+    $query .= ") ORDER BY created_at DESC LIMIT $limit";
     
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $result = $conn->query($query);
     
     $notifications = [];
-    while ($row = $result->fetch_assoc()) {
-        $notifications[] = $row;
+    if($result) {
+        while ($row = $result->fetch_assoc()) {
+            $notifications[] = $row;
+        }
     }
     
     ob_clean();

@@ -11,11 +11,42 @@ const OfficerComplaints = () => {
   const [reports, setReports] = useState([]);
   const [activeTab, setActiveTab] = useState("citizen"); // "citizen" or "admin"
   const [showReportModal, setShowReportModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [reportData, setReportData] = useState({
     subject: "",
     message: "",
     priority: "Medium",
   });
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this report?")) return;
+    try {
+      const res = await fetch(API_ENDPOINTS.communication.manageComplaints, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchComplaints();
+      } else {
+        alert(data.message || "Failed to delete.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Error deleting report.");
+    }
+  };
+
+  const handleEdit = (complaint) => {
+    setEditingId(complaint.id);
+    setReportData({
+      subject: complaint.subject,
+      message: complaint.message,
+      priority: complaint.priority || "Medium",
+    });
+    setShowReportModal(true);
+  };
 
   const handleResolve = (id) => {
     // Optimistic UI update
@@ -51,35 +82,43 @@ const OfficerComplaints = () => {
     e.preventDefault();
     if (!workLocation) return;
     try {
-      const res = await fetch(
-        `${API_ENDPOINTS.communication.submitComplaint}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            province: workLocation.work_province,
-            municipality: workLocation.work_municipality,
-            ward: workLocation.work_ward,
-            fullName: user.first_name + " " + (user.last_name || ""),
-            userId: user.id,
-            subject: reportData.subject,
-            message: reportData.message,
-            priority: reportData.priority,
-          }),
-        }
-      );
+      let url = API_ENDPOINTS.communication.submitComplaint;
+      let method = "POST";
+      let body = {
+        province: workLocation.work_province,
+        municipality: workLocation.work_municipality,
+        ward: workLocation.work_ward,
+        fullName: user.first_name + " " + (user.last_name || ""),
+        userId: user.id,
+        subject: reportData.subject,
+        message: reportData.message,
+        priority: reportData.priority,
+      };
+
+      if (editingId) {
+        url = API_ENDPOINTS.communication.manageComplaints;
+        method = "PUT";
+        body.id = editingId;
+      }
+
+      const res = await fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
       const data = await res.json();
-      if (res.ok && data.success) {
-        alert(data.message || "Report submitted successfully.");
+      if (data.success) {
+        alert(data.message || "Operation successful.");
         setShowReportModal(false);
+        setEditingId(null);
         setReportData({ subject: "", message: "", priority: "Medium" });
-        // Refresh reports if on admin tab
-        if (activeTab === "admin") fetchComplaints();
+        fetchComplaints();
       } else {
         alert(data.message || "Failed to submit report.");
       }
     } catch {
-      alert("Error submitting report.");
+      alert("Error processing request.");
     }
   };
 
@@ -153,13 +192,15 @@ const OfficerComplaints = () => {
               ? "Citizen Complaints"
               : "Self Reported Issues"}
           </h2>
-          <button
-            className="btn-primary"
-            onClick={() => setShowReportModal(true)}
-            style={{ fontSize: "0.9rem" }}
-          >
-            ⚠️ Report to Admin
-          </button>
+          {activeTab === "admin" && (
+            <button
+              className="btn-primary"
+              onClick={() => setShowReportModal(true)}
+              style={{ fontSize: "0.9rem" }}
+            >
+              ⚠️ Report to Admin
+            </button>
+          )}
         </div>
         <table className="complaints-table">
           <thead>
@@ -181,33 +222,72 @@ const OfficerComplaints = () => {
                         ? complaint.complainant
                         : "System Admin"}
                     </td>
-                    <td>{complaint.subject}</td>
                     <td>
-                      {complaint.date ||
-                        new Date(complaint.created_at).toLocaleDateString()}
+                      <div className="complaint-subject">
+                        {complaint.subject}
+                      </div>
+                      <div className="location-meta">
+                        {complaint.province}, {complaint.district_name},{" "}
+                        {complaint.municipality}, Ward {complaint.ward_number}
+                      </div>
+                    </td>
+                    <td className="complaint-date">
+                      {complaint.created_at
+                        ? new Date(complaint.created_at).toLocaleDateString()
+                        : "N/A"}
                     </td>
                     <td>
                       <span
                         className={`status-badge ${
-                          complaint.status === "Resolved" ? "resolved" : "open"
+                          activeTab === "admin" &&
+                          complaint.status.toLowerCase() === "open"
+                            ? "pending"
+                            : complaint.status.toLowerCase()
                         }`}
                       >
-                        {complaint.status}
+                        {activeTab === "admin" && complaint.status === "Open"
+                          ? "Pending"
+                          : complaint.status}
                       </span>
                     </td>
                     <td>
-                      {complaint.status === "Open" ? (
-                        <button
-                          onClick={() => handleResolve(complaint.id)}
-                          className="resolve-btn"
-                        >
-                          Mark as Resolved
-                        </button>
-                      ) : (
-                        <span className="resolved-text">
-                          <span>✅</span> Resolved
-                        </span>
-                      )}
+                      <div className="action-btns">
+                        {activeTab === "citizen" &&
+                          (complaint.status === "Open" ? (
+                            <button
+                              onClick={() => handleResolve(complaint.id)}
+                              className="resolve-btn"
+                              title="Resolve"
+                            >
+                              Mark as Resolved
+                            </button>
+                          ) : (
+                            <span className="resolved-text">
+                              <span>✅</span> Resolved
+                            </span>
+                          ))}
+
+                        {activeTab === "admin" && (
+                          <>
+                            {complaint.status !== "Resolved" && (
+                              <button
+                                onClick={() => handleEdit(complaint)}
+                                className="edit-btn"
+                                title="Edit"
+                              >
+                                ✏️
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDelete(complaint.id)}
+                              className="delete-btn"
+                              title="Delete"
+                            >
+                              🗑️
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -231,10 +311,18 @@ const OfficerComplaints = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: "500px" }}>
             <div className="modal-header">
-              <h3>Report Issue to Admin</h3>
+              <h3>{editingId ? "Edit Report" : "Report Issue to Admin"}</h3>
               <button
                 className="close-btn"
-                onClick={() => setShowReportModal(false)}
+                onClick={() => {
+                  setShowReportModal(false);
+                  setEditingId(null);
+                  setReportData({
+                    subject: "",
+                    message: "",
+                    priority: "Medium",
+                  });
+                }}
               >
                 ×
               </button>

@@ -14,7 +14,7 @@ $ward_number = $_GET['ward'] ?? null;
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
 $source_role = isset($_GET['source']) ? $_GET['source'] : null; // 'citizen', 'officer', 'admin_view'
 
-$sql = "SELECT c.*, u.role as user_role, w.municipality, w.ward_number, w.province
+$sql = "SELECT c.*, u.role as user_role, w.municipality, w.ward_number, w.province, w.district_name
         FROM complaints c 
         LEFT JOIN users u ON c.complainant_user_id = u.id 
         LEFT JOIN wards w ON c.ward_id = w.id

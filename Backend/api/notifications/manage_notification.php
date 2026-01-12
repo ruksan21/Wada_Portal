@@ -38,16 +38,23 @@ try {
             }
             
             $id = intval($data['id']);
-            $sql = "UPDATE notifications SET is_read = 1 WHERE id = ?";
+            $origin = isset($data['origin']) ? $data['origin'] : 'notification';
+            
+            if ($origin === 'system_alert') {
+                $sql = "UPDATE system_alerts SET status = 'read' WHERE id = ?";
+            } else {
+                $sql = "UPDATE notifications SET is_read = 1 WHERE id = ?";
+            }
+            
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             
             if ($stmt->execute()) {
                 ob_clean();
-                echo json_encode(["success" => true, "message" => "Notification marked as read"]);
+                echo json_encode(["success" => true, "message" => "Marked as read"]);
             } else {
                 ob_clean();
-                echo json_encode(["success" => false, "message" => "Failed to update notification"]);
+                echo json_encode(["success" => false, "message" => "Failed to update"]);
             }
             $stmt->close();
             break;
@@ -82,39 +89,48 @@ try {
             }
             
             $id = intval($data['id']);
-            $sql = "DELETE FROM notifications WHERE id = ?";
+            $origin = isset($data['origin']) ? $data['origin'] : 'notification';
+            
+            if ($origin === 'system_alert') {
+                $sql = "DELETE FROM system_alerts WHERE id = ?";
+            } else {
+                $sql = "DELETE FROM notifications WHERE id = ?";
+            }
+            
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             
             if ($stmt->execute()) {
                 ob_clean();
-                echo json_encode(["success" => true, "message" => "Notification deleted"]);
+                echo json_encode(["success" => true, "message" => "Deleted"]);
             } else {
                 ob_clean();
-                echo json_encode(["success" => false, "message" => "Failed to delete notification"]);
+                echo json_encode(["success" => false, "message" => "Failed to delete"]);
             }
             $stmt->close();
             break;
             
         case 'mark_all_read':
-            $sql = "UPDATE notifications SET is_read = 1";
-            if ($conn->query($sql)) {
+            $sql1 = "UPDATE notifications SET is_read = 1";
+            $sql2 = "UPDATE system_alerts SET status = 'read'";
+            if ($conn->query($sql1) && $conn->query($sql2)) {
                 ob_clean();
-                echo json_encode(["success" => true, "message" => "All notifications marked as read"]);
+                echo json_encode(["success" => true, "message" => "All marked as read"]);
             } else {
                 ob_clean();
-                echo json_encode(["success" => false, "message" => "Failed to update notifications"]);
+                echo json_encode(["success" => false, "message" => "Failed to update all"]);
             }
             break;
             
         case 'delete_all':
-            $sql = "DELETE FROM notifications";
-            if ($conn->query($sql)) {
+            $sql1 = "DELETE FROM notifications";
+            $sql2 = "DELETE FROM system_alerts";
+            if ($conn->query($sql1) && $conn->query($sql2)) {
                 ob_clean();
-                echo json_encode(["success" => true, "message" => "All notifications deleted"]);
+                echo json_encode(["success" => true, "message" => "All deleted"]);
             } else {
                 ob_clean();
-                echo json_encode(["success" => false, "message" => "Failed to delete notifications"]);
+                echo json_encode(["success" => false, "message" => "Failed to delete all"]);
             }
             break;
             

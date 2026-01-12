@@ -310,29 +310,36 @@ const OfficerManagement = () => {
   };
 
   const handleEditOfficer = (officer) => {
-    // Pre-populate form with officer data
-    setFormData((prev) => ({
-      ...prev,
-      firstName: officer.firstName || officer.first_name || "",
-      lastName: officer.lastName || officer.last_name || "",
+    // Pre-populate form with officer data mapping DB snake_case to state camelCase
+    setFormData({
+      firstName: officer.first_name || "",
+      middleName: officer.middle_name || "",
+      lastName: officer.last_name || "",
       email: officer.email || "",
-      officerId: officer.officerId || officer.officer_id || "",
-      department: officer.department || "",
+      password: "", // Don't pre-populate password
+      contactNumber: officer.phone || officer.contact_number || "",
+      dob: officer.dob || "",
+      gender: officer.gender || "Male",
+      province: officer.province || "Bagmati Province",
+      district: officer.district || "Kathmandu",
+      city:
+        officer.municipality || officer.city || "Kathmandu Metropolitan City",
+      wardNumber: officer.ward_number || "1",
+      officerId: officer.officer_id || "",
+      department: officer.department || "Administration",
       workProvince: officer.work_province || "Bagmati Province",
       workDistrict: officer.work_district || "Kathmandu",
       workMunicipality:
         officer.work_municipality || "Kathmandu Metropolitan City",
       workWard: officer.work_ward || "1",
       workOfficeLocation: officer.work_office_location || "",
-      contactNumber: officer.contactNumber || officer.contact_number || "",
       citizenshipNumber:
-        officer.citizenshipNumber || officer.citizenship_number || "",
-    }));
+        officer.citizenship_no || officer.citizenship_number || "",
+      citizenshipIssueDate: officer.citizenship_issue_date || "",
+      citizenshipIssueDistrict:
+        officer.citizenship_issue_district || "Kathmandu",
+    });
     setShowCreateModal(true);
-  };
-
-  const getStatusBadge = (status) => {
-    return <span className={`badge ${status.toLowerCase()}`}>{status}</span>;
   };
 
   const renderErrorMessage = (fieldName) => {
@@ -910,13 +917,13 @@ const OfficerManagement = () => {
 
       <div className="table-container">
         <div className="table-header-actions">
-          <div>
+          <div className="header-text">
             <h2 className="section-title">Pending Officer Applications</h2>
             <span className="pending-count">
-              {pendingOfficers.length} pending applications
+              {pendingOfficers.length} applicants waiting for review
             </span>
           </div>
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="header-buttons">
             <button
               className="btn-refresh"
               onClick={() => fetchPendingOfficers && fetchPendingOfficers()}
@@ -937,7 +944,7 @@ const OfficerManagement = () => {
                 setErrors({});
               }}
             >
-              + Create New Officer
+              <span style={{ fontSize: "1.2rem" }}>+</span> Create New Officer
             </button>
           </div>
         </div>
@@ -978,38 +985,42 @@ const OfficerManagement = () => {
                   </td>
                   <td>
                     {wardStatus[officer.id] === true ? (
-                      <span style={{ color: "#10b981", fontWeight: "600" }}>
+                      <span className="status-badge ward-exists">
                         ✓ Ward Exists
                       </span>
                     ) : wardStatus[officer.id] === false ? (
-                      <span style={{ color: "#ef4444", fontWeight: "600" }}>
-                        ✗ Ward Not Created
+                      <span className="status-badge ward-missing">
+                        ✗ Ward Not Found
                       </span>
                     ) : (
                       <span style={{ color: "#6b7280" }}>Checking...</span>
                     )}
                   </td>
-                  <td>{getStatusBadge(officer.status)}</td>
                   <td>
-                    <button
-                      className="action-btn edit"
-                      onClick={() => handleEditOfficer(officer)}
-                      title="Edit and assign ward"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="action-btn approve"
-                      onClick={() => handleApprove(officer.id)}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="action-btn reject"
-                      onClick={() => handleReject(officer.id)}
-                    >
-                      Reject
-                    </button>
+                    <span className="status-badge pending">🕒 Pending</span>
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        className="action-btn edit"
+                        onClick={() => handleEditOfficer(officer)}
+                        title="Edit and assign ward"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        className="action-btn approve"
+                        onClick={() => handleApprove(officer.id)}
+                      >
+                        ✅ Approve
+                      </button>
+                      <button
+                        className="action-btn reject"
+                        onClick={() => handleReject(officer.id)}
+                      >
+                        ❌ Reject
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

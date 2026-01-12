@@ -15,7 +15,7 @@ const NotificationPanel = ({ notifications, onClose }) => {
     if (notifications.length > 0) {
       const timer = setTimeout(() => {
         onClose(notifications[0].id);
-      }, 5000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }

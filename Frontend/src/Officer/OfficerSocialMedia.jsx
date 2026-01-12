@@ -200,7 +200,11 @@ export default function OfficerSocialMedia() {
                       <span className="no-link">Not Configured</span>
                     )}
                   </td>
-                  <td>{lastUpdated ? getTimeAgo(lastUpdated) : "-"}</td>
+                  <td>
+                    {platform.url && lastUpdated
+                      ? getTimeAgo(lastUpdated)
+                      : "-"}
+                  </td>
                   <td>
                     <span
                       className={`status-badge ${

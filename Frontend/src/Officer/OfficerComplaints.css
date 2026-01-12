@@ -41,6 +41,12 @@
   color: #22543d;
 }
 
+.status-badge.pending {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+}
+
 .resolve-btn {
   padding: 6px 12px;
   background: #48bb78;
@@ -91,4 +97,48 @@
 .tab-btn.active {
   color: #4a90e2;
   border-bottom-color: #4a90e2;
+}
+
+.location-meta {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn:hover {
+  transform: scale(1.2);
+}
+
+.delete-btn:hover {
+  transform: scale(1.2);
+}
+
+.complaint-subject {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.complaint-date {
+  font-size: 0.9rem;
+  color: #4a5568;
 }
