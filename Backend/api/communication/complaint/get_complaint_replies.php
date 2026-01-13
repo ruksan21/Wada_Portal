@@ -4,7 +4,7 @@ header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-require_once '../db_connect.php';
+require_once '../../db_connect.php';
 
 $complaint_id = isset($_GET['complaint_id']) ? intval($_GET['complaint_id']) : 0;
 

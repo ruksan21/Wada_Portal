@@ -4,7 +4,7 @@ header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-require_once '../db_connect.php';
+require_once '../../db_connect.php';
 
 // Get all complaints with user info
 $query = "SELECT c.*, u.full_name, u.gmail, u.role 

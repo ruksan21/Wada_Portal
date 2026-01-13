@@ -8,10 +8,10 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // Try Composer autoload first, then manual loader
-if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
-    require __DIR__ . '/../../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../../vendor/autoload.php')) {
+    require __DIR__ . '/../../../vendor/autoload.php';
 } else {
-    require __DIR__ . '/../../phpmailer_loader.php';
+    require __DIR__ . '/../../../phpmailer_loader.php';
 }
 
 require_once __DIR__ . '/../../db_connect.php';
@@ -98,13 +98,11 @@ try {
         </html>
     ";
 
-    $mail->AltBody = "Hello {$citizen_name},\n\nYour complaint reply:\n\n{$reply_text}\n\nReplied by: {$officer_name}\nDate: {$date}";
-
+    // Send the email
     $mail->send();
-    echo json_encode(['success' => true, 'message' => 'Reply sent successfully to citizen email!']);
-    
+    echo json_encode(['success' => true, 'message' => 'Reply sent successfully']);
 } catch (Exception $e) {
-    echo json_encode(['success' => true, 'message' => 'Reply saved but email failed: ' . $mail->ErrorInfo]);
+    echo json_encode(['success' => false, 'message' => 'Email sending error: ' . $mail->ErrorInfo]);
 }
 
 $stmt->close();

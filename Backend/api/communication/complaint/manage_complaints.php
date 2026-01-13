@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
-require_once '../db_connect.php';
+require_once '../../db_connect.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -52,12 +52,14 @@ try {
         }
     }
     else {
-        throw new Exception("Unsupported request method");
+        http_response_code(405);
+        echo json_encode(["success" => false, "message" => "Method not allowed"]);
     }
 } catch (Exception $e) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => $e->getMessage()]);
 }
 
+$stmt->close();
 $conn->close();
 ?>

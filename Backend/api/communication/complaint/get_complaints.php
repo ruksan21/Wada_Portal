@@ -4,7 +4,7 @@ header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
-require_once '../db_connect.php';
+require_once '../../db_connect.php';
 
 // Filter by ward ID or specific location details
 $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
@@ -48,25 +48,17 @@ if ($source_role === 'officer') {
     $sql .= " AND (u.role = 'citizen' OR u.role IS NULL)";
 } elseif ($source_role === 'admin_view') {
     // Admin sees everything, but can filter by role in frontend
-}
-
-$sql .= " ORDER BY c.created_at DESC";
+} // Otherwise no filter
 
 $result = $conn->query($sql);
-
 $complaints = [];
 
-if ($result && $result->num_rows > 0) {
+if ($result) {
     while ($row = $result->fetch_assoc()) {
         $complaints[] = $row;
     }
 }
 
-echo json_encode([
-    "success" => true,
-    "data" => $complaints,
-    "total" => count($complaints)
-]);
-
+echo json_encode(["success" => true, "complaints" => $complaints]);
 $conn->close();
 ?>
