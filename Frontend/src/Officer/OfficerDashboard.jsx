@@ -16,6 +16,8 @@ const OfficerDashboard = () => {
     { label: "Ward Population", value: "-", icon: "👥" },
   ]);
 
+  const [currentWardId, setCurrentWardId] = useState(null);
+
   // Check if officer's assigned ward exists and fetch data
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -33,6 +35,9 @@ const OfficerDashboard = () => {
           );
           const wardData = await wardRes.json();
           setWardExists(wardData.exists || false);
+          if (wardData.exists && wardData.ward_id) {
+            setCurrentWardId(wardData.ward_id);
+          }
 
           // 2. Fetch Complaints
           const params = new URLSearchParams({
@@ -50,14 +55,30 @@ const OfficerDashboard = () => {
           if (Array.isArray(complaintsData)) {
             setComplaints(complaintsData.slice(0, 5)); // Show latest 5
 
-            // 3. Update Stats (using counts from real data)
+            // 3. Update Stats
             const pendingCount = complaintsData.filter(
               (c) => c.status === "Open"
             ).length;
-            setStats((prev) => [
-              prev[0], // Keep New Applications (static for now)
-              { ...prev[1], value: pendingCount.toString() },
-              { ...prev[2], value: wardData.population || "12,500" },
+
+            // Format population
+            let popValue = "Not Set";
+            if (wardData.ward && wardData.ward.population) {
+              popValue = Number(wardData.ward.population).toLocaleString();
+            }
+
+            setStats([
+              { label: "New Applications", value: "0", icon: "📝" },
+              {
+                label: "Pending Complaints",
+                value: pendingCount.toString(),
+                icon: "📢",
+              },
+              {
+                label: "Ward Population",
+                value: popValue,
+                icon: "👥",
+                isEditable: true,
+              },
             ]);
           }
         } catch (error) {
@@ -71,20 +92,49 @@ const OfficerDashboard = () => {
     fetchDashboardData();
   }, [user, workLocation]);
 
+  const handleStatClick = async (stat) => {
+    if (!stat.isEditable || !currentWardId) return;
+
+    const newPopulation = prompt(
+      "Enter new Ward Population:",
+      stat.value === "Not Set" ? "" : stat.value.replace(/,/g, "")
+    );
+
+    if (newPopulation && !isNaN(newPopulation)) {
+      try {
+        const response = await fetch(API_ENDPOINTS.wards.update, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: currentWardId,
+            population: newPopulation,
+          }),
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          // Update local state
+          setStats((prev) =>
+            prev.map((item) =>
+              item.label === "Ward Population"
+                ? { ...item, value: Number(newPopulation).toLocaleString() }
+                : item
+            )
+          );
+          alert("Population updated successfully!");
+        } else {
+          alert("Failed to update: " + result.message);
+        }
+      } catch (err) {
+        console.error("Update failed:", err);
+        alert("An error occurred while updating.");
+      }
+    }
+  };
+
   return (
     <OfficerLayout title="Ward Overview">
-      {/* Ward Assignment Badge */}
-      {workLocation && (
-        <div className="ward-assignment-badge">
-          <span className="badge-icon">📍</span>
-          <span className="badge-text">
-            तपाईंको Assignment:{" "}
-            <strong>
-              {workLocation.work_municipality}, Ward {workLocation.work_ward}
-            </strong>
-          </span>
-        </div>
-      )}
+      {/* Redundant 'Assigned Location' banner removed as per user request */}
 
       {/* Warnings... */}
       {workLocation && wardExists === false && (
@@ -100,9 +150,17 @@ const OfficerDashboard = () => {
 
       <div className="dashboard-stats-grid">
         {stats.map((stat, index) => (
-          <div className="dashboard-stat-card" key={index}>
+          <div
+            className={`dashboard-stat-card ${
+              stat.isEditable ? "editable" : ""
+            }`}
+            key={index}
+            onClick={() => handleStatClick(stat)}
+            title={stat.isEditable ? "Click to edit" : ""}
+          >
             <span className="dashboard-stat-label">
               <span>{stat.icon}</span> {stat.label}
+              {stat.isEditable && <span className="edit-icon">✏️</span>}
             </span>
             <span className="dashboard-stat-value">{stat.value}</span>
           </div>

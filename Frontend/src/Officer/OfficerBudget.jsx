@@ -33,13 +33,22 @@ export default function OfficerBudget() {
 
   const fetchBudgetData = async (loc) => {
     try {
-      const params = new URLSearchParams({
-        work_province: loc.work_province,
-        work_district: loc.work_district,
-        work_municipality: loc.work_municipality,
-        work_ward: String(loc.work_ward || ""),
-      });
-      const response = await fetch(`${API_ENDPOINTS.assets.manageBudgets}?${params.toString()}`);
+      const params = new URLSearchParams();
+      if (user?.ward_id) {
+        params.append("ward_id", user.ward_id);
+      } else {
+        // Fallback to location-based fetch
+        if (loc.work_province)
+          params.append("work_province", loc.work_province);
+        if (loc.work_district)
+          params.append("work_district", loc.work_district);
+        if (loc.work_municipality)
+          params.append("work_municipality", loc.work_municipality);
+        if (loc.work_ward) params.append("work_ward", loc.work_ward);
+      }
+      const response = await fetch(
+        `${API_ENDPOINTS.assets.manageBudgets}?${params.toString()}`
+      );
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -98,28 +107,25 @@ export default function OfficerBudget() {
 
   const saveBudgetData = async () => {
     try {
-      const response = await fetch(
-        API_ENDPOINTS.assets.manageBudgets,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ward_id: 0,
-            officer_id: user.id,
-            total_allocated: Number(budgetAllocated) || 0,
-            total_spent: Number(budgetSpent) || 0,
-            total_beneficiaries: Number(benTotal) || 0,
-            direct_beneficiaries: Number(benDirect) || 0,
-            indirect_beneficiaries: Number(benIndirect) || 0,
-            fiscal_year: "2023/24",
-            // include location so backend resolves ward_id
-            work_province: workLocation?.work_province,
-            work_district: workLocation?.work_district,
-            work_municipality: workLocation?.work_municipality,
-            work_ward: workLocation?.work_ward,
-          }),
-        }
-      );
+      const response = await fetch(API_ENDPOINTS.assets.manageBudgets, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ward_id: 0,
+          officer_id: user.id,
+          total_allocated: Number(budgetAllocated) || 0,
+          total_spent: Number(budgetSpent) || 0,
+          total_beneficiaries: Number(benTotal) || 0,
+          direct_beneficiaries: Number(benDirect) || 0,
+          indirect_beneficiaries: Number(benIndirect) || 0,
+          fiscal_year: "2023/24",
+          // include location so backend resolves ward_id
+          work_province: workLocation?.work_province,
+          work_district: workLocation?.work_district,
+          work_municipality: workLocation?.work_municipality,
+          work_ward: workLocation?.work_ward,
+        }),
+      });
 
       const result = await response.json();
       if (result.success) {
@@ -163,7 +169,9 @@ export default function OfficerBudget() {
     <OfficerLayout title="Budgets">
       <div className="budget-container">
         <h2 className="budget-title">💰 Budget Management</h2>
-        <p className="budget-subtitle">Track and manage your ward's financial allocations and beneficiaries</p>
+        <p className="budget-subtitle">
+          Track and manage your ward's financial allocations and beneficiaries
+        </p>
 
         {toast.show && (
           <div className={`toast toast-${toast.type}`}>
@@ -187,12 +195,12 @@ export default function OfficerBudget() {
               Rs {Number(budgetSpent || 0).toLocaleString()}
             </div>
           </div>
-          <div className={`summary-card remaining ${isNegative ? 'negative' : ''}`}>
-            <div className="summary-icon">{isNegative ? '⚠️' : '✨'}</div>
+          <div
+            className={`summary-card remaining ${isNegative ? "negative" : ""}`}
+          >
+            <div className="summary-icon">{isNegative ? "⚠️" : "✨"}</div>
             <div className="summary-label">Remaining Balance</div>
-            <div className="summary-value">
-              Rs {remaining.toLocaleString()}
-            </div>
+            <div className="summary-value">Rs {remaining.toLocaleString()}</div>
           </div>
         </div>
 
@@ -202,7 +210,9 @@ export default function OfficerBudget() {
               <div className="form-icon budget">💳</div>
               <div>
                 <h3 className="form-title">Budget Allocation</h3>
-                <p className="form-subtitle">Set your ward's financial targets</p>
+                <p className="form-subtitle">
+                  Set your ward's financial targets
+                </p>
               </div>
             </div>
             <form onSubmit={handleBudgetSummarySubmit}>
@@ -254,7 +264,9 @@ export default function OfficerBudget() {
               <div className="form-icon beneficiary">👥</div>
               <div>
                 <h3 className="form-title">Beneficiary Details</h3>
-                <p className="form-subtitle">Track the impact of your programs</p>
+                <p className="form-subtitle">
+                  Track the impact of your programs
+                </p>
               </div>
             </div>
             <form onSubmit={handleBeneficiarySubmit}>

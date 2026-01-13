@@ -26,8 +26,10 @@ if ($ward_id > 0) {
     $result = $conn->query($sql);
     
     $reviews = [];
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
+            // Ensure photo is null if empty for frontend checks
+            $row['photo'] = !empty($row['photo']) ? $row['photo'] : null;
             $reviews[] = $row;
         }
     }

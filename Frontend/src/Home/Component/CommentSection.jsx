@@ -189,6 +189,14 @@ const CommentSection = ({ workId }) => {
     return date.toLocaleDateString("en-GB");
   };
 
+  // Helper to construct full image URL
+  const getPhotoUrl = (photoPath) => {
+    if (!photoPath) return "https://placehold.co/100x100?text=User";
+    if (photoPath.startsWith("http")) return photoPath;
+    // Assuming backend serves auth uploads at /auth/uploads/
+    return `${API_ENDPOINTS.authUploads}/${photoPath}`;
+  };
+
   const renderStars = (currentRating, isInteractive = false) => {
     return (
       <div className="star-rating">
@@ -256,9 +264,13 @@ const CommentSection = ({ workId }) => {
           <form className="comment-form" onSubmit={handleSubmit}>
             <div className="user-info">
               <img
-                src={user.photoUrl || "/default-avatar.png"}
+                src={getPhotoUrl(user.photo) || getPhotoUrl(user.photoUrl)}
                 alt={user.name}
                 className="user-avatar"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://placehold.co/100x100?text=U";
+                }}
               />
               <span className="user-name">
                 {user.name}{" "}
@@ -332,9 +344,13 @@ const CommentSection = ({ workId }) => {
             <div key={c.id} className="comment-card">
               <div className="comment-user">
                 <img
-                  src={c.user_photo}
+                  src={getPhotoUrl(c.user_photo)}
                   alt={c.user_name}
                   className="comment-avatar"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://placehold.co/100x100?text=U";
+                  }}
                 />
                 <div className="comment-user-info">
                   <span className="comment-user-name">
@@ -386,22 +402,32 @@ const CommentSection = ({ workId }) => {
                             <div key={reply.id} className="reply-card">
                               <div className="reply-user">
                                 <img
-                                  src={reply.officer_photo}
+                                  src={getPhotoUrl(reply.officer_photo)}
                                   alt={reply.officer_name}
                                   className="reply-avatar"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src =
+                                      "https://placehold.co/100x100?text=O";
+                                  }}
                                 />
                                 <div className="reply-user-info">
                                   <span className="reply-user-name">
-                                    🔸 {reply.officer_name}
-                                  </span>
-                                  {reply.officer_location && (
-                                    <span className="reply-user-location">
-                                      {reply.officer_location}
+                                    {reply.officer_name}
+                                    <span className="officer-badge">
+                                      Official
                                     </span>
-                                  )}
-                                  <span className="reply-date">
-                                    {formatDate(reply.created_at)}
                                   </span>
+                                  <div className="reply-meta-row">
+                                    {reply.officer_location && (
+                                      <span className="reply-user-location">
+                                        {reply.officer_location}
+                                      </span>
+                                    )}
+                                    <span className="reply-date">
+                                      • {formatDate(reply.created_at)}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                               <p className="reply-text">{reply.reply_text}</p>
@@ -413,32 +439,44 @@ const CommentSection = ({ workId }) => {
                       {/* Reply form for officers only */}
                       {user && user.role === "officer" && (
                         <div className="reply-form">
-                          <textarea
-                            className="reply-textarea"
-                            placeholder="Write an official response..."
-                            value={replyText[c.id] || ""}
-                            onChange={(e) =>
-                              setReplyText((prev) => ({
-                                ...prev,
-                                [c.id]: e.target.value,
-                              }))
-                            }
-                            rows="2"
-                            maxLength="300"
-                          />
-                          <div className="reply-form-footer">
-                            <span className="char-counter">
-                              {(replyText[c.id] || "").length}/300
+                          <div className="reply-form-header">
+                            <span className="reply-label">
+                              Official Response
                             </span>
+                          </div>
+                          <div className="reply-input-wrapper">
+                            <textarea
+                              className="reply-textarea"
+                              placeholder="Write an official response..."
+                              value={replyText[c.id] || ""}
+                              onChange={(e) =>
+                                setReplyText((prev) => ({
+                                  ...prev,
+                                  [c.id]: e.target.value,
+                                }))
+                              }
+                              rows="3"
+                              maxLength="300"
+                            />
                             <button
                               className="reply-submit-btn"
                               onClick={() => handleReplySubmit(c.id)}
                               disabled={replyLoading[c.id]}
                             >
-                              {replyLoading[c.id]
-                                ? "Posting..."
-                                : "Post Response"}
+                              {replyLoading[c.id] ? (
+                                <span className="spinner-small"></span>
+                              ) : (
+                                <>
+                                  <i className="fa-solid fa-paper-plane"></i>
+                                  Post
+                                </>
+                              )}
                             </button>
+                          </div>
+                          <div className="reply-form-footer">
+                            <span className="char-counter">
+                              {(replyText[c.id] || "").length}/300
+                            </span>
                           </div>
                         </div>
                       )}

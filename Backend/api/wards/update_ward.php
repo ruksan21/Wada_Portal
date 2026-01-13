@@ -37,7 +37,7 @@ $allowed_fields = [
     'location', 'google_map_link', 'municipality', 'contact_phone', 'telephone', 'contact_email',
     'chairperson_name', 'chairperson_phone', 'chairperson_email', 'chairperson_education',
     'chairperson_experience', 'chairperson_political_party', 'chairperson_appointment_date', 'chairperson_bio',
-    'province', 'district_name'
+    'province', 'district_name', 'population'
 ];
 
 foreach ($allowed_fields as $field) {

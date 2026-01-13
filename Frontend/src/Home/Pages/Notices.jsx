@@ -44,13 +44,13 @@ const NoticeCard = ({ notice, onClick }) => {
 };
 
 export default function Notices({ embedded = false, wardId: propWardId }) {
-  const { municipality, ward } = useWard();
+  const { municipality, ward, wardId } = useWard();
   const [notices, setNotices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNotice, setSelectedNotice] = useState(null);
 
-  // Use either the provided propWardId or the ward from context
-  const targetWardId = propWardId || ward;
+  // Use either the provided propWardId or the wardId from context
+  const targetWardId = propWardId || wardId;
 
   useEffect(() => {
     setIsLoading(true);

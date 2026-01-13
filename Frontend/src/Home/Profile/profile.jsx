@@ -468,7 +468,11 @@ const Profile = () => {
                       <div className="reviewer-avatar">
                         {review.photo ? (
                           <img
-                            src={`${API_BASE_URL}/auth/uploads/${review.photo}`}
+                            src={
+                              review.photo.startsWith("http")
+                                ? review.photo
+                                : `${API_BASE_URL}/auth/uploads/${review.photo}`
+                            }
                             alt={review.first_name}
                             style={{
                               width: "100%",

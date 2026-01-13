@@ -44,12 +44,34 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #e2e8f0;
-  transition: transform 0.2s;
+  transition: transform 0.2s, border-color 0.2s;
+  position: relative;
 }
 
 .dashboard-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-stat-card.editable {
+  cursor: pointer;
+  border-color: #cbd5e0;
+}
+
+.dashboard-stat-card.editable:hover {
+  border-color: #667eea;
+  background-color: #f7fafc;
+}
+
+.edit-icon {
+  margin-left: auto;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.dashboard-stat-card.editable:hover .edit-icon {
+  opacity: 1;
 }
 
 .dashboard-stat-label {

@@ -488,7 +488,7 @@ const OfficerComplaints = () => {
             <form onSubmit={handleReportSubmit} className="report-form">
               <div className="form-group">
                 <label>
-                  <i className="fa-solid fa-heading"></i> Subject
+                  <i className="fa-solid fa-pen-nib"></i> Subject
                 </label>
                 <input
                   type="text"
@@ -521,7 +521,7 @@ const OfficerComplaints = () => {
               </div>
               <div className="form-group">
                 <label>
-                  <i className="fa-solid fa-message"></i> Message
+                  <i className="fa-solid fa-comment-dots"></i> Message
                 </label>
                 <textarea
                   required

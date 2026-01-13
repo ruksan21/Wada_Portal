@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../Home/Context/AuthContext";
 
-/**
- * Custom hook to check if officer's assigned ward exists in the system
- * Returns: { wardExists, isLoading, wardId }
- * - wardExists: boolean - true if ward exists, false if not
- * - isLoading: boolean - true while checking
- * - wardId: number|null - the ward ID if exists
- */
+
 export const useWardVerification = () => {
   const { user, getOfficerWorkLocation } = useAuth();
   const workLocation = getOfficerWorkLocation();

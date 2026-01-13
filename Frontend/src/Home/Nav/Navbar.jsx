@@ -4,7 +4,6 @@ import { useAuth } from "../Context/AuthContext";
 import "./Navbar.css";
 import Profile from "../Profile/profile.jsx";
 import WardSelector from "../Component/wadaselector.jsx";
-import Notification from "../Component/Notification.jsx";
 import UserMenu from "../Component/UserMenu.jsx";
 import HeroSection from "../Pages/HeroSection.jsx";
 import Status from "../Pages/Status.jsx";
@@ -27,17 +26,10 @@ const Navbar = ({ showHomeContent = false }) => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Logic to show/hide Notification Bell
-  // Show for Citizen and Officer, hide for Admin
-  const showNotificationBell =
-    user &&
-    (user.role === "citizen" ||
-      user.role === "user" ||
-      user.role === "officer");
-
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Documents", path: "/documents" },
+    { name: "Budget", path: "/budget" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
@@ -71,7 +63,6 @@ const Navbar = ({ showHomeContent = false }) => {
         {/* Right Section - Ward Selector, Notification, User Menu */}
         <div className="navbar-right">
           <WardSelector />
-          {showNotificationBell && <Notification />}
           <UserMenu />
 
           {/* Hamburger Menu Icon (Mobile Only) */}

@@ -22,10 +22,10 @@ function resolveWardIdStrict($conn, $province, $district, $municipality, $wardNu
                 OR '$province_safe' LIKE CONCAT('%', TRIM(province), '%')
             )
             AND (
-                district IS NULL OR district = '' 
-                OR TRIM(district) LIKE TRIM('$district_safe')
-                OR TRIM(district) LIKE CONCAT('%', TRIM('$district_safe'), '%')
-                OR '$district_safe' LIKE CONCAT('%', TRIM(district), '%')
+                district_name IS NULL OR district_name = '' 
+                OR TRIM(district_name) LIKE TRIM('$district_safe')
+                OR TRIM(district_name) LIKE CONCAT('%', TRIM('$district_safe'), '%')
+                OR '$district_safe' LIKE CONCAT('%', TRIM(district_name), '%')
             )
             AND (
                 TRIM(municipality) LIKE TRIM('$municipality_safe')

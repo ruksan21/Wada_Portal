@@ -6,9 +6,6 @@ header("Content-Type: application/json");
 
 require_once '../../db_connect.php';
 
-// One-time fix for status column
-$conn->query("ALTER TABLE complaints MODIFY COLUMN status ENUM('Open', 'Resolved', 'Pending', 'Rejected') DEFAULT 'Open'");
-
 // 1. Get Inputs
 $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : null;
 $ward_number = $_GET['ward'] ?? null;

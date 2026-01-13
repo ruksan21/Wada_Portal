@@ -49,7 +49,7 @@ $municipality_safe = $conn->real_escape_string($municipality);
 // 3. We use bidirectional LIKE for string components
 
 // 1. STRICT MATCH (All fields)
-$query = "SELECT id, ward_number, municipality, district, province 
+$query = "SELECT id, ward_number, municipality, district_name, province, population 
           FROM wards 
           WHERE ward_number = $ward_number
           AND (
@@ -59,10 +59,10 @@ $query = "SELECT id, ward_number, municipality, district, province
               OR '$province_safe' LIKE CONCAT('%', TRIM(province), '%')
           )
           AND (
-              district IS NULL OR district = ''
-              OR TRIM(district) LIKE TRIM('$district_safe')
-              OR TRIM(district) LIKE CONCAT('%', TRIM('$district_safe'), '%')
-              OR '$district_safe' LIKE CONCAT('%', TRIM(district), '%')
+              district_name IS NULL OR district_name = ''
+              OR TRIM(district_name) LIKE TRIM('$district_safe')
+              OR TRIM(district_name) LIKE CONCAT('%', TRIM('$district_safe'), '%')
+              OR '$district_safe' LIKE CONCAT('%', TRIM(district_name), '%')
           )
           AND (
               TRIM(municipality) LIKE TRIM('$municipality_safe')
@@ -75,7 +75,7 @@ $result = $conn->query($query);
 
 // 2. RELAXED MATCH (Municipality + Ward Only) - Fallback
 if (!$result || $result->num_rows == 0) {
-    $fallback_query = "SELECT id, ward_number, municipality, district, province 
+    $fallback_query = "SELECT id, ward_number, municipality, district_name, province, population 
                        FROM wards 
                        WHERE ward_number = $ward_number_safe
                        AND (
@@ -101,7 +101,7 @@ if ($result && $result->num_rows > 0) {
     echo json_encode([
         "success" => true,
         "exists" => false,
-        "message" => "Ward $ward_number in $municipality, $district not found."
+        "message" => "Ward $ward_number in $municipality, $district_safe not found."
     ]);
 }
 
