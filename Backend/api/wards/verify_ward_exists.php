@@ -98,29 +98,10 @@ if ($result && $result->num_rows > 0) {
         "ward" => $ward
     ]);
 } else {
-    // Debug info to help diagnose
-    $debug_query = "SELECT * FROM wards WHERE ward_number = $ward_number";
-    $debug_res = $conn->query($debug_query);
-    $similar_wards = [];
-    while($row = $debug_res->fetch_assoc()) {
-        $similar_wards[] = $row;
-    }
-
     echo json_encode([
         "success" => true,
         "exists" => false,
-        "message" => "Ward $ward_number in $municipality, $district not found.",
-        "debug_info" => [
-            "searched_for" => [
-                "province" => $province,
-                "district" => $district, 
-                "municipality" => $municipality, 
-                "ward" => $ward_number
-            ],
-            "query_used" => $query,
-            "candidates_with_same_ward_number" => $similar_wards,
-            "note" => "Checked for NULL province/district as well."
-        ]
+        "message" => "Ward $ward_number in $municipality, $district not found."
     ]);
 }
 
