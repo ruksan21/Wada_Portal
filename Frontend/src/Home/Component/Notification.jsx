@@ -12,23 +12,12 @@ const Notification = () => {
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchNotifications();
-
-      // Poll every 10 seconds to keep sync
-      const intervalId = setInterval(fetchNotifications, 10000);
-      return () => clearInterval(intervalId);
-    }
-  }, [user?.id, wardId, fetchNotifications]);
-
   const fetchNotifications = useCallback(async () => {
     // Avoid fetching if user is not logged in
     if (!user?.id) return;
 
     // Don't set global loading state on background polls to avoid flickering
-    // We can use a local flag just for the first load if needed
-    if (notifications.length === 0) setLoading(true);
+    setLoading(true);
 
     try {
       // Include ward_id in the request if available
@@ -47,9 +36,20 @@ const Notification = () => {
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
-      if (notifications.length === 0) setLoading(false);
+      setLoading(false);
     }
-  }, [user?.id, wardId, notifications.length]);
+  }, [user?.id, wardId]);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchNotifications();
+
+      // Poll every 10 seconds to keep sync
+      const intervalId = setInterval(fetchNotifications, 10000);
+      return () => clearInterval(intervalId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, wardId]);
 
   const toggleNotification = () => {
     setIsOpen(!isOpen);

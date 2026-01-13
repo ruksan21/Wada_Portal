@@ -28,7 +28,11 @@ const AdminDashboard = () => {
     // Assuming dateString is "DD/MM/YYYY" or "YYYY-MM-DD" or standard ISO
     const date = new Date(dateString);
     // If invalid date, try parsing manually if format is "DD/MM/YYYY" from some locales
-    if (isNaN(date.getTime()) && dateString.includes("/")) {
+    if (
+      isNaN(date.getTime()) &&
+      typeof dateString === "string" &&
+      dateString.includes("/")
+    ) {
       const parts = dateString.split("/");
       if (parts.length === 3) {
         // Assume DD/MM/YYYY

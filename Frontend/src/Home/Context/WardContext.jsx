@@ -73,8 +73,7 @@ export function WardProvider({ children }) {
   const refreshStats = (currentWardId, followerId) => {
     // Don't fetch if no ward is selected
     if (!currentWardId) {
-      console.warn("No ward selected, skipping stats refresh");
-      return;
+      return; // Silently skip if no ward selected yet
     }
 
     const followerParam = followerId ? `&follower_id=${followerId}` : "";

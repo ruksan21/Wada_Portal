@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "./profile.css";
 import Works from "./works";
 import NoticePopup from "../Component/NoticePopup";
@@ -88,8 +89,7 @@ const Profile = () => {
   useEffect(() => {
     // Don't fetch if no ward is selected
     if (!wardId) {
-      console.warn("No ward selected, skipping profile fetch");
-      return;
+      return; // Silently skip if no ward selected yet
     }
 
     // Fetch chairperson profile data from ward database using selected ward ID
@@ -173,7 +173,7 @@ const Profile = () => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
-      alert("Please login to review.");
+      toast.error("Please login to review.");
       return;
     }
 
@@ -190,7 +190,7 @@ const Profile = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          alert("Review added!");
+          toast.success("Review added!");
           setNewReview({ rating: 5, comment: "" });
           // Refresh reviews
           fetch(`${API_ENDPOINTS.communication.getReviews}?ward_id=${wardId}`)
@@ -201,7 +201,7 @@ const Profile = () => {
               refreshStats(wardId, user.id);
             });
         } else {
-          alert(data.message);
+          toast.error(data.message);
         }
       });
   };
@@ -211,12 +211,12 @@ const Profile = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (!isLoggedIn || !user) {
-      alert("Please login to follow!");
+      toast.error("Please login to follow!");
       return;
     }
 
     if (user.role !== "citizen") {
-      alert("Only citizens can follow.");
+      toast.error("Only citizens can follow.");
       return;
     }
 
@@ -239,7 +239,7 @@ const Profile = () => {
           refreshStats(ward || 1, user.id);
           setIsFollowing(!isFollowing);
         } else {
-          alert(data.message || "Failed to update follow status.");
+          toast.error(data.message || "Failed to update follow status.");
         }
       })
       .catch((err) => console.error("Error toggling follow:", err));

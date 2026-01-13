@@ -19,10 +19,20 @@ export const AuthProvider = ({ children }) => {
   const [wards, setWards] = useState([]);
   const [wardsLoading, setWardsLoading] = useState(false);
 
+  // Helper function to add timeout to fetch
+  const fetchWithTimeout = (url, timeout = 10000) => {
+    return Promise.race([
+      fetch(url),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timeout")), timeout)
+      ),
+    ]);
+  };
+
   // Data Fetching Functions
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.users.getAll);
+      const response = await fetchWithTimeout(API_ENDPOINTS.users.getAll);
       const data = await response.json();
       if (data.success) {
         // Map created_at to joinedDate for frontend calculations
@@ -34,12 +44,14 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching users:", error);
+      // Set empty array on error to prevent blocking
+      setAllUsers([]);
     }
   };
 
   const fetchPendingOfficers = async () => {
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${API_ENDPOINTS.users.getPendingOfficers}?t=${Date.now()}`
       ); // Added cache buster
       const data = await response.json();
@@ -48,13 +60,15 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching pending officers:", error);
+      // Set empty array on error to prevent blocking
+      setPendingOfficers([]);
     }
   };
 
   const refreshWards = async () => {
     setWardsLoading(true);
     try {
-      const response = await fetch(API_ENDPOINTS.wards.getAll);
+      const response = await fetchWithTimeout(API_ENDPOINTS.wards.getAll);
       const data = await response.json();
       if (data.success) {
         const formattedWards = data.data.map((ward) => ({
@@ -74,6 +88,8 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error fetching wards:", error);
+      // Set empty array on error to prevent blocking
+      setWards([]);
     } finally {
       setWardsLoading(false);
     }
@@ -150,7 +166,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   // 3. Refresh session from DB to ensure latest location
   useEffect(() => {
