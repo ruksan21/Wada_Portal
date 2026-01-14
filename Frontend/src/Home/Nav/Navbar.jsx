@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../Context/AuthContext";
+
 import "./Navbar.css";
 import Profile from "../Profile/profile.jsx";
 import WardSelector from "../Component/wadaselector.jsx";
@@ -11,7 +11,7 @@ import { useWard } from "../Context/WardContext.jsx";
 
 const Navbar = ({ showHomeContent = false }) => {
   const { municipality, ward } = useWard();
-  const { user } = useAuth();
+
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -29,7 +29,6 @@ const Navbar = ({ showHomeContent = false }) => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Documents", path: "/documents" },
-    { name: "Budget", path: "/budget" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import { API_ENDPOINTS } from "../config/api";
@@ -171,7 +172,7 @@ const UserManagement = () => {
           if (addNotification) {
             addNotification("success", "User updated successfully!");
           } else {
-            alert("User updated successfully!");
+            toast.success("User updated successfully!");
           }
         }
         setIsEditing(false);
@@ -180,7 +181,7 @@ const UserManagement = () => {
         if (addNotification) {
           addNotification("error", data.message || "Failed to update user.");
         } else {
-          alert(data.message || "Failed to update user.");
+          toast.error(data.message || "Failed to update user.");
         }
       }
     } catch (error) {
@@ -188,7 +189,7 @@ const UserManagement = () => {
       if (addNotification) {
         addNotification("error", "Failed to update user. Please try again.");
       } else {
-        alert("Failed to update user. Please try again.");
+        toast.error("Failed to update user. Please try again.");
       }
     } finally {
       setIsUpdating(false);
@@ -250,7 +251,9 @@ const UserManagement = () => {
             <div className="profile-details-grid">
               <div className="detail-item">
                 <span className="detail-label">Email Address</span>
-                <span className="detail-value">{selectedUser.email || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.email || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">User ID</span>
@@ -258,41 +261,61 @@ const UserManagement = () => {
               </div>
               <div className="detail-item">
                 <span className="detail-label">Contact Number</span>
-                <span className="detail-value">{selectedUser.contact_number || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.contact_number || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Status</span>
-                <span className={`status-badge-${selectedUser.status || "active"}`} style={{ display: "inline-block" }}>
-                  {(selectedUser.status || "active").charAt(0).toUpperCase() + (selectedUser.status || "active").slice(1)}
+                <span
+                  className={`status-badge-${selectedUser.status || "active"}`}
+                  style={{ display: "inline-block" }}
+                >
+                  {(selectedUser.status || "active").charAt(0).toUpperCase() +
+                    (selectedUser.status || "active").slice(1)}
                 </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Gender</span>
-                <span className="detail-value">{selectedUser.gender || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.gender || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Date of Birth</span>
-                <span className="detail-value">{selectedUser.dob || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.dob || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Province</span>
-                <span className="detail-value">{selectedUser.province || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.province || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">District</span>
-                <span className="detail-value">{selectedUser.district || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.district || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">City</span>
-                <span className="detail-value">{selectedUser.city || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.city || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Ward Number</span>
-                <span className="detail-value">{selectedUser.ward_number || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.ward_number || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Citizenship Number</span>
-                <span className="detail-value">{selectedUser.citizenship_number || "N/A"}</span>
+                <span className="detail-value">
+                  {selectedUser.citizenship_number || "N/A"}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Joined Date</span>
@@ -303,50 +326,77 @@ const UserManagement = () => {
             </div>
 
             {/* Officer Specific Fields */}
-            {(selectedUser.role === "officer" || selectedUser.officer_id || selectedUser.department) && (
+            {(selectedUser.role === "officer" ||
+              selectedUser.officer_id ||
+              selectedUser.department) && (
               <div style={{ marginTop: "24px" }}>
-                <h4 style={{ marginBottom: "16px", fontSize: "1.1rem", fontWeight: 600 }}>Officer Details</h4>
+                <h4
+                  style={{
+                    marginBottom: "16px",
+                    fontSize: "1.1rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Officer Details
+                </h4>
                 <div className="profile-details-grid">
                   {selectedUser.officer_id && (
                     <div className="detail-item">
                       <span className="detail-label">Officer ID</span>
-                      <span className="detail-value">{selectedUser.officer_id}</span>
+                      <span className="detail-value">
+                        {selectedUser.officer_id}
+                      </span>
                     </div>
                   )}
                   {selectedUser.department && (
                     <div className="detail-item">
                       <span className="detail-label">Department</span>
-                      <span className="detail-value">{selectedUser.department}</span>
+                      <span className="detail-value">
+                        {selectedUser.department}
+                      </span>
                     </div>
                   )}
                   {selectedUser.work_province && (
                     <div className="detail-item">
                       <span className="detail-label">Work Province</span>
-                      <span className="detail-value">{selectedUser.work_province}</span>
+                      <span className="detail-value">
+                        {selectedUser.work_province}
+                      </span>
                     </div>
                   )}
                   {selectedUser.work_district && (
                     <div className="detail-item">
                       <span className="detail-label">Work District</span>
-                      <span className="detail-value">{selectedUser.work_district}</span>
+                      <span className="detail-value">
+                        {selectedUser.work_district}
+                      </span>
                     </div>
                   )}
                   {selectedUser.work_municipality && (
                     <div className="detail-item">
                       <span className="detail-label">Work Municipality</span>
-                      <span className="detail-value">{selectedUser.work_municipality}</span>
+                      <span className="detail-value">
+                        {selectedUser.work_municipality}
+                      </span>
                     </div>
                   )}
                   {selectedUser.work_ward && (
                     <div className="detail-item">
                       <span className="detail-label">Work Ward</span>
-                      <span className="detail-value">{selectedUser.work_ward}</span>
+                      <span className="detail-value">
+                        {selectedUser.work_ward}
+                      </span>
                     </div>
                   )}
                   {selectedUser.work_office_location && (
-                    <div className="detail-item" style={{ gridColumn: "1 / -1" }}>
+                    <div
+                      className="detail-item"
+                      style={{ gridColumn: "1 / -1" }}
+                    >
                       <span className="detail-label">Office Location</span>
-                      <span className="detail-value">{selectedUser.work_office_location}</span>
+                      <span className="detail-value">
+                        {selectedUser.work_office_location}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -365,7 +415,10 @@ const UserManagement = () => {
       {/* Edit User Modal */}
       {isEditing && selectedUser && (
         <div className="user-modal-overlay">
-          <div className="user-modal-content" style={{ maxHeight: "90vh", overflowY: "auto", width: "700px" }}>
+          <div
+            className="user-modal-content"
+            style={{ maxHeight: "90vh", overflowY: "auto", width: "700px" }}
+          >
             <div className="user-modal-header">
               <h3 className="user-modal-title">Edit User</h3>
               <button onClick={closeModals} className="user-close-btn">
@@ -374,8 +427,23 @@ const UserManagement = () => {
             </div>
             <form onSubmit={handleEditSubmit} className="user-form-grid">
               {/* Basic Information */}
-              <h4 style={{ marginBottom: "12px", fontSize: "1rem", fontWeight: 600, color: "#475569" }}>Basic Information</h4>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+              <h4
+                style={{
+                  marginBottom: "12px",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#475569",
+                }}
+              >
+                Basic Information
+              </h4>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">First Name *</label>
                   <input
@@ -412,7 +480,13 @@ const UserManagement = () => {
                   />
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">Email</label>
                   <input
@@ -420,7 +494,10 @@ const UserManagement = () => {
                     value={editForm.email}
                     disabled
                     className="user-input"
-                    style={{ backgroundColor: "#f1f5f9", cursor: "not-allowed" }}
+                    style={{
+                      backgroundColor: "#f1f5f9",
+                      cursor: "not-allowed",
+                    }}
                   />
                 </div>
                 <div>
@@ -429,13 +506,22 @@ const UserManagement = () => {
                     type="text"
                     value={editForm.contactNumber}
                     onChange={(e) =>
-                      setEditForm({ ...editForm, contactNumber: e.target.value })
+                      setEditForm({
+                        ...editForm,
+                        contactNumber: e.target.value,
+                      })
                     }
                     className="user-input"
                   />
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">Role *</label>
                   <select
@@ -469,8 +555,24 @@ const UserManagement = () => {
               </div>
 
               {/* Personal Information */}
-              <h4 style={{ marginTop: "24px", marginBottom: "12px", fontSize: "1rem", fontWeight: 600, color: "#475569" }}>Personal Information</h4>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <h4
+                style={{
+                  marginTop: "24px",
+                  marginBottom: "12px",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#475569",
+                }}
+              >
+                Personal Information
+              </h4>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">Gender</label>
                   <select
@@ -504,15 +606,34 @@ const UserManagement = () => {
                   type="text"
                   value={editForm.citizenshipNumber}
                   onChange={(e) =>
-                    setEditForm({ ...editForm, citizenshipNumber: e.target.value })
+                    setEditForm({
+                      ...editForm,
+                      citizenshipNumber: e.target.value,
+                    })
                   }
                   className="user-input"
                 />
               </div>
 
               {/* Address Information */}
-              <h4 style={{ marginTop: "24px", marginBottom: "12px", fontSize: "1rem", fontWeight: 600, color: "#475569" }}>Address Information</h4>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <h4
+                style={{
+                  marginTop: "24px",
+                  marginBottom: "12px",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#475569",
+                }}
+              >
+                Address Information
+              </h4>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">Province</label>
                   <input
@@ -536,7 +657,13 @@ const UserManagement = () => {
                   />
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "12px",
+                }}
+              >
                 <div>
                   <label className="stat-label">City</label>
                   <input
@@ -562,17 +689,37 @@ const UserManagement = () => {
               </div>
 
               {/* Officer Information */}
-              {(editForm.role === "officer" || selectedUser.role === "officer") && (
+              {(editForm.role === "officer" ||
+                selectedUser.role === "officer") && (
                 <>
-                  <h4 style={{ marginTop: "24px", marginBottom: "12px", fontSize: "1rem", fontWeight: 600, color: "#475569" }}>Officer Information</h4>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <h4
+                    style={{
+                      marginTop: "24px",
+                      marginBottom: "12px",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      color: "#475569",
+                    }}
+                  >
+                    Officer Information
+                  </h4>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "12px",
+                    }}
+                  >
                     <div>
                       <label className="stat-label">Officer ID</label>
                       <input
                         type="text"
                         value={editForm.officerId}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, officerId: e.target.value })
+                          setEditForm({
+                            ...editForm,
+                            officerId: e.target.value,
+                          })
                         }
                         className="user-input"
                       />
@@ -583,21 +730,43 @@ const UserManagement = () => {
                         type="text"
                         value={editForm.department}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, department: e.target.value })
+                          setEditForm({
+                            ...editForm,
+                            department: e.target.value,
+                          })
                         }
                         className="user-input"
                       />
                     </div>
                   </div>
-                  <h5 style={{ marginTop: "16px", marginBottom: "8px", fontSize: "0.9rem", fontWeight: 600, color: "#64748b" }}>Work Location</h5>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <h5
+                    style={{
+                      marginTop: "16px",
+                      marginBottom: "8px",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      color: "#64748b",
+                    }}
+                  >
+                    Work Location
+                  </h5>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "12px",
+                    }}
+                  >
                     <div>
                       <label className="stat-label">Work Province</label>
                       <input
                         type="text"
                         value={editForm.workProvince}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, workProvince: e.target.value })
+                          setEditForm({
+                            ...editForm,
+                            workProvince: e.target.value,
+                          })
                         }
                         className="user-input"
                       />
@@ -608,20 +777,32 @@ const UserManagement = () => {
                         type="text"
                         value={editForm.workDistrict}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, workDistrict: e.target.value })
+                          setEditForm({
+                            ...editForm,
+                            workDistrict: e.target.value,
+                          })
                         }
                         className="user-input"
                       />
                     </div>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "12px",
+                    }}
+                  >
                     <div>
                       <label className="stat-label">Work Municipality</label>
                       <input
                         type="text"
                         value={editForm.workMunicipality}
                         onChange={(e) =>
-                          setEditForm({ ...editForm, workMunicipality: e.target.value })
+                          setEditForm({
+                            ...editForm,
+                            workMunicipality: e.target.value,
+                          })
                         }
                         className="user-input"
                       />
@@ -644,7 +825,10 @@ const UserManagement = () => {
                       type="text"
                       value={editForm.workOfficeLocation}
                       onChange={(e) =>
-                        setEditForm({ ...editForm, workOfficeLocation: e.target.value })
+                        setEditForm({
+                          ...editForm,
+                          workOfficeLocation: e.target.value,
+                        })
                       }
                       className="user-input"
                     />
@@ -661,7 +845,11 @@ const UserManagement = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-save-user" disabled={isUpdating}>
+                <button
+                  type="submit"
+                  className="btn-save-user"
+                  disabled={isUpdating}
+                >
                   {isUpdating ? "Saving..." : "Save Changes"}
                 </button>
               </div>

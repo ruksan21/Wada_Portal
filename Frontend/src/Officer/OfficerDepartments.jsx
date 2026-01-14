@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import "./OfficerDepartments.css";
 import { useAuth } from "../Home/Context/AuthContext";
@@ -162,12 +163,15 @@ export default function OfficerDepartments() {
       if (result.success) {
         handleCloseForm();
         fetchDepartments(); // Reload departments
+        toast.success(
+          editingDept ? "Department updated!" : "Department added!"
+        );
       } else {
-        alert("Error: " + result.message);
+        toast.error("Error: " + result.message);
       }
     } catch (error) {
       console.error("Error saving department:", error);
-      alert("Failed to save department");
+      toast.error("Failed to save department");
     }
   };
 
@@ -183,12 +187,13 @@ export default function OfficerDepartments() {
         const result = await response.json();
         if (result.success) {
           fetchDepartments(); // Reload departments
+          toast.success("Department deleted!");
         } else {
-          alert("Error: " + result.message);
+          toast.error("Error: " + result.message);
         }
       } catch (error) {
         console.error("Error deleting department:", error);
-        alert("Failed to delete department");
+        toast.error("Failed to delete department");
       }
     }
   };

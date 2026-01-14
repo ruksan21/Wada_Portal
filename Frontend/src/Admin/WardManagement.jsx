@@ -1,5 +1,6 @@
 // WardManagement Component
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminLayout from "./AdminLayout";
 import ChairpersonPersonalAssets from "./ChairpersonPersonalAssets";
 import { useAuth } from "../Home/Context/AuthContext";
@@ -103,15 +104,15 @@ const WardManagement = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("District added successfully!");
+        toast.success("District added successfully!");
         setNewDistrictName("");
         setIsAddingDistrict(false);
         fetchDistricts(); // Refresh list
       } else {
-        alert("Failed to add district: " + data.message);
+        toast.error("Failed to add district: " + data.message);
       }
     } catch {
-      alert("Error adding district.");
+      toast.error("Error adding district.");
     }
   };
 
@@ -246,7 +247,7 @@ const WardManagement = () => {
     }
 
     if (missingFields.length > 0) {
-      alert(
+      toast.error(
         `Please fill in all required fields:\n\n• ${missingFields.join("\n• ")}`
       );
       return;
@@ -255,14 +256,14 @@ const WardManagement = () => {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.contact_email && !emailRegex.test(formData.contact_email)) {
-      alert("Please enter a valid contact email.");
+      toast.warning("Please enter a valid contact email.");
       return;
     }
     if (
       formData.chairperson_email &&
       !emailRegex.test(formData.chairperson_email)
     ) {
-      alert("Please enter a valid chairperson email.");
+      toast.warning("Please enter a valid chairperson email.");
       return;
     }
 
@@ -271,14 +272,14 @@ const WardManagement = () => {
       formData.contact_phone &&
       !/^[0-9\-+ ]+$/.test(formData.contact_phone)
     ) {
-      alert("Please enter a valid contact phone number.");
+      toast.warning("Please enter a valid contact phone number.");
       return;
     }
     if (
       formData.chairperson_phone &&
       !/^[0-9\-+ ]+$/.test(formData.chairperson_phone)
     ) {
-      alert("Please enter a valid chairperson phone number.");
+      toast.warning("Please enter a valid chairperson phone number.");
       return;
     }
 
@@ -314,18 +315,18 @@ const WardManagement = () => {
       });
       const data = await res.json();
       if (data.success) {
-        alert(
+        toast.success(
           isAdding ? "Ward added successfully!" : "Ward updated successfully!"
         );
         resetFormAndClose();
         fetchWards();
         refreshWards();
       } else {
-        alert("Failed to save: " + data.message);
+        toast.error("Failed to save: " + data.message);
       }
     } catch (err) {
       console.error("Save error:", err);
-      alert("An error occurred while saving.");
+      toast.error("An error occurred while saving.");
     }
   };
 
@@ -349,7 +350,7 @@ const WardManagement = () => {
         fetchWards();
         refreshWards();
       } else {
-        alert("Failed to delete: " + data.message);
+        toast.error("Failed to delete: " + data.message);
       }
     } catch (err) {
       console.error("Delete error:", err);

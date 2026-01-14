@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import "./OfficerActivities.css";
 import { API_ENDPOINTS } from "../config/api";
 import { useAuth } from "../Home/Context/AuthContext";
@@ -151,8 +152,9 @@ export default function OfficerActivities() {
       const data = await response.json();
       if (data.success) {
         fetchActivities();
+        toast.success("Activity deleted successfully!");
       } else {
-        alert(data.message);
+        toast.error(data.message);
       }
     } catch (err) {
       console.error(err);

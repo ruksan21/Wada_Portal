@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import "./OfficerNotices.css";
 import { useAuth } from "../Home/Context/AuthContext";
@@ -229,7 +230,7 @@ const OfficerNotices = () => {
     e.preventDefault();
 
     if (!formData.title || !formData.content) {
-      alert("Title and content are required.");
+      toast.error("Title and content are required.");
       return;
     }
 
@@ -301,7 +302,7 @@ const OfficerNotices = () => {
         setWardError(null);
         handleCancelEdit();
         fetchNotices();
-        alert(
+        toast.success(
           editingId
             ? "Notice updated successfully!"
             : "Notice published successfully!"
@@ -311,12 +312,12 @@ const OfficerNotices = () => {
         if (result.message && result.message.includes("Ward not found")) {
           setWardError(result.message);
         } else {
-          alert("Failed: " + (result.message || "Unknown error"));
+          toast.error("Failed: " + (result.message || "Unknown error"));
         }
       }
     } catch (error) {
       console.error("Error creating notice:", error);
-      alert("Failed to create notice: " + error.message);
+      toast.error("Failed to create notice: " + error.message);
     }
   };
 
@@ -344,12 +345,13 @@ const OfficerNotices = () => {
         const result = await response.json();
         if (result.success) {
           fetchNotices(); // Reload notices
+          toast.success("Notice deleted successfully!");
         } else {
-          alert("Error: " + result.message);
+          toast.error("Error: " + result.message);
         }
       } catch (error) {
         console.error("Error deleting notice:", error);
-        alert("Failed to delete notice");
+        toast.error("Failed to delete notice");
       }
     }
   };

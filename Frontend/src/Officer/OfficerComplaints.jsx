@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import { useAuth } from "../Home/Context/AuthContext";
 import OfficerLayout from "./OfficerLayout";
 import "./OfficerComplaints.css";
@@ -38,7 +39,7 @@ const OfficerComplaints = () => {
       if (data.success) {
         fetchComplaints();
       } else {
-        alert(data.message || "Failed to delete.");
+        toast.error(data.message || "Failed to delete.");
       }
     } catch (err) {
       console.error("Delete error:", err);
@@ -83,22 +84,23 @@ const OfficerComplaints = () => {
 
       const data = await res.json();
       if (!data.success) {
-        alert(data.message || "Failed to update status on server.");
+        toast.error(data.message || "Failed to update status on server.");
         fetchComplaints();
       } else {
         // Build a helpful message based on email status
         let msg = `Status updated to ${status}!`;
         if (data.email_sent) {
           msg += "\n✅ Notification email sent to citizen.";
+          toast.success(msg);
         } else {
           msg += `\n⚠️ ${data.message}`;
+          toast.warning(msg);
         }
-        alert(msg);
         fetchComplaints();
       }
     } catch (err) {
       console.error("Status update error:", err);
-      alert(`Update Failed: ${err.message}`);
+      toast.error(`Update Failed: ${err.message}`);
       fetchComplaints();
     }
   };
@@ -145,18 +147,19 @@ const OfficerComplaints = () => {
         let msg = "Operation successful!";
         if (data.email_sent) {
           msg = "Reply and notification email sent successfully!";
+          toast.success(msg);
         } else {
           msg = `Status updated, but email not sent: ${data.message}`;
+          toast.warning(msg);
         }
-        alert(msg);
         setShowReplyModal(false);
         fetchComplaints();
       } else {
-        alert(data.message || "Failed to send reply.");
+        toast.error(data.message || "Failed to send reply.");
       }
     } catch (err) {
       console.error("Reply error:", err);
-      alert("Error sending reply.");
+      toast.error("Error sending reply.");
     } finally {
       setIsSendingReply(false);
     }
@@ -193,16 +196,16 @@ const OfficerComplaints = () => {
 
       const data = await res.json();
       if (data.success) {
-        alert(data.message || "Operation successful.");
+        toast.success(data.message || "Operation successful.");
         setShowReportModal(false);
         setEditingId(null);
         setReportData({ subject: "", message: "", priority: "Medium" });
         fetchComplaints();
       } else {
-        alert(data.message || "Failed to submit report.");
+        toast.error(data.message || "Failed to submit report.");
       }
     } catch {
-      alert("Error processing request.");
+      toast.error("Error processing request.");
     }
   };
 

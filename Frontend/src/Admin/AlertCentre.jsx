@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminLayout from "./AdminLayout";
 import { API_ENDPOINTS } from "../config/api";
 import "./AlertCentre.css";
@@ -52,7 +53,7 @@ const AlertCentre = () => {
       }
     } catch (err) {
       console.error("Failed to update alert status:", err);
-      alert("Failed to update alert status.");
+      toast.error("Failed to update alert status.");
     }
   };
 
@@ -70,7 +71,7 @@ const AlertCentre = () => {
       }
     } catch (err) {
       console.error("Failed to delete alert:", err);
-      alert("Failed to delete alert.");
+      toast.error("Failed to delete alert.");
     }
   };
 
@@ -88,7 +89,7 @@ const AlertCentre = () => {
       }
     } catch (err) {
       console.error("Failed to clear alerts:", err);
-      alert("Failed to clear alerts.");
+      toast.error("Failed to clear alerts.");
     }
   };
 

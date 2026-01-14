@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { API_ENDPOINTS } from "../config/api";
 import "./ChairpersonPersonalAssets.css";
 
@@ -51,7 +52,7 @@ const ChairpersonPersonalAssets = ({ wardId }) => {
       });
       const data = await res.json();
       if (data.success) {
-        alert("Personal asset added successfully!");
+        toast.success("Personal asset added successfully!");
         setIsAdding(false);
         setFormData({
           asset_type: "land",
@@ -64,11 +65,11 @@ const ChairpersonPersonalAssets = ({ wardId }) => {
         });
         fetchPersonalAssets();
       } else {
-        alert("Failed to add personal asset: " + data.message);
+        toast.error("Failed to add personal asset: " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Error adding personal asset.");
+      toast.error("Error adding personal asset.");
     }
   };
 
@@ -85,13 +86,13 @@ const ChairpersonPersonalAssets = ({ wardId }) => {
       const data = await res.json();
       if (data.success) {
         setPersonalAssets(personalAssets.filter((a) => a.id !== assetId));
-        alert("Personal asset deleted successfully!");
+        toast.success("Personal asset deleted successfully!");
       } else {
-        alert("Failed to delete personal asset: " + data.message);
+        toast.error("Failed to delete personal asset: " + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting personal asset.");
+      toast.error("Error deleting personal asset.");
     }
   };
 

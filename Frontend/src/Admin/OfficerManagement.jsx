@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import { API_ENDPOINTS } from "../config/api";
@@ -272,7 +273,7 @@ const OfficerManagement = () => {
       });
       const result = await res.json();
       if (result.success) {
-        alert("Officer created successfully!");
+        toast.success("Officer created successfully!");
         setShowCreateModal(false);
         setFormData(initialFormState);
         setPhotoFiles({ citizenship: null, idCard: null, profilePhoto: null });

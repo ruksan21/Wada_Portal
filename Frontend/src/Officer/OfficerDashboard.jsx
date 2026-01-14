@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import { API_ENDPOINTS } from "../config/api";
@@ -121,13 +122,13 @@ const OfficerDashboard = () => {
                 : item
             )
           );
-          alert("Population updated successfully!");
+          toast.success("Population updated successfully!");
         } else {
-          alert("Failed to update: " + result.message);
+          toast.error("Failed to update: " + result.message);
         }
       } catch (err) {
         console.error("Update failed:", err);
-        alert("An error occurred while updating.");
+        toast.error("An error occurred while updating.");
       }
     }
   };

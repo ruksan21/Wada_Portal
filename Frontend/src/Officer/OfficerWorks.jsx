@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import "../Home/Pages/Works.css";
 import "./OfficerWorks.css";
@@ -234,15 +235,19 @@ export default function OfficerWorks() {
 
       if (data.success) {
         setWardError(null);
-        alert(editingWork ? "Work updated successfully!" : "Work saved successfully!");
+        toast.success(
+          editingWork
+            ? "Work updated successfully!"
+            : "Work saved successfully!"
+        );
         fetchWorks(workLocation);
         handleCloseForm();
       } else {
-        alert("Error: " + data.message);
+        toast.error("Error: " + data.message);
       }
     } catch (error) {
       console.error("Error saving work:", error);
-      alert("Failed to save work");
+      toast.error("Failed to save work");
     }
   };
 
@@ -261,14 +266,14 @@ export default function OfficerWorks() {
 
         const data = await response.json();
         if (data.success) {
-          alert("Work deleted successfully!");
+          toast.success("Work deleted successfully!");
           fetchWorks(workLocation);
         } else {
-          alert("Error: " + data.message);
+          toast.error("Error: " + data.message);
         }
       } catch (error) {
         console.error("Error deleting work:", error);
-        alert("Failed to delete work");
+        toast.error("Failed to delete work");
       }
     }
   };

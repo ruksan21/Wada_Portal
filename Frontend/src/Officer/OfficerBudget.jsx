@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import "./Budget.css";
 import OfficerLayout from "./OfficerLayout";
 import { useAuth } from "../Home/Context/AuthContext";
+import { useWard } from "../Home/Context/WardContext";
 import { API_ENDPOINTS } from "../config/api";
 
 export default function OfficerBudget() {
-  const { getOfficerWorkLocation, user } = useAuth();
-  const workLocation = getOfficerWorkLocation();
+  const { user } = useAuth();
+  const { wardId } = useWard();
 
   // Beneficiary form state
   const [benTotal, setBenTotal] = useState("");
@@ -17,6 +18,9 @@ export default function OfficerBudget() {
   const [budgetAllocated, setBudgetAllocated] = useState("");
   const [budgetSpent, setBudgetSpent] = useState("");
 
+  // Latest fetched record to preserve data
+  const [latestRecord, setLatestRecord] = useState(null);
+
   // Toast notification state
   const [toast, setToast] = useState({
     show: false,
@@ -24,28 +28,18 @@ export default function OfficerBudget() {
     type: "success",
   });
 
-  // Load budget data from backend
-  useEffect(() => {
-    if (workLocation) {
-      fetchBudgetData(workLocation);
-    }
-  }, [workLocation]);
+  // Budget history state
+  const [budgetHistory, setBudgetHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
-  const fetchBudgetData = async (loc) => {
+  // Load budget data from backend
+  const fetchBudgetData = React.useCallback(async (currentWardId) => {
+    if (!currentWardId) return;
     try {
       const params = new URLSearchParams();
-      if (user?.ward_id) {
-        params.append("ward_id", user.ward_id);
-      } else {
-        // Fallback to location-based fetch
-        if (loc.work_province)
-          params.append("work_province", loc.work_province);
-        if (loc.work_district)
-          params.append("work_district", loc.work_district);
-        if (loc.work_municipality)
-          params.append("work_municipality", loc.work_municipality);
-        if (loc.work_ward) params.append("work_ward", loc.work_ward);
-      }
+      params.append("ward_id", currentWardId);
+
+      // Fetch latest for summary cards
       const response = await fetch(
         `${API_ENDPOINTS.assets.manageBudgets}?${params.toString()}`
       );
@@ -53,16 +47,38 @@ export default function OfficerBudget() {
 
       if (result.success && result.data) {
         const data = result.data;
+        setLatestRecord(data);
         setBudgetAllocated(data.total_allocated || "");
         setBudgetSpent(data.total_spent || "");
         setBenTotal(data.total_beneficiaries || "");
         setBenDirect(data.direct_beneficiaries || "");
         setBenIndirect(data.indirect_beneficiaries || "");
+      } else {
+        setLatestRecord(null);
+      }
+
+      // Fetch history for the table
+      setHistoryLoading(true);
+      params.append("history", "true");
+      const historyRes = await fetch(
+        `${API_ENDPOINTS.assets.manageBudgets}?${params.toString()}`
+      );
+      const historyResult = await historyRes.json();
+      if (historyResult.success) {
+        setBudgetHistory(historyResult.data || []);
       }
     } catch (error) {
       console.error("Error fetching budget data:", error);
+    } finally {
+      setHistoryLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (wardId) {
+      fetchBudgetData(wardId);
+    }
+  }, [wardId, fetchBudgetData]);
 
   // Auto-hide toast after 3 seconds
   useEffect(() => {
@@ -78,7 +94,7 @@ export default function OfficerBudget() {
   async function handleBeneficiarySubmit(e) {
     e.preventDefault();
 
-    if (!benTotal || !benDirect || !benIndirect) {
+    if (benTotal === "" || benDirect === "" || benIndirect === "") {
       setToast({
         show: true,
         message: "⚠️ Please fill all beneficiary fields!",
@@ -87,13 +103,13 @@ export default function OfficerBudget() {
       return;
     }
 
-    await saveBudgetData();
+    await saveBudgetData("Beneficiary details saved successfully!");
   }
 
   async function handleBudgetSummarySubmit(e) {
     e.preventDefault();
 
-    if (!budgetAllocated || !budgetSpent) {
+    if (budgetAllocated === "" || budgetSpent === "") {
       setToast({
         show: true,
         message: "⚠️ Please fill all budget fields!",
@@ -102,28 +118,40 @@ export default function OfficerBudget() {
       return;
     }
 
-    await saveBudgetData();
+    await saveBudgetData("Budget allocations saved successfully!");
   }
 
-  const saveBudgetData = async () => {
+  const saveBudgetData = async (successMsg = "Data saved successfully!") => {
+    if (!wardId) return;
     try {
       const response = await fetch(API_ENDPOINTS.assets.manageBudgets, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ward_id: 0,
+          ward_id: wardId,
           officer_id: user.id,
-          total_allocated: Number(budgetAllocated) || 0,
-          total_spent: Number(budgetSpent) || 0,
-          total_beneficiaries: Number(benTotal) || 0,
-          direct_beneficiaries: Number(benDirect) || 0,
-          indirect_beneficiaries: Number(benIndirect) || 0,
+          // If a field is empty, fallback to latest fetched value to prevent zeroing
+          total_allocated:
+            budgetAllocated !== ""
+              ? Number(budgetAllocated)
+              : Number(latestRecord?.total_allocated || 0),
+          total_spent:
+            budgetSpent !== ""
+              ? Number(budgetSpent)
+              : Number(latestRecord?.total_spent || 0),
+          total_beneficiaries:
+            benTotal !== ""
+              ? Number(benTotal)
+              : Number(latestRecord?.total_beneficiaries || 0),
+          direct_beneficiaries:
+            benDirect !== ""
+              ? Number(benDirect)
+              : Number(latestRecord?.direct_beneficiaries || 0),
+          indirect_beneficiaries:
+            benIndirect !== ""
+              ? Number(benIndirect)
+              : Number(latestRecord?.indirect_beneficiaries || 0),
           fiscal_year: "2023/24",
-          // include location so backend resolves ward_id
-          work_province: workLocation?.work_province,
-          work_district: workLocation?.work_district,
-          work_municipality: workLocation?.work_municipality,
-          work_ward: workLocation?.work_ward,
         }),
       });
 
@@ -131,9 +159,10 @@ export default function OfficerBudget() {
       if (result.success) {
         setToast({
           show: true,
-          message: "Budget data saved successfully!",
+          message: successMsg,
           type: "success",
         });
+        fetchBudgetData(wardId); // Refresh data
       } else {
         setToast({
           show: true,
@@ -316,6 +345,109 @@ export default function OfficerBudget() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <div className="current-data-section">
+          <h3 className="section-title">📊 Current Ward Records</h3>
+          <div className="data-grid">
+            <div className="data-card">
+              <h4>Financial Details</h4>
+              <div className="data-item">
+                <span>Total Allocated:</span>
+                <strong>
+                  Rs {Number(budgetAllocated || 0).toLocaleString()}
+                </strong>
+              </div>
+              <div className="data-item">
+                <span>Total Spent:</span>
+                <strong>Rs {Number(budgetSpent || 0).toLocaleString()}</strong>
+              </div>
+              <div className="data-item">
+                <span>Balance:</span>
+                <strong className={isNegative ? "text-danger" : "text-success"}>
+                  Rs {remaining.toLocaleString()}
+                </strong>
+              </div>
+            </div>
+
+            <div className="data-card">
+              <h4>Beneficiary Demographics</h4>
+              <div className="data-item">
+                <span>Total Beneficiaries:</span>
+                <strong>{Number(benTotal || 0).toLocaleString()}</strong>
+              </div>
+              <div className="data-item">
+                <span>Direct Impact:</span>
+                <strong>{Number(benDirect || 0).toLocaleString()}</strong>
+              </div>
+              <div className="data-item">
+                <span>Indirect Impact:</span>
+                <strong>{Number(benIndirect || 0).toLocaleString()}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="current-data-section">
+          <h3 className="section-title">🕒 Budget Adjustment History</h3>
+          <div className="history-table-container">
+            {historyLoading ? (
+              <div className="loading-state">Loading history...</div>
+            ) : budgetHistory.length === 0 ? (
+              <div className="empty-state">No historical records found.</div>
+            ) : (
+              <table className="history-table">
+                <thead>
+                  <tr>
+                    <th>Fiscal Year</th>
+                    <th>Allocated Amount</th>
+                    <th>Spent Amount</th>
+                    <th>Balance</th>
+                    <th>Beneficiaries</th>
+                    <th>Entry Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetHistory.map((entry) => {
+                    const bal =
+                      Number(entry.total_allocated) - Number(entry.total_spent);
+                    return (
+                      <tr key={entry.id}>
+                        <td>{entry.fiscal_year}</td>
+                        <td className="text-primary">
+                          Rs {Number(entry.total_allocated).toLocaleString()}
+                        </td>
+                        <td className="text-warning">
+                          Rs {Number(entry.total_spent).toLocaleString()}
+                        </td>
+                        <td
+                          className={bal < 0 ? "text-danger" : "text-success"}
+                        >
+                          Rs {bal.toLocaleString()}
+                        </td>
+                        <td>
+                          <div className="ben-chip">
+                            {entry.total_beneficiaries} Total
+                          </div>
+                        </td>
+                        <td className="text-muted">
+                          {new Date(entry.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

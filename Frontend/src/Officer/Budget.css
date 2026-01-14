@@ -45,7 +45,7 @@
 }
 
 .summary-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -81,19 +81,35 @@
 }
 
 .summary-card.allocated .summary-icon {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(96, 165, 250, 0.1)
+  );
 }
 
 .summary-card.spent .summary-icon {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.15),
+    rgba(251, 191, 36, 0.1)
+  );
 }
 
 .summary-card.remaining .summary-icon {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.15),
+    rgba(52, 211, 153, 0.1)
+  );
 }
 
 .summary-card.remaining.negative .summary-icon {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.15),
+    rgba(248, 113, 113, 0.1)
+  );
 }
 
 .summary-label {
@@ -333,7 +349,7 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .forms-row {
     grid-template-columns: 1fr;
   }
@@ -343,16 +359,173 @@
   .budget-container {
     padding: 16px;
   }
-  
+
   .form-card {
     padding: 20px;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .btn {
     justify-content: center;
+  }
+}
+
+/* Current Data Section */
+.current-data-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.current-data-section .section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.data-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.data-card h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #f8fafc;
+  padding-bottom: 12px;
+}
+
+.data-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.data-item:last-child {
+  border-bottom: none;
+}
+
+.data-item span {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.data-item strong {
+  color: #1e293b;
+  font-size: 1.05rem;
+}
+
+.text-danger {
+  color: #ef4444 !important;
+}
+
+.text-success {
+  color: #10b981 !important;
+}
+
+@media (max-width: 768px) {
+  .data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* History Table Styles */
+.history-table-container {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.history-table th {
+  background: #f8fafc;
+  padding: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.history-table td {
+  padding: 16px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.history-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.text-primary {
+  color: #2563eb !important;
+}
+.text-warning {
+  color: #d97706 !important;
+}
+.text-danger {
+  color: #ef4444 !important;
+}
+.text-success {
+  color: #10b981 !important;
+}
+.text-muted {
+  color: #94a3b8 !important;
+  font-size: 0.85rem !important;
+}
+
+.ben-chip {
+  display: inline-block;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.loading-state,
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+@media (max-width: 800px) {
+  .history-table-container {
+    overflow-x: auto;
+  }
+
+  .history-table {
+    min-width: 700px;
   }
 }

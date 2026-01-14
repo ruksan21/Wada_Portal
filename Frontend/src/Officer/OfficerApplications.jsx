@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import "./OfficerApplications.css";
 import { useAuth } from "../Home/Context/AuthContext";
@@ -29,19 +30,16 @@ const OfficerApplications = () => {
     if (editingOfficer) {
       // We can reuse update_user.php since officers are users
       try {
-        const response = await fetch(
-          API_ENDPOINTS.users.update,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(editingOfficer),
-          }
-        );
+        const response = await fetch(API_ENDPOINTS.users.update, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editingOfficer),
+        });
         const data = await response.json();
         if (data.success) {
           window.location.reload();
         } else {
-          alert(data.message);
+          toast.error(data.message);
         }
       } catch (error) {
         console.error("Update failed", error);

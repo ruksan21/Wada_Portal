@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import OfficerLayout from "./OfficerLayout";
 import { useAuth } from "../Home/Context/AuthContext";
 import { API_ENDPOINTS, API_BASE_URL } from "../config/api";
@@ -109,12 +110,13 @@ const OfficerAssets = () => {
         });
         setIsEditing(false);
         fetchAssets();
+        toast.success(isEditing ? "Asset updated!" : "Asset added!");
       } else {
-        alert(data.message || "Failed to save asset");
+        toast.error(data.message || "Failed to save asset");
       }
     } catch (err) {
       console.error("Failed to save asset:", err);
-      alert("Error saving asset: " + err.message);
+      toast.error("Error saving asset: " + err.message);
     }
   };
 
@@ -143,8 +145,9 @@ const OfficerAssets = () => {
       const data = await res.json();
       if (data.success) {
         fetchAssets();
+        toast.success("Asset deleted successfully!");
       } else {
-        alert(data.message);
+        toast.error(data.message);
       }
     } catch (err) {
       console.error("Failed to delete asset:", err);
@@ -173,7 +176,13 @@ const OfficerAssets = () => {
           >
             <span style={{ fontSize: "28px" }}>⚠️</span>
             <div>
-              <div style={{ fontWeight: 700, marginBottom: "4px", fontSize: "1.1rem" }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  marginBottom: "4px",
+                  fontSize: "1.1rem",
+                }}
+              >
                 Ward Not Found
               </div>
               <div style={{ fontSize: "0.9em", opacity: 0.9 }}>{wardError}</div>
@@ -193,24 +202,41 @@ const OfficerAssets = () => {
             overflow: "hidden",
           }}
         >
-          <div style={{ position: "absolute", right: "-20px", top: "-20px", fontSize: "120px", opacity: 0.1 }}>
+          <div
+            style={{
+              position: "absolute",
+              right: "-20px",
+              top: "-20px",
+              fontSize: "120px",
+              opacity: 0.1,
+            }}
+          >
             🏢
           </div>
-          <h2 style={{ margin: 0, fontSize: "1.75rem", fontWeight: 700, marginBottom: "8px" }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "1.75rem",
+              fontWeight: 700,
+              marginBottom: "8px",
+            }}
+          >
             📦 Registered Assets
           </h2>
           <p style={{ margin: 0, opacity: 0.9, fontSize: "1rem" }}>
             {workLocation
               ? `${workLocation.work_municipality}, Ward ${workLocation.work_ward}`
               : `Ward ${wardId}`}
-            <span style={{ 
-              background: "rgba(255,255,255,0.2)", 
-              padding: "4px 12px", 
-              borderRadius: "20px", 
-              marginLeft: "12px",
-              fontSize: "0.9rem",
-              fontWeight: 600
-            }}>
+            <span
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                padding: "4px 12px",
+                borderRadius: "20px",
+                marginLeft: "12px",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+              }}
+            >
               {assets.length} Assets
             </span>
           </p>
@@ -257,26 +283,37 @@ const OfficerAssets = () => {
         </div>
 
         {isLoading ? (
-          <div style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            background: "white",
-            borderRadius: "16px",
-            color: "#64748b"
-          }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              background: "white",
+              borderRadius: "16px",
+              color: "#64748b",
+            }}
+          >
             <div style={{ fontSize: "3rem", marginBottom: "16px" }}>⏳</div>
             <p style={{ margin: 0, fontSize: "1.1rem" }}>Loading assets...</p>
           </div>
         ) : assets.length === 0 ? (
-          <div style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-            borderRadius: "16px",
-            border: "2px dashed #cbd5e1"
-          }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+              borderRadius: "16px",
+              border: "2px dashed #cbd5e1",
+            }}
+          >
             <div style={{ fontSize: "4rem", marginBottom: "16px" }}>📭</div>
-            <p style={{ margin: 0, fontSize: "1.2rem", color: "#475569", fontWeight: 600 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "1.2rem",
+                color: "#475569",
+                fontWeight: 600,
+              }}
+            >
               No assets registered yet
             </p>
             <p style={{ margin: "8px 0 0", color: "#94a3b8" }}>
@@ -284,16 +321,19 @@ const OfficerAssets = () => {
             </p>
           </div>
         ) : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "20px"
-          }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gap: "20px",
+            }}
+          >
             {assets.map((asset) => (
               <div
                 key={asset.id}
                 style={{
-                  background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                  background:
+                    "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
                   borderRadius: "16px",
                   padding: "24px",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
@@ -303,77 +343,140 @@ const OfficerAssets = () => {
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.12)";
+                  e.currentTarget.style.boxShadow =
+                    "0 12px 32px rgba(0,0,0,0.12)";
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 20px rgba(0,0,0,0.06)";
                 }}
               >
                 {/* Asset Icon */}
-                <div style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
-                  background: asset.asset_type === "Electronics" ? "linear-gradient(135deg, #dbeafe, #bfdbfe)" :
-                             asset.asset_type === "Vehicle" ? "linear-gradient(135deg, #fef3c7, #fde68a)" :
-                             asset.asset_type === "Furniture" ? "linear-gradient(135deg, #d1fae5, #a7f3d0)" :
-                             asset.asset_type === "Land" ? "linear-gradient(135deg, #fce7f3, #fbcfe8)" :
-                             "linear-gradient(135deg, #e0e7ff, #c7d2fe)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1.5rem",
-                  marginBottom: "16px"
-                }}>
-                  {asset.asset_type === "Electronics" ? "💻" :
-                   asset.asset_type === "Vehicle" ? "🚗" :
-                   asset.asset_type === "Furniture" ? "🪑" :
-                   asset.asset_type === "Land" ? "🏞️" :
-                   asset.asset_type === "Machinery" ? "⚙️" : "📦"}
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "12px",
+                    background:
+                      asset.asset_type === "Electronics"
+                        ? "linear-gradient(135deg, #dbeafe, #bfdbfe)"
+                        : asset.asset_type === "Vehicle"
+                        ? "linear-gradient(135deg, #fef3c7, #fde68a)"
+                        : asset.asset_type === "Furniture"
+                        ? "linear-gradient(135deg, #d1fae5, #a7f3d0)"
+                        : asset.asset_type === "Land"
+                        ? "linear-gradient(135deg, #fce7f3, #fbcfe8)"
+                        : "linear-gradient(135deg, #e0e7ff, #c7d2fe)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.5rem",
+                    marginBottom: "16px",
+                  }}
+                >
+                  {asset.asset_type === "Electronics"
+                    ? "💻"
+                    : asset.asset_type === "Vehicle"
+                    ? "🚗"
+                    : asset.asset_type === "Furniture"
+                    ? "🪑"
+                    : asset.asset_type === "Land"
+                    ? "🏞️"
+                    : asset.asset_type === "Machinery"
+                    ? "⚙️"
+                    : "📦"}
                 </div>
 
                 {/* Asset Name & Type */}
-                <h3 style={{ margin: "0 0 4px", fontSize: "1.1rem", fontWeight: 700, color: "#1e293b" }}>
+                <h3
+                  style={{
+                    margin: "0 0 4px",
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                    color: "#1e293b",
+                  }}
+                >
                   {asset.asset_name}
                 </h3>
-                <p style={{ margin: "0 0 16px", fontSize: "0.85rem", color: "#64748b" }}>
+                <p
+                  style={{
+                    margin: "0 0 16px",
+                    fontSize: "0.85rem",
+                    color: "#64748b",
+                  }}
+                >
                   {asset.asset_type}
                 </p>
 
                 {/* Value */}
-                <div style={{
-                  background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
-                  padding: "12px 16px",
-                  borderRadius: "10px",
-                  marginBottom: "16px"
-                }}>
-                  <div style={{ fontSize: "0.75rem", color: "#059669", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <div
+                  style={{
+                    background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#059669",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
                     Asset Value
                   </div>
-                  <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#047857" }}>
+                  <div
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: 800,
+                      color: "#047857",
+                    }}
+                  >
                     Rs. {parseInt(asset.value || 0).toLocaleString()}
                   </div>
                 </div>
 
                 {/* Meta Info */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "16px",
+                  }}
+                >
                   <div style={{ fontSize: "0.85rem", color: "#64748b" }}>
                     📅 {asset.acquisition_date || "N/A"}
                   </div>
-                  <span style={{
-                    padding: "4px 12px",
-                    borderRadius: "20px",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    background: asset.status === "active" ? "#dcfce7" :
-                               asset.status === "damaged" ? "#fee2e2" :
-                               asset.status === "maintenance" ? "#fef3c7" : "#f1f5f9",
-                    color: asset.status === "active" ? "#059669" :
-                           asset.status === "damaged" ? "#dc2626" :
-                           asset.status === "maintenance" ? "#d97706" : "#64748b"
-                  }}>
+                  <span
+                    style={{
+                      padding: "4px 12px",
+                      borderRadius: "20px",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      background:
+                        asset.status === "active"
+                          ? "#dcfce7"
+                          : asset.status === "damaged"
+                          ? "#fee2e2"
+                          : asset.status === "maintenance"
+                          ? "#fef3c7"
+                          : "#f1f5f9",
+                      color:
+                        asset.status === "active"
+                          ? "#059669"
+                          : asset.status === "damaged"
+                          ? "#dc2626"
+                          : asset.status === "maintenance"
+                          ? "#d97706"
+                          : "#64748b",
+                    }}
+                  >
                     {asset.status}
                   </span>
                 </div>
@@ -392,7 +495,7 @@ const OfficerAssets = () => {
                       fontWeight: 600,
                       cursor: "pointer",
                       fontSize: "0.9rem",
-                      transition: "opacity 0.2s"
+                      transition: "opacity 0.2s",
                     }}
                   >
                     ✏️ Edit
@@ -409,7 +512,7 @@ const OfficerAssets = () => {
                       fontWeight: 600,
                       cursor: "pointer",
                       fontSize: "0.9rem",
-                      transition: "all 0.2s"
+                      transition: "all 0.2s",
                     }}
                   >
                     🗑️ Delete
@@ -422,17 +525,19 @@ const OfficerAssets = () => {
       </div>
 
       {showAddModal && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(4px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1000,
-          padding: "20px"
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+        >
           <div
             style={{
               background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
@@ -441,36 +546,57 @@ const OfficerAssets = () => {
               maxWidth: "500px",
               width: "100%",
               boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
-              animation: "slideUp 0.3s ease-out"
+              animation: "slideUp 0.3s ease-out",
             }}
           >
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "24px",
-              paddingBottom: "16px",
-              borderBottom: "2px solid #f1f5f9"
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, #dbeafe, #bfdbfe)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1.4rem"
-                }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "24px",
+                paddingBottom: "16px",
+                borderBottom: "2px solid #f1f5f9",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
+                <div
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, #dbeafe, #bfdbfe)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.4rem",
+                  }}
+                >
                   {isEditing ? "✏️" : "📦"}
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#1e293b" }}>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: "1.25rem",
+                      fontWeight: 700,
+                      color: "#1e293b",
+                    }}
+                  >
                     {isEditing ? "Edit Asset" : "Add New Asset"}
                   </h3>
-                  <p style={{ margin: "2px 0 0", fontSize: "0.85rem", color: "#94a3b8" }}>
-                    {isEditing ? "Update asset details" : "Register a new ward asset"}
+                  <p
+                    style={{
+                      margin: "2px 0 0",
+                      fontSize: "0.85rem",
+                      color: "#94a3b8",
+                    }}
+                  >
+                    {isEditing
+                      ? "Update asset details"
+                      : "Register a new ward asset"}
                   </p>
                 </div>
               </div>
@@ -488,15 +614,26 @@ const OfficerAssets = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#64748b",
-                  transition: "all 0.2s"
+                  transition: "all 0.2s",
                 }}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit} style={{ display: "grid", gap: "18px" }}>
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: "grid", gap: "18px" }}
+            >
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", color: "#475569", fontWeight: 600 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "8px",
+                    color: "#475569",
+                    fontWeight: 600,
+                  }}
+                >
                   Asset Name
                 </label>
                 <input
@@ -514,12 +651,20 @@ const OfficerAssets = () => {
                     fontSize: "1rem",
                     boxSizing: "border-box",
                     background: "#f8fafc",
-                    transition: "all 0.2s"
+                    transition: "all 0.2s",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", color: "#475569", fontWeight: 600 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "8px",
+                    color: "#475569",
+                    fontWeight: 600,
+                  }}
+                >
                   Asset Type
                 </label>
                 <select
@@ -535,7 +680,7 @@ const OfficerAssets = () => {
                     fontSize: "1rem",
                     boxSizing: "border-box",
                     background: "#f8fafc",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <option value="">Select Type</option>
@@ -548,22 +693,34 @@ const OfficerAssets = () => {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", color: "#475569", fontWeight: 600 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "8px",
+                    color: "#475569",
+                    fontWeight: 600,
+                  }}
+                >
                   Value (Estimated NPR)
                 </label>
                 <div style={{ position: "relative" }}>
-                  <span style={{
-                    position: "absolute",
-                    left: "16px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    fontWeight: 600,
-                    color: "#3b82f6",
-                    background: "#e0e7ff",
-                    padding: "4px 8px",
-                    borderRadius: "6px",
-                    fontSize: "0.85rem"
-                  }}>Rs</span>
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "16px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      fontWeight: 600,
+                      color: "#3b82f6",
+                      background: "#e0e7ff",
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      fontSize: "0.85rem",
+                    }}
+                  >
+                    Rs
+                  </span>
                   <input
                     type="number"
                     name="value"
@@ -577,13 +734,21 @@ const OfficerAssets = () => {
                       border: "2px solid #e2e8f0",
                       fontSize: "1rem",
                       boxSizing: "border-box",
-                      background: "#f8fafc"
+                      background: "#f8fafc",
                     }}
                   />
                 </div>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", color: "#475569", fontWeight: 600 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "8px",
+                    color: "#475569",
+                    fontWeight: 600,
+                  }}
+                >
                   Acquisition Date
                 </label>
                 <input
@@ -598,12 +763,20 @@ const OfficerAssets = () => {
                     border: "2px solid #e2e8f0",
                     fontSize: "1rem",
                     boxSizing: "border-box",
-                    background: "#f8fafc"
+                    background: "#f8fafc",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", color: "#475569", fontWeight: 600 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.85rem",
+                    marginBottom: "8px",
+                    color: "#475569",
+                    fontWeight: 600,
+                  }}
+                >
                   Status
                 </label>
                 <select
@@ -618,7 +791,7 @@ const OfficerAssets = () => {
                     fontSize: "1rem",
                     boxSizing: "border-box",
                     background: "#f8fafc",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <option value="active">✅ Active/Working</option>
@@ -627,7 +800,15 @@ const OfficerAssets = () => {
                   <option value="maintenance">🔧 Under Maintenance</option>
                 </select>
               </div>
-              <div style={{ display: "flex", gap: "12px", marginTop: "8px", paddingTop: "16px", borderTop: "2px solid #f1f5f9" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginTop: "8px",
+                  paddingTop: "16px",
+                  borderTop: "2px solid #f1f5f9",
+                }}
+              >
                 <button
                   type="submit"
                   style={{
@@ -640,7 +821,7 @@ const OfficerAssets = () => {
                     fontWeight: 700,
                     fontSize: "1rem",
                     cursor: "pointer",
-                    boxShadow: "0 4px 14px rgba(59, 130, 246, 0.4)"
+                    boxShadow: "0 4px 14px rgba(59, 130, 246, 0.4)",
                   }}
                 >
                   {isEditing ? "💾 Update Asset" : "📦 Register Asset"}
@@ -657,7 +838,7 @@ const OfficerAssets = () => {
                     color: "#64748b",
                     fontWeight: 600,
                     fontSize: "1rem",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Cancel

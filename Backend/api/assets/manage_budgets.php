@@ -26,6 +26,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 // GET - Fetch budget data for a ward
 if ($method === 'GET') {
     $ward_id = isset($_GET['ward_id']) ? intval($_GET['ward_id']) : 0;
+    $history = isset($_GET['history']) && $_GET['history'] === 'true';
     
     // Officer work location filters
     $work_province = isset($_GET['work_province']) ? $conn->real_escape_string($_GET['work_province']) : null;
@@ -39,7 +40,8 @@ if ($method === 'GET') {
     }
     
     if ($ward_id > 0) {
-        $sql = "SELECT * FROM ward_budgets WHERE ward_id = ? ORDER BY created_at DESC LIMIT 1";
+        $sql = "SELECT * FROM ward_budgets WHERE ward_id = ? ORDER BY created_at DESC";
+        if (!$history) $sql .= " LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ward_id);
     } else {
@@ -73,7 +75,9 @@ if ($method === 'GET') {
             $types .= "i";
         }
         
-        $sql .= " ORDER BY wb.created_at DESC LIMIT 1";
+        $sql .= " ORDER BY wb.created_at DESC";
+        if (!$history) $sql .= " LIMIT 1";
+        
         $stmt = $conn->prepare($sql);
         
         if (!empty($params)) {
@@ -85,16 +89,21 @@ if ($method === 'GET') {
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
-        $budget = $result->fetch_assoc();
-        echo json_encode(["success" => true, "data" => $budget]);
+        if ($history) {
+            $budgets = $result->fetch_all(MYSQLI_ASSOC);
+            echo json_encode(["success" => true, "data" => $budgets]);
+        } else {
+            $budget = $result->fetch_assoc();
+            echo json_encode(["success" => true, "data" => $budget]);
+        }
     } else {
-        echo json_encode(["success" => true, "data" => null]);
+        echo json_encode(["success" => true, "data" => $history ? [] : null]);
     }
     
     $stmt->close();
 }
 
-// POST - Create or update budget
+// POST - Create budget (always Insert for history)
 else if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
     
@@ -119,35 +128,13 @@ else if ($method === 'POST') {
         exit();
     }
     
-    // Check if budget exists for this ward
-    $check_sql = "SELECT id FROM ward_budgets WHERE ward_id = ?";
-    $check_stmt = $conn->prepare($check_sql);
-    $check_stmt->bind_param("i", $ward_id);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
-    
-    if ($check_result->num_rows > 0) {
-        // Update existing budget
-        $sql = "UPDATE ward_budgets SET 
-                total_allocated = ?, 
-                total_spent = ?, 
-                total_beneficiaries = ?, 
-                direct_beneficiaries = ?, 
-                indirect_beneficiaries = ?, 
-                fiscal_year = ?
-                WHERE ward_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ddiiisi", $total_allocated, $total_spent, $total_beneficiaries, 
-                         $direct_beneficiaries, $indirect_beneficiaries, $fiscal_year, $ward_id);
-    } else {
-        // Insert new budget
-        $sql = "INSERT INTO ward_budgets (ward_id, officer_id, total_allocated, total_spent, 
-                total_beneficiaries, direct_beneficiaries, indirect_beneficiaries, fiscal_year) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiddiiis", $ward_id, $officer_id, $total_allocated, $total_spent, 
-                         $total_beneficiaries, $direct_beneficiaries, $indirect_beneficiaries, $fiscal_year);
-    }
+    // Always Insert new budget entry for history
+    $sql = "INSERT INTO ward_budgets (ward_id, officer_id, total_allocated, total_spent, 
+            total_beneficiaries, direct_beneficiaries, indirect_beneficiaries, fiscal_year) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiddiiis", $ward_id, $officer_id, $total_allocated, $total_spent, 
+                     $total_beneficiaries, $direct_beneficiaries, $indirect_beneficiaries, $fiscal_year);
     
     if ($stmt->execute()) {
         // Fetch location details for the notification source safely
@@ -182,7 +169,6 @@ else if ($method === 'POST') {
     }
     
     $stmt->close();
-    $check_stmt->close();
 }
 
 $conn->close();
