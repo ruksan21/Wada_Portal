@@ -14,12 +14,27 @@ if ($ward_id > 0) {
                 r.id, 
                 r.rating, 
                 r.comment, 
+                r.reply_text,
+                r.replied_at,
                 r.created_at, 
                 u.first_name, 
+                u.middle_name,
                 u.last_name,
-                u.photo
+                u.photo,
+                u.role,
+                u.province,
+                u.district,
+                u.city,
+                off.first_name as officer_first_name,
+                off.last_name as officer_last_name,
+                off.photo as officer_photo,
+                off.work_province,
+                off.work_district,
+                off.work_municipality,
+                off.work_ward
             FROM reviews r
             JOIN users u ON r.user_id = u.id
+            LEFT JOIN users off ON r.replied_by_officer_id = off.id
             WHERE r.ward_id = $ward_id
             ORDER BY r.created_at DESC";
     

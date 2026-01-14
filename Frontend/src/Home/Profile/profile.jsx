@@ -498,9 +498,36 @@ const Profile = () => {
                       </div>
                       <div className="reviewer-details">
                         <h4>
-                          {review.first_name} {review.last_name}
+                          {[
+                            review.first_name,
+                            review.middle_name,
+                            review.last_name,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         </h4>
-                        <div className="review-date">
+                        <div
+                          className="reviewer-meta"
+                          style={{ fontSize: "12px", color: "#6b7280" }}
+                        >
+                          <span style={{ textTransform: "capitalize" }}>
+                            {review.role || "Citizen"}
+                          </span>
+                          {review.city && (
+                            <span>
+                              {" "}
+                              • {review.city}, {review.district}
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          className="review-date"
+                          style={{
+                            fontSize: "11px",
+                            color: "#9ca3af",
+                            marginTop: "2px",
+                          }}
+                        >
                           {new Date(review.created_at).toLocaleDateString()}
                         </div>
                       </div>
@@ -510,7 +537,154 @@ const Profile = () => {
                       {"☆".repeat(5 - parseInt(review.rating))}
                     </div>
                   </div>
-                  <p className="review-comment">{review.comment}</p>
+                  <p
+                    className="review-comment"
+                    style={{ marginBottom: "15px" }}
+                  >
+                    {review.comment}
+                  </p>
+
+                  {review.reply_text && (
+                    <div className="official-replies-container">
+                      <details
+                        className="official-replies-details"
+                        style={{ border: "none" }}
+                      >
+                        <summary
+                          style={{
+                            listStyle: "none",
+                            cursor: "pointer",
+                            backgroundColor: "#f3f4f6",
+                            padding: "8px 15px",
+                            borderRadius: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            color: "#4b5563",
+                            width: "fit-content",
+                            transition: "all 0.2s ease",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          <span style={{ fontSize: "16px" }}>💬</span>
+                          Official Replies (1)
+                          <span style={{ fontSize: "10px", marginLeft: "5px" }}>
+                            ▼
+                          </span>
+                        </summary>
+
+                        <div
+                          className="official-reply-card"
+                          style={{
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: "12px",
+                            padding: "15px",
+                            marginTop: "5px",
+                            marginLeft: "10px",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "12px",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                backgroundColor: "#f3f4f6",
+                                overflow: "hidden",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <img
+                                src={
+                                  review.officer_photo
+                                    ? `${API_BASE_URL}/auth/uploads/${review.officer_photo}`
+                                    : "https://i.imgur.com/JQrOMa7.png"
+                                }
+                                alt="Officer"
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                }}
+                                onError={(e) => {
+                                  e.target.src =
+                                    "https://i.imgur.com/JQrOMa7.png";
+                                }}
+                              />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontWeight: "700",
+                                    color: "#111827",
+                                    fontSize: "14px",
+                                  }}
+                                >
+                                  {review.officer_first_name}{" "}
+                                  {review.officer_last_name}
+                                </span>
+                                <span
+                                  style={{
+                                    backgroundColor: "#dbeafe",
+                                    color: "#1e40af",
+                                    fontSize: "10px",
+                                    fontWeight: "800",
+                                    padding: "2px 8px",
+                                    borderRadius: "4px",
+                                    letterSpacing: "0.5px",
+                                  }}
+                                >
+                                  OFFICIAL
+                                </span>
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "11px",
+                                  color: "#6b7280",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                {review.work_municipality}, Ward{" "}
+                                {review.work_ward} •{" "}
+                                {new Date(
+                                  review.replied_at
+                                ).toLocaleDateString()}
+                              </div>
+                              <p
+                                style={{
+                                  marginTop: "10px",
+                                  color: "#374151",
+                                  fontSize: "14px",
+                                  lineHeight: "1.5",
+                                  margin: "10px 0 0",
+                                }}
+                              >
+                                {review.reply_text}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  )}
                 </div>
               ))
             )}

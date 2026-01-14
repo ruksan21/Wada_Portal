@@ -9,10 +9,9 @@ const OfficerDashboard = () => {
   const { getOfficerWorkLocation, user } = useAuth();
   const workLocation = getOfficerWorkLocation();
   const [wardExists, setWardExists] = useState(null);
-  const [complaints, setComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [complaints, setComplaints] = useState([]); // Removed
+  // const [loading, setLoading] = useState(true); // Removed
   const [stats, setStats] = useState([
-    { label: "New Applications", value: "0", icon: "📝" },
     { label: "Pending Complaints", value: "0", icon: "📢" },
     { label: "Ward Population", value: "-", icon: "👥" },
   ]);
@@ -54,7 +53,7 @@ const OfficerDashboard = () => {
           const complaintsData = await complaintsRes.json();
 
           if (Array.isArray(complaintsData)) {
-            setComplaints(complaintsData.slice(0, 5)); // Show latest 5
+            // setComplaints(complaintsData.slice(0, 5)); // Removed
 
             // 3. Update Stats
             const pendingCount = complaintsData.filter(
@@ -68,7 +67,6 @@ const OfficerDashboard = () => {
             }
 
             setStats([
-              { label: "New Applications", value: "0", icon: "📝" },
               {
                 label: "Pending Complaints",
                 value: pendingCount.toString(),
@@ -84,8 +82,6 @@ const OfficerDashboard = () => {
           }
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
-        } finally {
-          setLoading(false);
         }
       }
     };
@@ -168,33 +164,7 @@ const OfficerDashboard = () => {
         ))}
       </div>
 
-      <div className="recent-activity">
-        <h2 className="section-title">Pending Tasks (Latest Complaints)</h2>
-        <div className="tasks-list">
-          {loading ? (
-            <p>Loading tasks...</p>
-          ) : complaints.length === 0 ? (
-            <p className="no-data">No pending tasks found.</p>
-          ) : (
-            complaints.map((complaint) => (
-              <div key={complaint.id} className="task-item">
-                <div className="task-info">
-                  <h4>{complaint.subject}</h4>
-                  <p>
-                    Submitted by {complaint.complainant} • {complaint.status}
-                  </p>
-                </div>
-                <button
-                  className="task-review-btn"
-                  onClick={() => (window.location.href = "/officer/complaints")}
-                >
-                  Review
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+      {/* Recent activity section removed as per user request */}
     </OfficerLayout>
   );
 };

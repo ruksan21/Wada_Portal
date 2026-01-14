@@ -919,19 +919,16 @@ const OfficerManagement = () => {
       <div className="table-container">
         <div className="table-header-actions">
           <div className="header-text">
-            <h2 className="section-title">Pending Officer Applications</h2>
+            <h2 className="section-title">
+              <span style={{ marginRight: "10px" }}>👥</span>
+              Pending Officer Applications
+            </h2>
             <span className="pending-count">
               {pendingOfficers.length} applicants waiting for review
             </span>
           </div>
           <div className="header-buttons">
-            <button
-              className="btn-refresh"
-              onClick={() => fetchPendingOfficers && fetchPendingOfficers()}
-              title="Refresh List"
-            >
-              🔄 Refresh
-            </button>
+            {/* Refresh button removed as per user request */}
             <button
               className="btn-primary"
               onClick={() => {

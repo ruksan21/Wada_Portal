@@ -26,6 +26,7 @@ const OfficerLayout = ({ children, title }) => {
     { path: "/officer/notices", label: "Notices", icon: "📌" },
     { path: "/officer/activities", label: "Activities", icon: "📅" },
     { path: "/officer/social-media", label: "Social Media", icon: "🌐" },
+    { path: "/officer/reviews", label: "Public Reviews", icon: "⭐" },
   ];
 
   return (

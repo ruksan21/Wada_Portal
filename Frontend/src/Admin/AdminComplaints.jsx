@@ -10,17 +10,28 @@ const AdminComplaints = () => {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
-    // Fetch specific Admin complaints or all complaints if needed
-    // For now, mocking or fetching all if API supports it
+    // Fetch all complaints for admin view
     const fetchComplaints = async () => {
       try {
-        const res = await fetch(
-          `${API_ENDPOINTS.communication.getComplaints}?source=admin_view`
-        );
+        const res = await fetch(`${API_ENDPOINTS.communication.getComplaints}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.success && Array.isArray(data.complaints)) {
-            setComplaints(data.complaints);
+          console.log("Admin complaints API response:", data);
+          if (data.success && Array.isArray(data.data)) {
+            // Filter and map only officer complaints
+            const officerComplaints = data.data
+              .filter((c) => c.user_role === "officer")
+              .map((c) => ({
+                ...c,
+                complainant:
+                  c.first_name && c.last_name
+                    ? `${c.first_name} ${c.last_name}`
+                    : c.complainant_name || c.complainant_email || "Anonymous",
+                subject: c.subject || c.title || "No Subject",
+                message: c.message || c.description || "",
+                priority: c.priority || "Medium",
+              }));
+            setComplaints(officerComplaints);
           }
         }
       } catch (error) {

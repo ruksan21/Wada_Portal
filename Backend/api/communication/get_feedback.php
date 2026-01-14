@@ -15,12 +15,13 @@ if ($work_id === 0) {
     exit();
 }
 
-// Fetch comments with user details
+// Fetch comments with user details and reply count
 $sql = "SELECT 
     wf.*,
     u.first_name, u.last_name, u.role as user_role,
     u.photo as user_photo,
-    u.email as user_email
+    u.email as user_email,
+    (SELECT COUNT(*) FROM feedback_replies WHERE feedback_id = wf.id) as reply_count
 FROM `work_feedback` wf
 LEFT JOIN users u ON wf.user_id = u.id
 WHERE wf.work_id = ? 
@@ -53,6 +54,7 @@ while ($row = $result->fetch_assoc()) {
         'user_email' => $row['user_email'],
         'rating' => (int)$row['rating'],
         'comment' => $row['comment'],
+        'reply_count' => (int)$row['reply_count'],
         'created_at' => $row['created_at']
     ];
     if ($row['rating'] > 0) {

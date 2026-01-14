@@ -9,34 +9,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once '../db_connect.php';
+try {
+    require_once '../db_connect.php';
 
-// Fetch all users ordered by creation date (id)
-// We might want to exclude pending officers if they are shown elsewhere, but usually 'User Management' shows active users.
-// For now, fetching everything. Frontend can filter.
-// Check if a specific ID is requested
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $stmt = $conn->prepare("SELECT id, first_name, middle_name, last_name, email, contact_number, role, status, 
-          ward_number, officer_id, department, work_province, work_district, work_municipality, work_ward, work_ward_id, work_office_location, gender, dob, 
-          province, district, city, citizenship_number, created_at, photo 
-          FROM users WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-} else {
-    // Fetch all users ordered by creation date (id)
-    $query = "SELECT id, first_name, middle_name, last_name, email, contact_number, role, status, 
-          ward_number, officer_id, department, work_province, work_district, work_municipality, work_ward, work_ward_id, work_office_location, gender, dob, 
-          province, district, city, citizenship_number, created_at, photo 
-          FROM users 
-          ORDER BY id DESC";
-    $result = $conn->query($query);
-}
+    // Check if a specific ID is requested
+    if (isset($_GET['id'])) {
+        $id = intval($_GET['id']);
+        $stmt = $conn->prepare("SELECT id, first_name, middle_name, last_name, email, contact_number, role, status, 
+              ward_number, officer_id, department, work_province, work_district, work_municipality, work_ward, work_office_location, gender, dob, 
+              province, district, city, citizenship_number, created_at, photo 
+              FROM users WHERE id = ?");
+        
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        // Fetch all users ordered by creation date (id)
+        $query = "SELECT id, first_name, middle_name, last_name, email, contact_number, role, status, 
+              ward_number, officer_id, department, work_province, work_district, work_municipality, work_ward, work_office_location, gender, dob, 
+              province, district, city, citizenship_number, created_at, photo 
+              FROM users 
+              ORDER BY id DESC";
+        $result = $conn->query($query);
+        
+        if (!$result) {
+            throw new Exception("Query failed: " . $conn->error);
+        }
+    }
 
-if ($result) {
-    echo json_encode(array("success" => true, "data" => $result->fetch_all(MYSQLI_ASSOC)));
-} else {
-    echo json_encode(array("success" => false, "message" => "Database Error: " . $conn->error));
+    if ($result) {
+        $users = $result->fetch_all(MYSQLI_ASSOC);
+        echo json_encode(array("success" => true, "data" => $users));
+    } else {
+        echo json_encode(array("success" => false, "message" => "No results found"));
+    }
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(array(
+        "success" => false, 
+        "message" => "Server Error: " . $e->getMessage()
+    ));
 }
 ?>

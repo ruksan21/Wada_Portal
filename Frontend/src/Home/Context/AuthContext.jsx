@@ -31,36 +31,67 @@ export const AuthProvider = ({ children }) => {
 
   // Data Fetching Functions
   const fetchAllUsers = async () => {
+    console.log(
+      "🔍 [AuthContext] Fetching all users from:",
+      API_ENDPOINTS.users.getAll
+    );
     try {
       const response = await fetchWithTimeout(API_ENDPOINTS.users.getAll);
       const data = await response.json();
+      console.log("📦 [AuthContext] Users API response:", data);
       if (data.success) {
         // Map created_at to joinedDate for frontend calculations
         const formattedUsers = data.data.map((u) => ({
           ...u,
           joinedDate: u.created_at || u.joinedDate,
         }));
+        console.log(
+          "✅ [AuthContext] Setting",
+          formattedUsers.length,
+          "users to state"
+        );
         setAllUsers(formattedUsers);
+      } else {
+        console.warn(
+          "⚠️ [AuthContext] API returned success=false:",
+          data.message
+        );
+        setAllUsers([]);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("❌ [AuthContext] Error fetching users:", error);
       // Set empty array on error to prevent blocking
       setAllUsers([]);
     }
   };
 
   const fetchPendingOfficers = async () => {
+    console.log(
+      "🔍 [AuthContext] Fetching pending officers from:",
+      API_ENDPOINTS.users.getPendingOfficers
+    );
     try {
       const response = await fetchWithTimeout(
-        `${API_ENDPOINTS.users.getPendingOfficers}?t=${Date.now()}`
-      ); // Added cache buster
+        API_ENDPOINTS.users.getPendingOfficers
+      );
       const data = await response.json();
+      console.log("📦 [AuthContext] Pending officers API response:", data);
       if (data.success) {
+        console.log(
+          "✅ [AuthContext] Setting",
+          data.data.length,
+          "pending officers to state"
+        );
         setPendingOfficers(data.data);
+      } else {
+        console.warn(
+          "⚠️ [AuthContext] API returned success=false:",
+          data.message
+        );
+        setPendingOfficers([]);
       }
     } catch (error) {
-      console.error("Error fetching pending officers:", error);
-      // Set empty array on error to prevent blocking
+      console.error("❌ [AuthContext] Error fetching pending officers:", error);
       setPendingOfficers([]);
     }
   };
@@ -528,6 +559,7 @@ export const AuthProvider = ({ children }) => {
     createOfficer,
     updateWard,
     refreshWards, // Exposed function
+    fetchAllUsers, // Exposed function for Admin
     fetchPendingOfficers, // Exposed function
     getSystemStats,
     addNotification,

@@ -96,6 +96,16 @@ const CommentSection = ({ workId }) => {
       if (data.success) {
         showNotification("success", "✓ Reply posted successfully!");
         setReplyText((prev) => ({ ...prev, [commentId]: "" }));
+
+        // Update reply count in local state
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === commentId
+              ? { ...c, reply_count: (c.reply_count || 0) + 1 }
+              : c
+          )
+        );
+
         // Reload replies
         fetchReplies(commentId);
       } else {
@@ -372,7 +382,7 @@ const CommentSection = ({ workId }) => {
               <p className="comment-text">{c.comment}</p>
 
               {/* Replies Section */}
-              {(replies[c.id]?.length > 0 || user?.role === "officer") && (
+              {(c.reply_count > 0 || user?.role === "officer") && (
                 <div className="replies-section">
                   <button
                     className="expand-replies-btn"
@@ -381,8 +391,8 @@ const CommentSection = ({ workId }) => {
                     <span className="reply-toggle-icon">
                       {expandedComments[c.id] ? "💬" : "🗨️"}
                     </span>
-                    {replies[c.id]?.length > 0
-                      ? `Official Replies (${replies[c.id].length})`
+                    {c.reply_count > 0
+                      ? `Official Replies (${c.reply_count})`
                       : "Add Official Response"}
                     <span
                       className={`reply-arrow ${

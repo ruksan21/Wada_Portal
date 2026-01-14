@@ -4,13 +4,7 @@ import { useAuth } from "../Home/Context/AuthContext";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
-  const {
-    allUsers,
-    pendingOfficers,
-    fetchAllUsers,
-    fetchPendingOfficers,
-    refreshWards,
-  } = useAuth();
+  const { allUsers, pendingOfficers } = useAuth();
   // recentComplaints removed as per cleanup request
 
   // Calculate stats
@@ -89,38 +83,6 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Dashboard">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}
-      >
-        <button
-          className="btn-refresh-dashboard"
-          onClick={async () => {
-            const btn = document.querySelector(".btn-refresh-dashboard");
-            btn.innerText = "⌛ Refreshing...";
-            await Promise.all([
-              fetchAllUsers && fetchAllUsers(),
-              fetchPendingOfficers && fetchPendingOfficers(),
-              refreshWards && refreshWards(),
-            ]);
-            btn.innerText = "🔄 Refresh";
-          }}
-          style={{
-            padding: "8px 16px",
-            background: "rgba(99, 102, 241, 0.1)",
-            color: "#6366f1",
-            border: "1px solid #6366f1",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          🔄 Refresh
-        </button>
-      </div>
       {/* Premium Stats Grid */}
       <div className="stats-grid-premium">
         {stats.map((stat, index) => (

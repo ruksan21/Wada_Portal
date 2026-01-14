@@ -9,25 +9,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once '../db_connect.php';
+try {
+    require_once '../db_connect.php';
 
-// Pending officer haru matra select gareko
-$query = "SELECT * 
-          FROM users 
-          WHERE role = 'officer' AND status = 'pending'
-          ORDER BY created_at DESC";
+    // Pending officer haru matra select gareko
+    $query = "SELECT * 
+              FROM users 
+              WHERE role = 'officer' AND status = 'pending'
+              ORDER BY created_at DESC";
 
-$result = $conn->query($query);
+    $result = $conn->query($query);
 
-$officers = array();
-
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        // Name concat gareko frontend matching ko lagi
-        $row['name'] = $row['first_name'] . ($row['middle_name'] ? " " . $row['middle_name'] : "") . " " . $row['last_name'];
-        $officers[] = $row;
+    if (!$result) {
+        throw new Exception("Query failed: " . $conn->error);
     }
-}
 
-echo json_encode(array("success" => true, "data" => $officers));
+    $officers = array();
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            // Name concat gareko frontend matching ko lagi
+            $row['name'] = $row['first_name'] . ($row['middle_name'] ? " " . $row['middle_name'] : "") . " " . $row['last_name'];
+            $officers[] = $row;
+        }
+    }
+
+    echo json_encode(array("success" => true, "data" => $officers));
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(array(
+        "success" => false, 
+        "message" => "Server Error: " . $e->getMessage()
+    ));
+}
 ?>

@@ -9,6 +9,7 @@ import OfficerComplaints from "./OfficerComplaints";
 import OfficerAssets from "./OfficerAssets";
 import OfficerActivities from "./OfficerActivities";
 import OfficerSocialMedia from "./OfficerSocialMedia";
+import OfficerReviews from "./OfficerReviews";
 
 const OfficerRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const OfficerRoutes = () => {
       <Route path="notices" element={<OfficerNotices />} />
       <Route path="activities" element={<OfficerActivities />} />
       <Route path="social-media" element={<OfficerSocialMedia />} />
+      <Route path="reviews" element={<OfficerReviews />} />
     </Routes>
   );
 };

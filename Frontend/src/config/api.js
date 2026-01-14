@@ -14,9 +14,11 @@ export const API_ENDPOINTS = {
     getAll: `${BASE_URL}/users/get_users.php`,
     delete: `${BASE_URL}/users/delete_user.php`,
     update: `${BASE_URL}/users/update_user.php`,
+    updatePhoto: `${BASE_URL}/users/update_profile_photo.php`,
     changePassword: `${BASE_URL}/users/change_password.php`,
     getPendingOfficers: `${BASE_URL}/users/get_pending_officers.php`,
     updateOfficerStatus: `${BASE_URL}/users/update_officer_status.php`,
+    getActivity: `${BASE_URL}/users/get_user_activity.php`,
   },
 
   // Ward Management
@@ -76,6 +78,7 @@ export const API_ENDPOINTS = {
     addReview: `${BASE_URL}/communication/add_review.php`,
     getReplies: `${BASE_URL}/communication/get_replies.php`,
     addReply: `${BASE_URL}/communication/add_reply.php`,
+    addReviewReply: `${BASE_URL}/communication/add_review_reply.php`,
   },
 
   // Alerts & Notices
