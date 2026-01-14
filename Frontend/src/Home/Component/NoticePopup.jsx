@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./NoticePopup.css";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 import { useWard } from "../Context/WardContext";
+import { useLocation } from "react-router-dom";
 
 const NoticePopup = ({ notice: propNotice, onClose }) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -10,6 +11,11 @@ const NoticePopup = ({ notice: propNotice, onClose }) => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { wardId } = useWard();
+  const location = useLocation();
+
+  // Swipe gesture state
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Handle automatic mode vs specific notice mode
   useEffect(() => {
@@ -49,7 +55,7 @@ const NoticePopup = ({ notice: propNotice, onClose }) => {
     fetchAndShowNotices();
     const interval = setInterval(fetchAndShowNotices, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [wardId, propNotice]);
+  }, [wardId, propNotice, location.pathname]);
 
   const handleClose = () => {
     if (!propNotice && notices.length > 0) {
@@ -73,6 +79,36 @@ const NoticePopup = ({ notice: propNotice, onClose }) => {
 
     setShowPopup(false);
     if (onClose) onClose();
+  };
+
+  // Minimum swipe distance (in px) to trigger navigation
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentIndex < notices.length - 1) {
+      // Swipe left - next notice
+      setCurrentIndex((prev) => prev + 1);
+    }
+
+    if (isRightSwipe && currentIndex > 0) {
+      // Swipe right - previous notice
+      setCurrentIndex((prev) => prev - 1);
+    }
   };
 
   const getFileUrl = (path) => {
@@ -172,8 +208,12 @@ const NoticePopup = ({ notice: propNotice, onClose }) => {
 
   return (
     <>
-      <div className="notice-popup-overlay" onClick={handleClose}></div>
-      <div className="notice-popup-container">
+      <div
+        className="notice-popup-overlay"
+        onClick={handleClose}
+        style={{ zIndex: 99999 }}
+      ></div>
+      <div className="notice-popup-container" style={{ zIndex: 100000 }}>
         <div className="notice-popup-header-bar">
           <div className="notice-popup-badge">Public Notice</div>
           <button
@@ -185,7 +225,12 @@ const NoticePopup = ({ notice: propNotice, onClose }) => {
           </button>
         </div>
 
-        <div className="notice-popup-body">
+        <div
+          className="notice-popup-body"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           <h2 className="notice-card-title">{currentNotice.title}</h2>
 
           <div className="notice-meta">

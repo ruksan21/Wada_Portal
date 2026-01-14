@@ -2,8 +2,21 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET");
+
+// Capture errors and return as JSON
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
+
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "message" => "PHP Error: $errstr",
+        "file" => basename($errfile),
+        "line" => $errline
+    ]);
+    exit();
+});
 
 require_once '../db_connect.php';
 
@@ -14,8 +27,6 @@ if ($ward_id > 0) {
                 r.id, 
                 r.rating, 
                 r.comment, 
-                r.reply_text,
-                r.replied_at,
                 r.created_at, 
                 u.first_name, 
                 u.middle_name,
@@ -24,21 +35,24 @@ if ($ward_id > 0) {
                 u.role,
                 u.province,
                 u.district,
-                u.city,
-                off.first_name as officer_first_name,
-                off.last_name as officer_last_name,
-                off.photo as officer_photo,
-                off.work_province,
-                off.work_district,
-                off.work_municipality,
-                off.work_ward
+                u.city
             FROM reviews r
             JOIN users u ON r.user_id = u.id
-            LEFT JOIN users off ON r.replied_by_officer_id = off.id
-            WHERE r.ward_id = $ward_id
+            WHERE r.ward_id = ?
             ORDER BY r.created_at DESC";
     
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        echo json_encode([
+            "success" => false,
+            "message" => "SQL prepare failed: " . $conn->error
+        ]);
+        exit();
+    }
+    
+    $stmt->bind_param("i", $ward_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
     
     $reviews = [];
     if ($result && $result->num_rows > 0) {
@@ -50,18 +64,24 @@ if ($ward_id > 0) {
     }
     
     // Calculate average
-    $avgSql = "SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews FROM reviews WHERE ward_id = $ward_id";
-    $avgResult = $conn->query($avgSql);
+    $avgSql = "SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews FROM reviews WHERE ward_id = ?";
+    $avgStmt = $conn->prepare($avgSql);
+    $avgStmt->bind_param("i", $ward_id);
+    $avgStmt->execute();
+    $avgResult = $avgStmt->get_result();
     $stats = $avgResult->fetch_assoc();
     
     echo json_encode([
         "success" => true, 
         "data" => $reviews,
         "stats" => [
-            "rating" => round($stats['avg_rating'], 1) ?? 0,
+            "rating" => $stats['avg_rating'] ? round($stats['avg_rating'], 1) : 0,
             "count" => $stats['total_reviews'] ?? 0
         ]
     ]);
+    
+    $stmt->close();
+    $avgStmt->close();
 } else {
     echo json_encode(["success" => false, "message" => "Ward ID required"]);
 }
