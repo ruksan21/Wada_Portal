@@ -47,10 +47,22 @@
 
 .profile-header-contact {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   font-size: 14px;
-  color: #6b7280;
-  margin-top: 8px;
+  color: #4b5563;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.profile-header-contact span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3f4f6;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
 }
 
 .profile-header-right {
@@ -459,5 +471,106 @@ h2 {
   .review-form-card {
     position: static;
     margin-bottom: 24px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .profile-header-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .info-section {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    margin: 10px;
+    border-radius: 8px;
+  }
+
+  .profile-header {
+    padding: 16px;
+  }
+
+  .profile-picture {
+    width: 60px;
+    height: 60px;
+    margin-right: 12px;
+  }
+
+  .profile-name-role h1 {
+    font-size: 18px;
+  }
+
+  .profile-name-role p {
+    font-size: 12px;
+  }
+
+  .profile-header-contact {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-body {
+    padding: 16px;
+  }
+
+  .tab-item {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .activity-item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .review-card {
+    padding: 14px;
+  }
+
+  .reviewer-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .follow-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .download-button {
+    padding: 10px 14px;
+    font-size: 14px;
   }
 }

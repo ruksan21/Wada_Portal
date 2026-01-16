@@ -243,3 +243,81 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 16px;
+  }
+
+  .budget-card {
+    padding: 18px;
+    min-height: 120px;
+  }
+
+  .budget-amount {
+    font-size: 1.5rem;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .progress-row {
+    grid-template-columns: 100px 1fr 40px;
+    gap: 8px;
+  }
+
+  .beneficiary-sub {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-page {
+    padding: 12px;
+  }
+
+  .budget-card {
+    padding: 14px;
+  }
+
+  .budget-title {
+    font-size: 0.8rem;
+  }
+
+  .budget-amount {
+    font-size: 1.3rem;
+  }
+
+  .budget-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .panel-title {
+    font-size: 1rem;
+  }
+
+  .progress-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .progress-label {
+    font-size: 13px;
+  }
+
+  .beneficiaries .beneficiary-total {
+    font-size: 2rem;
+  }
+
+  .beneficiary-count {
+    font-size: 1.2rem;
+  }
+
+  .beneficiary-sub {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

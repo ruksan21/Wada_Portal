@@ -416,3 +416,122 @@
     opacity: 1;
   }
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .comment-section-fb {
+    padding: 14px;
+  }
+
+  .fb-header h3 {
+    font-size: 18px;
+  }
+
+  .fb-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fb-avatar-small {
+    width: 32px;
+    height: 32px;
+  }
+
+  .fb-avatar-xs {
+    width: 24px;
+    height: 24px;
+  }
+
+  .fb-bubble {
+    padding: 8px 12px;
+  }
+
+  .fb-text {
+    font-size: 14px;
+  }
+
+  .fb-action-bar {
+    gap: 12px;
+    font-size: 11px;
+  }
+
+  .fb-nested-replies {
+    margin-left: 36px;
+  }
+
+  .fb-reply-input-row {
+    margin-left: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comment-section-fb {
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .fb-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .fb-header h3 {
+    font-size: 16px;
+  }
+
+  .fb-composer-inner {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .fb-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .fb-textarea {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .fb-submit-btn {
+    width: 100%;
+    padding: 10px 14px;
+  }
+
+  .fb-user-name {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .fb-text {
+    font-size: 13px;
+  }
+
+  .fb-action-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fb-action-btn {
+    font-size: 11px;
+  }
+
+  .fb-nested-replies {
+    margin-left: 24px;
+  }
+
+  .fb-reply-input-row {
+    margin-left: 24px;
+  }
+
+  .fb-reply-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fb-reply-action-btn {
+    font-size: 10px;
+  }
+}
