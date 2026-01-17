@@ -9,9 +9,11 @@ import Notification from "../Component/Notification.jsx";
 import HeroSection from "../Pages/HeroSection.jsx";
 import Status from "../Pages/Status.jsx";
 import { useWard } from "../Context/WardContext.jsx";
+// import { useAuth } from "../Context/AuthContext.jsx";
 
 const Navbar = ({ showHomeContent = false }) => {
   const { municipality, ward } = useWard();
+  // const { user } = useAuth(); // User no longer needed for notification logic
 
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -63,7 +65,42 @@ const Navbar = ({ showHomeContent = false }) => {
         {/* Right Section - Ward Selector, Notification, User Menu */}
         <div className="navbar-right">
           <WardSelector />
-          <Notification />
+
+          {/* Language Toggle */}
+          <button
+            className="lang-toggle-btn"
+            onClick={() => {
+              const newLang =
+                localStorage.getItem("app_lang") === "NP" ? "EN" : "NP";
+              localStorage.setItem("app_lang", newLang);
+              window.dispatchEvent(new Event("storage")); // Trigger update if needed
+              // Force update for demo
+              const btn = document.querySelector(".lang-toggle-text");
+              if (btn) btn.innerText = newLang;
+            }}
+            style={{
+              background: "none",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              padding: "6px 12px",
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+          >
+            <span
+              className="lang-toggle-text"
+              style={{ fontSize: "14px", fontWeight: "600", color: "#4a5568" }}
+            >
+              {localStorage.getItem("app_lang") === "NP" ? "NP" : "EN"}
+            </span>
+            <i
+              className="fa-solid fa-globe"
+              style={{ marginLeft: "8px", color: "#718096" }}
+            ></i>
+          </button>
+
           <UserMenu />
 
           {/* Hamburger Menu Icon (Mobile Only) */}

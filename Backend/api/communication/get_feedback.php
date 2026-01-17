@@ -16,6 +16,8 @@ if ($work_id === 0) {
     exit();
 }
 
+$current_user_id = isset($_GET['current_user_id']) ? intval($_GET['current_user_id']) : 0;
+
 // 1. Ensure feedback_replies table exists
 $check_replies = $conn->query("SHOW TABLES LIKE 'feedback_replies'");
 if ($check_replies->num_rows === 0) {
@@ -32,18 +34,20 @@ if ($check_replies->num_rows === 0) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 
-// 2. Ensure feedback_votes table exists
-$check_votes = $conn->query("SHOW TABLES LIKE 'feedback_votes'");
-if ($check_votes->num_rows === 0) {
-    $conn->query("CREATE TABLE `feedback_votes` (
+// 2. Ensure feedback_reactions table exists
+$check_reactions = $conn->query("SHOW TABLES LIKE 'feedback_reactions'");
+if ($check_reactions->num_rows === 0) {
+    $conn->query("CREATE TABLE `feedback_reactions` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `feedback_id` INT DEFAULT NULL,
         `review_id` INT DEFAULT NULL,
+        `reply_id` INT DEFAULT NULL,
         `user_id` INT NOT NULL,
-        `vote_type` TINYINT NOT NULL COMMENT '1 for like, -1 for dislike',
+        `reaction_type` VARCHAR(20) DEFAULT 'like',
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY `idx_user_feedback` (`user_id`, `feedback_id`),
-        UNIQUE KEY `idx_user_review` (`user_id`, `review_id`)
+        KEY `idx_feedback_id` (`feedback_id`),
+        KEY `idx_review_id` (`review_id`),
+        KEY `idx_reply_id` (`reply_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 
@@ -67,10 +71,10 @@ $sql = "SELECT
     u.first_name, u.last_name, u.role as user_role,
     u.photo as user_photo,
     u.email as user_email,
-    (SELECT COUNT(*) FROM feedback_replies WHERE feedback_id = wf.id) as reply_count,
-    (SELECT COUNT(*) FROM feedback_votes WHERE feedback_id = wf.id AND vote_type = 1) as likes,
-    (SELECT COUNT(*) FROM feedback_votes WHERE feedback_id = wf.id AND vote_type = -1) as dislikes
-    " . ($current_user_id > 0 ? ", (SELECT vote_type FROM feedback_votes WHERE feedback_id = wf.id AND user_id = $current_user_id) as user_vote" : ", 0 as user_vote") . "
+    (SELECT COUNT(*) FROM feedback_reactions WHERE feedback_id = wf.id) as likes,
+    (SELECT COUNT(*) FROM feedback_reactions WHERE feedback_id = wf.id AND reaction_type = 'dislike') as dislikes,
+    (SELECT COUNT(*) FROM feedback_replies WHERE feedback_id = wf.id) as reply_count
+    " . ($current_user_id > 0 ? ", (SELECT reaction_type FROM feedback_reactions WHERE feedback_id = wf.id AND user_id = $current_user_id LIMIT 1) as user_reaction" : ", NULL as user_reaction") . "
 FROM `work_feedback` wf
 LEFT JOIN users u ON wf.user_id = u.id
 WHERE wf.work_id = ? 
@@ -109,13 +113,24 @@ while ($row = $result->fetch_assoc()) {
         'reply_count' => (int)$row['reply_count'],
         'likes' => (int)$row['likes'],
         'dislikes' => (int)$row['dislikes'],
-        'user_vote' => (int)$row['user_vote'],
+        'user_reaction' => $row['user_reaction'] ?? null,
         'created_at' => $row['created_at'],
         // Legacy Support
         'reply_text' => $row['reply_text'] ?? null,
         'replied_by_officer_id' => $row['replied_by_officer_id'] ?? null,
-        'replied_at' => $row['replied_at'] ?? null
+        'replied_at' => $row['replied_at'] ?? null,
+        'reaction_breakdown' => []
     ];
+
+    // Fetch Reaction Breakdown
+    $reaction_sql = "SELECT reaction_type, COUNT(*) as count FROM feedback_reactions WHERE feedback_id = " . $row['id'] . " GROUP BY reaction_type";
+    $reaction_res = $conn->query($reaction_sql);
+    if ($reaction_res && $reaction_res->num_rows > 0) {
+        while ($r_row = $reaction_res->fetch_assoc()) {
+            $comments[count($comments)-1]['reaction_breakdown'][$r_row['reaction_type']] = intval($r_row['count']);
+        }
+    }
+
     if ($row['rating'] > 0) {
         $total_rating += $row['rating'];
         $count++;

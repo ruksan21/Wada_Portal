@@ -21,6 +21,8 @@ $avg_rating = 0;
 $review_count = 0;
 $total_works = 0;
 $completed_works = 0;
+$ongoing_works = 0;
+$total_budget = 0;
 
 // 1. Follower Count
 if ($ward_id && $ward_id !== '0') {
@@ -76,24 +78,42 @@ if ($ward_id && $ward_id !== '0') {
         $wn = (int)$ward_data['ward_number'];
         $mun = $conn->real_escape_string($ward_data['municipality']);
         
-        $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` dw 
+        $res = $conn->query("SELECT COUNT(*) as count, SUM(REPLACE(REPLACE(budget, 'Rs.', ''), ',', '')) as total_budget FROM `development_works` dw 
                             JOIN `users` u ON dw.officer_id = u.id 
                             WHERE u.work_ward = $wn AND u.work_municipality = '$mun'");
-        $total_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
+        if ($res) {
+            $row = $res->fetch_assoc();
+            $total_works = (int)$row['count'];
+            $total_budget = (float)$row['total_budget'];
+        }
         
         $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` dw 
                             JOIN `users` u ON dw.officer_id = u.id 
                             WHERE u.work_ward = $wn AND u.work_municipality = '$mun' 
-                            AND (LOWER(dw.status) = 'completed' OR LOWER(dw.status) = 'success')");
+                            AND (LOWER(REPLACE(dw.status, '-', '')) = 'completed' OR LOWER(REPLACE(dw.status, '-', '')) = 'success')");
         $completed_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
+
+        $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` dw 
+                            JOIN `users` u ON dw.officer_id = u.id 
+                            WHERE u.work_ward = $wn AND u.work_municipality = '$mun' 
+                            AND (LOWER(REPLACE(dw.status, '-', '')) = 'ongoing')");
+        $ongoing_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
     }
 } elseif ($officer_id > 0) {
-    $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` WHERE officer_id = $officer_id");
-    $total_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
+    $res = $conn->query("SELECT COUNT(*) as count, SUM(REPLACE(REPLACE(budget, 'Rs.', ''), ',', '')) as total_budget FROM `development_works` WHERE officer_id = $officer_id");
+    if ($res) {
+        $row = $res->fetch_assoc();
+        $total_works = (int)$row['count'];
+        $total_budget = (float)$row['total_budget'];
+    }
 
-    $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` WHERE officer_id = $officer_id AND (LOWER(status) = 'completed' OR LOWER(status) = 'success')");
+    $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` WHERE officer_id = $officer_id AND (LOWER(REPLACE(status, '-', '')) = 'completed' OR LOWER(REPLACE(status, '-', '')) = 'success')");
     $completed_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
+
+    $res = $conn->query("SELECT COUNT(*) as count FROM `development_works` WHERE officer_id = $officer_id AND (LOWER(REPLACE(status, '-', '')) = 'ongoing')");
+    $ongoing_works = $res ? (int)$res->fetch_assoc()['count'] : 0;
 }
+
 
 echo json_encode([
     "success" => true,
@@ -102,6 +122,8 @@ echo json_encode([
     "reviews" => $review_count,
     "totalWorks" => $total_works,
     "completedWorks" => $completed_works,
+    "ongoingWorks" => $ongoing_works,
+    "totalBudget" => $total_budget,
     "isFollowing" => $isFollowing
 ]);
 

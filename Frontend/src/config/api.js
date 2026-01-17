@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
     update: `${BASE_URL}/works/update_work.php`,
     getAll: `${BASE_URL}/works/get_works.php`,
     delete: `${BASE_URL}/works/delete_work.php`,
+    toggleLike: `${BASE_URL}/works/toggle_work_like.php`,
   },
 
   // Communication
@@ -81,6 +82,10 @@ export const API_ENDPOINTS = {
     addReviewReply: `${BASE_URL}/communication/add_review_reply.php`,
     deleteReview: `${BASE_URL}/communication/delete_review.php`,
     toggleVote: `${BASE_URL}/communication/toggle_vote.php`,
+    deleteFeedback: `${BASE_URL}/communication/delete_feedback.php`,
+    updateFeedback: `${BASE_URL}/communication/update_feedback.php`,
+    deleteReply: `${BASE_URL}/communication/delete_reply.php`,
+    updateReply: `${BASE_URL}/communication/update_reply.php`,
   },
 
   // Alerts & Notices

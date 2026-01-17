@@ -4,8 +4,38 @@ import { useWard } from "../Context/WardContext";
 import CommentSection from "../Component/CommentSection";
 import "./Works.css";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
+import { useAuth } from "../Context/AuthContext";
+import { toast } from "react-toastify";
 
 const WorkCard = ({ work }) => {
+  const { user } = useAuth();
+  const [likes, setLikes] = useState(parseInt(work.likes_count) || 0);
+  const [isLiked, setIsLiked] = useState(work.user_liked > 0);
+  const [userReaction, setUserReaction] = useState(work.user_reaction);
+  const [reactionBreakdown, setReactionBreakdown] = useState(
+    work.reaction_breakdown || {}
+  );
+  const [showComments, setShowComments] = useState(false);
+
+  // Sync props to state (crucial for when list refreshes or component is reused)
+  useEffect(() => {
+    setLikes(parseInt(work.likes_count) || 0);
+    setIsLiked(work.user_liked > 0);
+    setUserReaction(work.user_reaction);
+    setReactionBreakdown(work.reaction_breakdown || {});
+  }, [work]);
+
+  // Reaction Types
+  const reactionTypes = [
+    { type: "like", icon: "👍", label: "Like", color: "#dab748ff" },
+    { type: "love", icon: "❤️", label: "Love", color: "#f33e58" },
+    { type: "care", icon: "🥰", label: "Care", color: "#f7b125" },
+    { type: "haha", icon: "😆", label: "Haha", color: "#f7b125" },
+    { type: "wow", icon: "😮", label: "Wow", color: "#f7b125" },
+    { type: "sad", icon: "😢", label: "Sad", color: "#f7b125" },
+    { type: "angry", icon: "😡", label: "Angry", color: "#e9710f" },
+  ];
+
   // Format budget to ensure it's displayed properly
   const formatBudget = (budget) => {
     if (!budget) return "N/A";
@@ -17,19 +47,51 @@ const WorkCard = ({ work }) => {
     return `Rs. ${num.toLocaleString("en-IN")}`;
   };
 
+  const handleLike = async (reactionType = "like") => {
+    if (!user) return toast.info("Please login to like.");
+    try {
+      const res = await fetch(API_ENDPOINTS.works.toggleLike, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          work_id: work.id,
+          user_id: user.id,
+          reaction_type: reactionType,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLikes(data.likes);
+        setIsLiked(data.liked);
+        setUserReaction(data.user_reaction);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="work-card">
       <div className="work-header">
-        <div>
-          <div className="work-label">DEVELOPMENT WORK</div>
+        <div className="work-header-main">
+          <div className="work-label-group">
+            <span className="work-label">DEVELOPMENT WORK</span>
+            <span
+              className={`work-status-tag status-${work.status.toLowerCase()}`}
+            >
+              {work.status}
+            </span>
+          </div>
           <h3 className="work-title">{work.title}</h3>
-          <p className="work-location">
-            📍 {work.ward}, {work.municipality}
-          </p>
+
+          <div className="work-location-pill">
+            <span className="pill-icon">📍</span>
+            <span className="pill-text">
+              {work.province}, {work.district_name}, {work.municipality}, Ward{" "}
+              {work.ward_number}
+            </span>
+          </div>
         </div>
-        <span className={`work-status status-${work.status.toLowerCase()}`}>
-          {work.status}
-        </span>
       </div>
 
       <div className="work-image-container">
@@ -90,14 +152,142 @@ const WorkCard = ({ work }) => {
         </div>
       </div>
 
-      {/* Comment Section - Citizens can comment, Officers can reply */}
-      <CommentSection workId={work.id} />
+      <div className="fb-feedback-summary">
+        {likes > 0 && (
+          <div className="fb-reaction-icons">
+            {Object.keys(reactionBreakdown).length > 0 ? (
+              Object.entries(reactionBreakdown)
+                .filter(([, count]) => count > 0)
+                .slice(0, 3)
+                .map(([rt]) => {
+                  const r = reactionTypes.find((item) => item.type === rt);
+                  return r ? (
+                    <span
+                      key={rt}
+                      className={`reaction-icon type-${rt}`}
+                      style={{ fontSize: "20px" }}
+                    >
+                      {r.icon}
+                    </span>
+                  ) : null;
+                })
+            ) : (
+              <span className="reaction-icon like" style={{ fontSize: "20px" }}>
+                <i className="fa-solid fa-thumbs-up"></i>
+              </span>
+            )}
+            <span className="reaction-count">{likes}</span>
+          </div>
+        )}
+        <div className="fb-stats-summary">
+          <span className="stat-text">{work.comments_count || 0} comments</span>
+        </div>
+      </div>
+
+      {/* Interaction Bar */}
+      {/* Interaction Bar */}
+      <div className="work-interaction-bar">
+        <div
+          className="fb-interaction-wrapper"
+          style={{ position: "relative" }}
+        >
+          <div
+            className="fb-reaction-dock top-dock"
+            style={{ bottom: "100%", marginBottom: "5px" }}
+          >
+            {" "}
+            {/* Inline style for quick fix, prefer CSS class */}
+            {reactionTypes.map((r) => (
+              <span
+                key={r.type}
+                className="reaction-emoji"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Check if handleLike expects args
+                  handleLike(r.type);
+                }}
+                title={r.label}
+              >
+                {r.icon}
+              </span>
+            ))}
+          </div>
+          <button
+            className={`interaction-btn like-btn ${
+              isLiked ? `liked type-${userReaction || "like"}` : ""
+            }`}
+            onClick={() =>
+              handleLike(
+                isLiked && userReaction === "like"
+                  ? "like"
+                  : userReaction || "like"
+              )
+            }
+          >
+            {userReaction &&
+            reactionTypes.find((r) => r.type === userReaction) ? (
+              <>
+                <span className="current-reaction-icon">
+                  {reactionTypes.find((r) => r.type === userReaction).icon}
+                </span>
+                <span
+                  className="reaction-label"
+                  style={{
+                    color: reactionTypes.find((r) => r.type === userReaction)
+                      .color,
+                    fontWeight: "700",
+                  }}
+                >
+                  {reactionTypes.find((r) => r.type === userReaction).label}
+                </span>
+              </>
+            ) : (
+              <>
+                <i className="fa-regular fa-thumbs-up"></i>
+                <span className="reaction-label">Like</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <button
+          className={`interaction-btn ${showComments ? "active" : ""}`}
+          onClick={() => setShowComments(!showComments)}
+        >
+          <i className="fa-regular fa-comment"></i>
+          <span>Comment</span>
+        </button>
+
+        <button
+          className="interaction-btn share-btn"
+          onClick={() => {
+            const shareUrl = `${window.location.origin}/works?id=${work.id}`;
+            navigator.clipboard.writeText(shareUrl);
+            toast.success("Work details link copied to clipboard!");
+          }}
+        >
+          <i className="fa-solid fa-share-nodes"></i>
+          <span>Share</span>
+        </button>
+      </div>
+
+      {/* Comment Section - Toggled by interaction bar */}
+      <div
+        className={`work-comments-container ${showComments ? "visible" : ""}`}
+      >
+        <CommentSection
+          workId={work.id}
+          initialExpanded={true}
+          hideToggle={true}
+        />
+      </div>
     </div>
   );
 };
 
 export default function Works({ embedded = false, wardId }) {
   const { municipality, ward } = useWard();
+  const { user } = useAuth();
   const [works, setWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -105,10 +295,16 @@ export default function Works({ embedded = false, wardId }) {
     setIsLoading(true);
     let url = API_ENDPOINTS.works.getAll;
 
-    // Construct query parameters
     const params = new URLSearchParams();
+    const searchParams = new URLSearchParams(window.location.search);
+    const workId = searchParams.get("id");
 
-    if (wardId) {
+    // Add current_user_id to check likes
+    if (user?.id) params.append("current_user_id", user.id);
+
+    if (workId) {
+      params.append("id", workId);
+    } else if (wardId) {
       // If specific ward ID provided (e.g. Profile page), use strict ID filter
       params.append("ward_id", wardId);
     } else {
@@ -125,15 +321,17 @@ export default function Works({ embedded = false, wardId }) {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        setWorks(Array.isArray(data) ? data : []);
+        // Support both direct array and {success, data} formats
+        const worksList = data.data || (Array.isArray(data) ? data : []);
+        setWorks(worksList);
         setIsLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching works:", err);
-        setWorks([]); // Ensure works is array on error
+        setWorks([]);
         setIsLoading(false);
       });
-  }, [ward, municipality, wardId]); // Re-fetch when dependencies change
+  }, [ward, municipality, wardId, user?.id]); // Re-fetch when dependencies change
 
   return (
     <>

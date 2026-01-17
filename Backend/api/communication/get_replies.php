@@ -51,9 +51,9 @@ $sql = "SELECT
     u.work_district,
     u.work_municipality,
     u.work_ward,
-    (SELECT COUNT(*) FROM feedback_votes fv WHERE fv.reply_id = fr.id AND fv.vote_type = 1) AS likes,
-    (SELECT COUNT(*) FROM feedback_votes fv WHERE fv.reply_id = fr.id AND fv.vote_type = -1) AS dislikes,
-    (SELECT vote_type FROM feedback_votes fv WHERE fv.reply_id = fr.id AND fv.user_id = ?) AS user_vote
+    (SELECT COUNT(*) FROM feedback_reactions fv WHERE fv.reply_id = fr.id) AS likes,
+    (SELECT COUNT(*) FROM feedback_reactions fv WHERE fv.reply_id = fr.id AND fv.reaction_type = 'dislike') AS dislikes,
+    (SELECT reaction_type FROM feedback_reactions fv WHERE fv.reply_id = fr.id AND fv.user_id = ?) AS user_reaction
 FROM `feedback_replies` fr
 LEFT JOIN users u ON " . ($has_user_id ? "fr.user_id" : "fr.officer_id") . " = u.id
 WHERE $where_msg
@@ -97,8 +97,18 @@ while ($row = $result->fetch_assoc()) {
         'created_at' => $row['created_at'],
         'likes' => intval($row['likes']),
         'dislikes' => intval($row['dislikes']),
-        'user_vote' => intval($row['user_vote'] ?? 0)
+        'user_reaction' => $row['user_reaction'] ?? null,
+        'reaction_breakdown' => []
     ];
+
+    // Fetch Reaction Breakdown
+    $reaction_sql = "SELECT reaction_type, COUNT(*) as count FROM feedback_reactions WHERE reply_id = " . $row['id'] . " GROUP BY reaction_type";
+    $reaction_res = $conn->query($reaction_sql);
+    if ($reaction_res && $reaction_res->num_rows > 0) {
+        while ($r_row = $reaction_res->fetch_assoc()) {
+            $replies[count($replies)-1]['reaction_breakdown'][$r_row['reaction_type']] = intval($r_row['count']);
+        }
+    }
 }
 
 echo json_encode([

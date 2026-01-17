@@ -31,60 +31,75 @@
 }
 
 /* Header Section */
-.work-header {
+.work-header-main {
+  width: 100%;
+}
+
+.work-label-group {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .work-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #888;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1877f2;
   text-transform: uppercase;
-  margin-bottom: 0.25rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .work-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 0 0 0.25rem 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #050505;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.2;
 }
 
-.work-location {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin: 0;
-}
-
-/* Status Badge */
-.work-status {
-  padding: 0.25rem 0.75rem;
+.work-location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0f2f5;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: lowercase;
-  border: 1px solid currentColor;
+  border: 1px solid #e4e6eb;
+}
+
+.pill-icon {
+  font-size: 1rem;
+}
+
+.pill-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #65676b;
+}
+
+/* Status Badge Table */
+.work-status-tag {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .status-completed {
-  color: #28a745;
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
+  color: #00a400;
+  background-color: #e7f3ff;
 }
 
 .status-ongoing {
-  color: #007bff;
-  background-color: #f0f9ff;
-  border-color: #bae6fd;
+  color: #1877f2;
+  background-color: #e7f3ff;
 }
 
-.status-pending {
-  color: #d97706;
-  background-color: #fffbeb;
-  border-color: #fde68a;
+.status-planned {
+  color: #65676b;
+  background-color: #f0f2f5;
 }
 
 /* Image */
@@ -207,6 +222,71 @@
   text-transform: capitalize;
 }
 
+/* Interaction Bar */
+.work-interaction-bar {
+  display: flex;
+  padding: 8px 0;
+  border-top: 1px solid #e4e6eb;
+  border-bottom: 1px solid #e4e6eb;
+  margin-top: 10px;
+}
+
+.interaction-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  color: #65676b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.interaction-btn:hover {
+  background: #f0f2f5;
+}
+
+.interaction-btn i {
+  font-size: 1.1rem;
+}
+
+.interaction-btn.liked {
+  color: #1877f2;
+}
+
+.interaction-btn.active {
+  background: #e7f3ff;
+  color: #1877f2;
+}
+
+.share-btn:hover i {
+  color: #1877f2;
+  transform: rotate(15deg);
+}
+
+.interaction-btn i {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.interaction-btn:active i {
+  transform: scale(1.3);
+}
+
+.work-comments-container {
+  display: none;
+  margin-top: 10px;
+}
+
+.work-comments-container.visible {
+  display: block;
+}
+
 .works-note {
   margin-top: 2rem;
   text-align: center;
@@ -263,4 +343,145 @@
   .budget-amount {
     font-size: 1.25rem;
   }
+}
+
+/* --- Reaction Dock Styling for Work Cards --- */
+.fb-reaction-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.fb-reaction-dock {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: white;
+  padding: 5px 10px;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  gap: 8px;
+  z-index: 100;
+  margin-bottom: 10px;
+  animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* Fix hover gap */
+.fb-reaction-dock::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 20px; /* Bridge the gap */
+}
+
+.fb-reaction-wrapper:hover .fb-reaction-dock {
+  display: flex !important;
+}
+
+.reaction-emoji {
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: inline-block;
+  line-height: 1;
+}
+
+.reaction-emoji:hover {
+  transform: scale(1.3) translateY(-5px);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Button Reacted State Styles */
+.interaction-btn.like-btn.liked {
+  font-weight: 700;
+}
+
+.interaction-btn.like-btn.liked.type-like,
+.fb-btn.like-btn.reacted.type-like {
+  color: #1877f2 !important;
+}
+.interaction-btn.like-btn.liked.type-love,
+.fb-btn.like-btn.reacted.type-love {
+  color: #f33e58 !important;
+}
+.interaction-btn.like-btn.liked.type-haha,
+.interaction-btn.like-btn.liked.type-wow,
+.interaction-btn.like-btn.liked.type-sad,
+.fb-btn.like-btn.reacted.type-haha,
+.fb-btn.like-btn.reacted.type-wow,
+.fb-btn.like-btn.reacted.type-sad {
+  color: #f7b125 !important;
+}
+.interaction-btn.like-btn.liked.type-angry,
+.fb-btn.like-btn.reacted.type-angry {
+  color: #e9710f !important;
+}
+
+.current-reaction-icon {
+  margin-right: 5px;
+  font-size: 1.1em;
+}
+
+/* Ensure action bar allows overflow visible for the dock to appear */
+.work-interaction-bar,
+.fb-interaction-bar {
+  overflow: visible !important;
+}
+
+/* Feedback Summary */
+.fb-feedback-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 1px solid #e4e6eb;
+  margin-top: 5px;
+}
+
+.fb-reaction-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fb-reaction-icons .reaction-icon {
+  font-size: 20px !important;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px;
+}
+
+.fb-reaction-icons .reaction-icon i {
+  font-size: 16px !important;
+}
+
+.reaction-count {
+  font-size: 14px;
+  color: #65676b;
+  font-weight: 500;
+}
+
+.fb-stats-summary {
+  font-size: 14px;
+  color: #65676b;
+}
+
+.stat-text:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
