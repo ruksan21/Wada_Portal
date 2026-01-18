@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./Home/Context/AuthContext";
 import { WardProvider } from "./Home/Context/WardContext";
+import { LanguageProvider } from "./Home/Context/LanguageContext";
 import Navbar from "./Home/Nav/Navbar";
 import Login from "./Home/Auth/Login";
 import RoleSelection from "./Home/Auth/RoleSelection";
@@ -39,81 +40,83 @@ const PageWithNavbar = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <WardProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Navbar showHomeContent={true} />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <PageWithNavbar>
-                    <ProfileSection />
-                  </PageWithNavbar>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <PageWithNavbar>
-                    <Settings />
-                  </PageWithNavbar>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<RoleSelection />} />
-            <Route
-              path="/register/citizen"
-              element={
-                <Register initialRole="citizen" hideRoleSelector={true} />
-              }
-            />
-            <Route
-              path="/register/officer"
-              element={
-                <Register initialRole="officer" hideRoleSelector={true} />
-              }
-            />
-            <Route path="/forgot-password" element={<Forget />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/help" element={<HelpSupport />} />
-            <Route path="/assets" element={<Assets />} />
-            <Route path="/activities" element={<Activities />} />
-            <Route path="/works" element={<Works />} />
-            <Route path="/notices" element={<Notices />} />
-            <Route path="/departments" element={<Departments />} />
+      <LanguageProvider>
+        <WardProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Navbar showHomeContent={true} />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/documents" element={<Documents />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <PageWithNavbar>
+                      <ProfileSection />
+                    </PageWithNavbar>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <PageWithNavbar>
+                      <Settings />
+                    </PageWithNavbar>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<RoleSelection />} />
+              <Route
+                path="/register/citizen"
+                element={
+                  <Register initialRole="citizen" hideRoleSelector={true} />
+                }
+              />
+              <Route
+                path="/register/officer"
+                element={
+                  <Register initialRole="officer" hideRoleSelector={true} />
+                }
+              />
+              <Route path="/forgot-password" element={<Forget />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/help" element={<HelpSupport />} />
+              <Route path="/assets" element={<Assets />} />
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/works" element={<Works />} />
+              <Route path="/notices" element={<Notices />} />
+              <Route path="/departments" element={<Departments />} />
 
-            <Route path="/contact" element={<Contact />} />
+              <Route path="/contact" element={<Contact />} />
 
-            {/* Admin Routes */}
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminRoutes />
-                </ProtectedRoute>
-              }
-            />
+              {/* Admin Routes */}
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminRoutes />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Officer Routes */}
-            <Route
-              path="/officer/*"
-              element={
-                <ProtectedRoute requiredRole="officer">
-                  <OfficerRoutes />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-          <ToastContainer position="top-right" autoClose={3000} />
-          <NoticePopup />
-        </Router>
-      </WardProvider>
+              {/* Officer Routes */}
+              <Route
+                path="/officer/*"
+                element={
+                  <ProtectedRoute requiredRole="officer">
+                    <OfficerRoutes />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+            <ToastContainer position="top-right" autoClose={3000} />
+            <NoticePopup />
+          </Router>
+        </WardProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
 }

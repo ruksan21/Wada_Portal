@@ -3,16 +3,20 @@ import "./works.css";
 import CommentSection from "../Component/CommentSection";
 import { useWard } from "../Context/WardContext";
 import { useAuth } from "../Context/AuthContext";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 import { toast } from "react-toastify";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 
 const WorkCard = ({ work }) => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const [likes, setLikes] = useState(parseInt(work.likes_count) || 0);
   const [isLiked, setIsLiked] = useState(work.user_liked > 0);
   const [userReaction, setUserReaction] = useState(work.user_reaction);
   const [reactionBreakdown, setReactionBreakdown] = useState(
-    work.reaction_breakdown || {}
+    work.reaction_breakdown || {},
   );
   const [showComments, setShowComments] = useState(false);
 
@@ -51,23 +55,50 @@ const WorkCard = ({ work }) => {
   };
 
   const reactionTypes = [
-    { type: "like", icon: "👍", label: "Like", color: "#dab748ff" },
-    { type: "love", icon: "❤️", label: "Love", color: "#f33e58" },
-    { type: "care", icon: "🥰", label: "Care", color: "#f7b125" },
-    { type: "haha", icon: "😆", label: "Haha", color: "#f7b125" },
-    { type: "wow", icon: "😮", label: "Wow", color: "#f7b125" },
-    { type: "sad", icon: "😢", label: "Sad", color: "#f7b125" },
-    { type: "angry", icon: "😡", label: "Angry", color: "#e9710f" },
+    {
+      type: "like",
+      icon: "👍",
+      label: isNP ? "मनपर्‍यो" : "Like",
+      color: "#dab748ff",
+    },
+    {
+      type: "love",
+      icon: "❤️",
+      label: isNP ? "माया" : "Love",
+      color: "#f33e58",
+    },
+    {
+      type: "care",
+      icon: "🥰",
+      label: isNP ? "हेरचाह" : "Care",
+      color: "#f7b125",
+    },
+    {
+      type: "haha",
+      icon: "😆",
+      label: isNP ? "हाहा" : "Haha",
+      color: "#f7b125",
+    },
+    { type: "wow", icon: "😮", label: isNP ? "वाह" : "Wow", color: "#f7b125" },
+    { type: "sad", icon: "😢", label: isNP ? "दुखी" : "Sad", color: "#f7b125" },
+    {
+      type: "angry",
+      icon: "😡",
+      label: isNP ? "रिसाएको" : "Angry",
+      color: "#e9710f",
+    },
   ];
 
   return (
     <div className="works-card" key={work.id} style={{ marginBottom: "30px" }}>
       <div className="works-card-header">
         <div>
-          <p className="works-label">Works</p>
+          <p className="works-label">{t("profile.tabs.works")}</p>
           <h3>{work.title}</h3>
           <p className="works-subtitle">
-            {work.location || work.subtitle || "Ward No. 1, Kathmandu"}
+            {work.location ||
+              work.subtitle ||
+              (isNP ? "वडा नं. १, काठमाडौं" : "Ward No. 1, Kathmandu")}
           </p>
         </div>
         <span
@@ -75,7 +106,13 @@ const WorkCard = ({ work }) => {
             .toLowerCase()
             .replace("-", "")}`}
         >
-          {work.status || "Pending"}
+          {isNP
+            ? work.status === "Completed"
+              ? "सम्पन्न"
+              : work.status === "Ongoing"
+                ? "सञ्चालनमा"
+                : "पेन्डिङ"
+            : work.status || "Pending"}
         </span>
       </div>
 
@@ -95,20 +132,40 @@ const WorkCard = ({ work }) => {
 
       <div className="works-details">
         <div>
-          <strong>Start Date</strong>
-          <p>{work.start_date || work.startDate || "N/A"}</p>
+          <strong>{isNP ? "नुसुरु मिति" : "Start Date"}</strong>
+          <p>
+            {isNP
+              ? toNepaliNumber(work.start_date || work.startDate || "N/A")
+              : work.start_date || work.startDate || "N/A"}
+          </p>
         </div>
         <div>
-          <strong>End Date</strong>
-          <p>{work.end_date || work.endDate || "N/A"}</p>
+          <strong>{isNP ? "अन्तिम मिति" : "End Date"}</strong>
+          <p>
+            {isNP
+              ? toNepaliNumber(work.end_date || work.endDate || "N/A")
+              : work.end_date || work.endDate || "N/A"}
+          </p>
         </div>
         <div>
-          <strong>Budget</strong>
-          <p>{work.budget ? `Rs. ${work.budget}` : work.budget || "N/A"}</p>
+          <strong>{isNP ? "बजेट" : "Budget"}</strong>
+          <p>
+            {work.budget
+              ? isNP
+                ? `रु. ${toNepaliNumber(work.budget)}`
+                : `Rs. ${work.budget}`
+              : isNP
+                ? "उपलब्ध छैन"
+                : "N/A"}
+          </p>
         </div>
         <div>
-          <strong>Beneficiaries</strong>
-          <p>{work.beneficiaries || "N/A"}</p>
+          <strong>{isNP ? "लाभार्थीहरू" : "Beneficiaries"}</strong>
+          <p>
+            {isNP
+              ? toNepaliNumber(work.beneficiaries || "N/A")
+              : work.beneficiaries || "N/A"}
+          </p>
         </div>
       </div>
 
@@ -139,7 +196,9 @@ const WorkCard = ({ work }) => {
                 <i className="fa-solid fa-thumbs-up"></i>
               </span>
             )}
-            <span className="reaction-count">{likes}</span>
+            <span className="reaction-count">
+              {isNP ? toNepaliNumber(likes) : likes}
+            </span>
 
             {/* Reaction Breakdown Tooltip */}
             <div className="reaction-tooltip">
@@ -150,7 +209,9 @@ const WorkCard = ({ work }) => {
                     <div key={type} className="reaction-breakdown-item">
                       <span className="reaction-icon">{reaction.icon}</span>
                       <span className="reaction-label">{reaction.label}</span>
-                      <span className="reaction-count">{count}</span>
+                      <span className="reaction-count">
+                        {isNP ? toNepaliNumber(count) : count}
+                      </span>
                     </div>
                   ) : null;
                 })
@@ -158,14 +219,21 @@ const WorkCard = ({ work }) => {
                 <div className="reaction-breakdown-item">
                   <span className="reaction-icon">👍</span>
                   <span className="reaction-label">Like</span>
-                  <span className="reaction-count">{likes}</span>
+                  <span className="reaction-count">
+                    {isNP ? toNepaliNumber(likes) : likes}
+                  </span>
                 </div>
               )}
             </div>
           </div>
         )}
         <div className="fb-stats-summary">
-          <span className="stat-text">{work.comments_count || 0} comments</span>
+          <span className="stat-text">
+            {isNP
+              ? toNepaliNumber(work.comments_count || 0)
+              : work.comments_count || 0}{" "}
+            {isNP ? "प्रतिक्रियाहरू" : "comments"}
+          </span>
         </div>
       </div>
 
@@ -201,7 +269,7 @@ const WorkCard = ({ work }) => {
               handleLike(
                 isLiked && userReaction === "like"
                   ? "like"
-                  : userReaction || "like"
+                  : userReaction || "like",
               )
             }
           >
@@ -236,7 +304,7 @@ const WorkCard = ({ work }) => {
           onClick={() => setShowComments(!showComments)}
         >
           <i className="fa-regular fa-comment"></i>
-          <span>Comment</span>
+          <span>{isNP ? "प्रतिक्रिया" : "Comment"}</span>
         </button>
 
         <button
@@ -244,11 +312,15 @@ const WorkCard = ({ work }) => {
           onClick={() => {
             const shareUrl = `${window.location.origin}/works?id=${work.id}`;
             navigator.clipboard.writeText(shareUrl);
-            toast.success("Work link copied to clipboard!");
+            toast.success(
+              isNP
+                ? "कार्य लिंक क्लिपबोर्डमा प्रतिलिपि गरियो!"
+                : "Work link copied to clipboard!",
+            );
           }}
         >
           <i className="fa-solid fa-share-nodes"></i>
-          <span>Share</span>
+          <span>{isNP ? "साझा गर्नुहोस्" : "Share"}</span>
         </button>
       </div>
 
@@ -267,6 +339,8 @@ const WorkCard = ({ work }) => {
 };
 
 const Works = ({ wardId: propWardId }) => {
+  const { language } = useLanguage();
+  const isNP = language === "NP";
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { wardId: contextWardId } = useWard();
@@ -309,11 +383,21 @@ const Works = ({ wardId: propWardId }) => {
   }, [wardId]);
 
   if (loading) {
-    return <div className="loading-state">Loading works...</div>;
+    return (
+      <div className="loading-state">
+        {isNP ? "कार्यहरू लोड हुँदैछ..." : "Loading works..."}
+      </div>
+    );
   }
 
   if (works.length === 0) {
-    return <div className="no-works">No works found for this ward.</div>;
+    return (
+      <div className="no-works">
+        {isNP
+          ? "यस वडाको लागि कुनै कार्यहरू फेला परेन।"
+          : "No works found for this ward."}
+      </div>
+    );
   }
 
   return (

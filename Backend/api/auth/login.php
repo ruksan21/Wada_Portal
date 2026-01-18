@@ -34,17 +34,17 @@ if (!empty($data->email) && !empty($data->password)) {
                 if ($user['status'] === 'pending') {
                     echo json_encode(array(
                         "success" => false, 
-                        "message" => "Your account is pending approval. Please wait for admin approval."
+                        "message" => "तपाईंको खाता अनुमोदनको पर्खाइमा छ। कृपया प्रशासकको अनुमोदन पर्खनुहोस्।"
                     ));
                 } else if ($user['status'] === 'rejected') {
                     echo json_encode(array(
                         "success" => false, 
-                        "message" => "Your account has been rejected. Please contact the administrator."
+                        "message" => "तपाईंको खाता अस्वीकार गरिएको छ। कृपया प्रशासकलाई सम्पर्क गर्नुहोस्।"
                     ));
                 } else {
                     echo json_encode(array(
                         "success" => false, 
-                        "message" => "Your account is not active. Please contact the administrator."
+                        "message" => "तपाईंको खाता सक्रिय छैन। कृपया प्रशासकलाई सम्पर्क गर्नुहोस्।"
                     ));
                 }
                 exit();
@@ -66,7 +66,7 @@ if (!empty($data->email) && !empty($data->password)) {
             
             echo json_encode(array(
                 "success" => true,
-                "message" => "Login successful!",
+                "message" => "लगइन सफल भयो!",
                 "data" => array(
                     "user" => $user, // Role is included here (admin, officer, citizen)
                     "workLocation" => $workLocation,
@@ -75,14 +75,14 @@ if (!empty($data->email) && !empty($data->password)) {
             ));
         } else {
             http_response_code(401);
-            echo json_encode(array("success" => false, "message" => "Invalid password."));
+            echo json_encode(array("success" => false, "message" => "पासवर्ड गलत छ।"));
         }
     } else {
         http_response_code(404);
-        echo json_encode(array("success" => false, "message" => "User not found."));
+        echo json_encode(array("success" => false, "message" => "प्रयोगकर्ता फेला परेन।"));
     }
 } else {
     http_response_code(400);
-    echo json_encode(array("success" => false, "message" => "Incomplete data."));
+    echo json_encode(array("success" => false, "message" => "अपूर्ण डाटा।"));
 }
 ?>

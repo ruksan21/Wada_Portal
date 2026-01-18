@@ -8,6 +8,8 @@ import Dashboard from "../Pages/Dashboard";
 import Assets from "../Pages/Assets";
 import Activities from "../Pages/Activities";
 import { useWard } from "../Context/WardContext";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 import ReviewListFB from "../Component/ReviewListFB";
 
@@ -37,6 +39,8 @@ const defaultProfileData = {
 
 // Star rating component
 const StarRating = ({ rating, reviews }) => {
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.3 && rating % 1 <= 0.7;
   const extraFullStar = rating % 1 > 0.7 ? 1 : 0;
@@ -45,7 +49,7 @@ const StarRating = ({ rating, reviews }) => {
   const displayHalfStar = !extraFullStar && hasHalfStar;
   const emptyStars = Math.max(
     0,
-    5 - displayFullStars - (displayHalfStar ? 1 : 0)
+    5 - displayFullStars - (displayHalfStar ? 1 : 0),
   );
 
   return (
@@ -60,13 +64,23 @@ const StarRating = ({ rating, reviews }) => {
         ))}
       </div>
       <span className="reviews-text">
-        {rating > 0 ? rating.toFixed(1) : "No rating"} ({reviews || 0} reviews)
+        {rating > 0
+          ? isNP
+            ? toNepaliNumber(rating.toFixed(1))
+            : rating.toFixed(1)
+          : isNP
+            ? "कुनै मूल्याङ्कन छैन"
+            : "No rating"}{" "}
+        ({isNP ? toNepaliNumber(reviews || 0) : reviews || 0}{" "}
+        {t("profile.reviews")})
       </span>
     </div>
   );
 };
 
 const Profile = () => {
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const [activeTab, setActiveTab] = useState("Details");
   const { ward, wardId, stats, refreshStats } = useWard();
   const [isFollowing, setIsFollowing] = useState(false);
@@ -110,10 +124,12 @@ const Profile = () => {
           // Update profile data with database values
           setProfileData((prev) => ({
             ...prev,
-            name: wardData.chairperson_name || "Not Assigned",
-            role: `wardChairperson - ${
-              wardData.municipality || wardData.district_name
-            } , Ward No. ${wardData.ward_number}`,
+            name:
+              wardData.chairperson_name ||
+              (isNP ? "तोकिएको छैन" : "Not Assigned"),
+            role: isNP
+              ? `वडा अध्यक्ष - ${wardData.municipality || wardData.district_name} , वडा नं. ${toNepaliNumber(wardData.ward_number)}`
+              : `wardChairperson - ${wardData.municipality || wardData.district_name} , Ward No. ${wardData.ward_number}`,
             phone: wardData.chairperson_phone || "N/A",
             email: wardData.chairperson_email || "N/A",
             imageUrl: wardData.chairperson_photo
@@ -144,7 +160,7 @@ const Profile = () => {
         }
       })
       .catch((err) => console.error("Error fetching personal assets:", err));
-  }, [wardId, refreshStats]);
+  }, [wardId, refreshStats, isNP]);
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -302,33 +318,42 @@ const Profile = () => {
       return (
         <div className="info-section">
           <div className="personal-info">
-            <h2>Personal Information</h2>
+            <h2>{t("profile.tabs.details")}</h2>
             <div className="info-item">
-              <label>Address</label>
+              <label>{t("about.address")}</label>
               <p>{profileData.personalInfo?.address}</p>
             </div>
             <div className="info-item">
-              <label>Education</label>
+              <label>{isNP ? "शिक्षा" : "Education"}</label>
               <p>{profileData.personalInfo?.education}</p>
             </div>
             <div className="info-item">
-              <label>Experience</label>
+              <label>{isNP ? "अनुभव" : "Experience"}</label>
               <p>{profileData.personalInfo?.experience}</p>
             </div>
             <div className="info-item">
-              <label>Political Party</label>
+              <label>{isNP ? "राजनीतिक दल" : "Political Party"}</label>
               <p>{profileData.personalInfo?.politicalParty}</p>
             </div>
             <div className="info-item">
-              <label>Appointment Date</label>
-              <p>{profileData.personalInfo?.appointmentDate}</p>
+              <label>{isNP ? "नियुक्ति मिति" : "Appointment Date"}</label>
+              <p>
+                {isNP
+                  ? toNepaliNumber(profileData.personalInfo?.appointmentDate)
+                  : profileData.personalInfo?.appointmentDate}
+              </p>
             </div>
           </div>
 
           <div className="contact-details">
-            <h2>Contact Details</h2>
+            <h2>{t("about.contact_title")}</h2>
             <div className="contact-item">
-              <span>&#9742; {profileData.contactDetails?.phone}</span>
+              <span>
+                &#9742;{" "}
+                {isNP
+                  ? toNepaliNumber(profileData.contactDetails?.phone)
+                  : profileData.contactDetails?.phone}
+              </span>
             </div>
             <div className="contact-item">
               <span>&#9993; {profileData.contactDetails?.email}</span>
@@ -337,7 +362,7 @@ const Profile = () => {
               <span>&#128205; {profileData.contactDetails?.address}</span>
             </div>
             <button className="download-button" onClick={handleDownloadPDF}>
-              Download Details
+              {isNP ? "विवरण डाउनलोड गर्नुहोस्" : "Download Details"}
             </button>
           </div>
         </div>
@@ -364,11 +389,13 @@ const Profile = () => {
           {/* Left Column: Write a Review Form */}
           <div className="review-form-card">
             <div className="review-form-header">
-              <h3>Write a Review</h3>
+              <h3>{t("profile.reviews_form.title")}</h3>
             </div>
             <form onSubmit={handleReviewSubmit}>
               <div className="form-group">
-                <label className="form-label">Rating</label>
+                <label className="form-label">
+                  {t("profile.reviews_form.rating")}
+                </label>
                 <div className="interactive-stars">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <i
@@ -390,9 +417,11 @@ const Profile = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Your Experience</label>
+                <label className="form-label">
+                  {t("profile.reviews_form.experience")}
+                </label>
                 <textarea
-                  placeholder="Share your experience clearly..."
+                  placeholder={t("profile.reviews_form.placeholder")}
                   value={newReview.comment}
                   onChange={(e) =>
                     setNewReview({ ...newReview, comment: e.target.value })
@@ -402,7 +431,7 @@ const Profile = () => {
                 />
               </div>
               <button type="submit" className="submit-review-btn">
-                Submit Review
+                {t("profile.reviews_form.submit")}
               </button>
             </form>
           </div>
@@ -555,34 +584,37 @@ const Profile = () => {
         <div className="profile-header-right">
           <StarRating rating={stats.rating} reviews={stats.reviews} />
           <div className="followers-section">
-            <span>&#128100; {stats.followers} followers</span>
+            <span>
+              &#128100;{" "}
+              {isNP ? toNepaliNumber(stats.followers) : stats.followers}{" "}
+              {t("profile.followers")}
+            </span>
             <button
               className={`follow-button ${isFollowing ? "following" : ""}`}
               onClick={handleFollow}
             >
-              {isFollowing ? "Following" : "Follow"}
+              {isFollowing ? t("profile.following") : t("profile.follow")}
             </button>
           </div>
         </div>
       </div>
-
       <div className="profile-body">
         <div className="tabs">
           {[
-            "Details",
-            "Personal Property",
-            "Works",
-            "Assets",
-            "Activities",
-            "Reviews",
-            "Dashboard",
+            { id: "Details", label: t("profile.tabs.details") },
+            { id: "Personal Property", label: t("profile.tabs.property") },
+            { id: "Works", label: t("profile.tabs.works") },
+            { id: "Assets", label: t("profile.tabs.assets") },
+            { id: "Activities", label: t("profile.tabs.activities") },
+            { id: "Reviews", label: t("profile.tabs.reviews") },
+            { id: "Dashboard", label: t("profile.tabs.dashboard") },
           ].map((tab) => (
             <button
-              key={tab}
-              className={`tab-item ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
+              key={tab.id}
+              className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>

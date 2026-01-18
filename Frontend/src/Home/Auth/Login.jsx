@@ -4,9 +4,11 @@ import { useAuth } from "../Context/AuthContext";
 import "./Login.css";
 import { API_ENDPOINTS } from "../../config/api";
 import { toast } from "react-toastify";
+import { useLanguage } from "../Context/LanguageContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({
@@ -22,13 +24,11 @@ export default function LoginPage() {
     const newErrors = { email: "", password: "" };
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
-    if (!email.trim()) newErrors.email = "Email is required!";
-    else if (!emailRegex.test(email))
-      newErrors.email = "Enter a valid email address";
+    if (!email.trim()) newErrors.email = t("auth.required");
+    else if (!emailRegex.test(email)) newErrors.email = t("auth.email_invalid");
 
-    if (!password) newErrors.password = "Password is required!";
-    else if (password.length < 8)
-      newErrors.password = "Password must be at least 8 characters";
+    if (!password) newErrors.password = t("auth.required");
+    else if (password.length < 8) newErrors.password = t("auth.password_min");
 
     setErrors(newErrors);
     return !newErrors.email && !newErrors.password;
@@ -60,10 +60,10 @@ export default function LoginPage() {
       if (!response.ok || !data.success) {
         // Handle specific account status errors (403)
         if (response.status === 403) {
-          toast.error(data.message || "Account access denied.");
+          toast.error(data.message || t("auth.access_denied"));
         } else {
           // Handle normal validation errors (401, 404, etc.)
-          toast.error(data.message || "Login failed. Please try again.");
+          toast.error(data.message || t("auth.login_failed"));
         }
         setIsLoading(false);
         return;
@@ -80,7 +80,7 @@ export default function LoginPage() {
 
       // Update context with work location
       login(userData, workLocation);
-      toast.success("Login successful!");
+      toast.success(t("auth.login_success"));
 
       // Redirect after showing success
       setTimeout(() => {
@@ -88,7 +88,7 @@ export default function LoginPage() {
       }, 1500);
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Network error. Please check your connection and try again.");
+      toast.error(t("auth.network_error"));
     } finally {
       setIsLoading(false);
     }
@@ -103,20 +103,20 @@ export default function LoginPage() {
 
       <div className="login-container">
         <div className="login-header">
-          <h1>Login your account</h1>
-          <p> Please login to continue</p>
+          <h1>{t("auth.login_header")}</h1>
+          <p> {t("auth.login_subheader")}</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t("auth.email")}</label>
             <div className="input-wrapper">
               <i className="fa-regular fa-user" />
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder={t("auth.enter_email")}
                 className={`form-control ${errors.email ? "error" : ""}`}
                 maxLength={100}
                 value={email}
@@ -130,14 +130,14 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t("auth.password")}</label>
             <div className="input-wrapper">
               <i className="fa-solid fa-lock" />
               <input
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder={t("auth.enter_password")}
                 className={`form-control ${errors.password ? "error" : ""}`}
                 maxLength={50}
                 value={password}
@@ -151,19 +151,20 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className="btn-login" disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? t("auth.logging_in") : t("auth.login_title")}
           </button>
         </form>
 
         <div className="forgot-password">
           <p>
-            <Link to="/forgot-password">Forgot Password?</Link>
+            <Link to="/forgot-password">{t("auth.forgot_password")}</Link>
           </p>
         </div>
 
         <div className="register-link">
           <p>
-            Don't have an account? <Link to="/register">Register here</Link>
+            {t("auth.dont_have_account")}{" "}
+            <Link to="/register">{t("auth.register_here")}</Link>
           </p>
         </div>
       </div>

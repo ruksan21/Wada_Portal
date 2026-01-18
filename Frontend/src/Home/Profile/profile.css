@@ -1,7 +1,8 @@
 /* General styling for the component */
 .profile-container {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
   background-color: #f9fafb;
   max-width: 1200px;
   margin: 20px auto;
@@ -127,6 +128,120 @@
   background-color: #2563eb;
 }
 
+.follow-button:hover {
+  background-color: #2563eb;
+}
+
+/* Official Badge Styling */
+.fb-user-info-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.fb-badge-official {
+  background-color: #e7f3ff;
+  color: #1877f2;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fb-badge-official i {
+  font-size: 10px;
+}
+
+.fb-user-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #050505;
+}
+
+.fb-action-btn.delete-action,
+.fb-reply-action-btn.delete-action {
+  color: #d93025;
+}
+
+.fb-action-btn.delete-action:hover,
+.fb-reply-action-btn.delete-action:hover {
+  background: #fdeaea;
+  color: #bc2116;
+}
+
+.fb-edit-area {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.fb-edit-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #1877f2;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  background: #f8f9fa;
+}
+
+.fb-edit-textarea.sm {
+  min-height: 60px;
+  font-size: 13px;
+  padding: 8px;
+}
+
+.fb-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fb-btn-cancel-edit,
+.fb-btn-save-edit {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.fb-btn-cancel-edit {
+  background: #f0f2f5;
+  color: #050505;
+}
+
+.fb-btn-save-edit {
+  background: #1877f2;
+  color: white;
+}
+
+.fb-btn-cancel-edit:hover {
+  background: #e4e6eb;
+}
+
+.fb-btn-save-edit:hover {
+  background: #166fe5;
+}
+
+.fb-btn-cancel-edit.sm,
+.fb-btn-save-edit.sm {
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
 /* Body Section */
 .profile-body {
   background-color: #ffffff;
@@ -157,6 +272,26 @@
 
 .tab-content {
   padding-top: 24px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  /* Scrollbar for Tab Content */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
 
 .info-section {
@@ -340,7 +475,9 @@ h2 {
   border-radius: 6px;
   font-size: 14px;
   color: #1f2937;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-select:focus,
@@ -365,7 +502,9 @@ h2 {
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
 }
 
 .submit-review-btn:hover {
@@ -377,6 +516,33 @@ h2 {
 }
 
 /* Reviews List Styles */
+.reviews-container {
+  max-height: 550px;
+  overflow-y: auto;
+  padding-right: 15px;
+  /* Custom Scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f1f1;
+}
+
+.reviews-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reviews-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.reviews-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.reviews-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .reviews-container h3 {
   font-size: 18px;
   font-weight: 600;
@@ -393,7 +559,9 @@ h2 {
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .review-card:hover {

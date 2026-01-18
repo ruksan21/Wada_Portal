@@ -1,26 +1,34 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./Assets.css";
 import { useWard } from "../Context/WardContext";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 import Navbar from "../Nav/Navbar";
 import { API_ENDPOINTS } from "../../config/api";
 
-const AssetCard = ({ icon, title, subtitle, value, description }) => (
-  <div className="asset-card">
-    <div className="asset-header">
-      <span className="asset-icon">{icon}</span>
-      <div>
-        <div className="asset-title">{title}</div>
-        <div className="asset-subtitle">{subtitle}</div>
+const AssetCard = ({ icon, title, subtitle, value, description }) => {
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
+  return (
+    <div className="asset-card">
+      <div className="asset-header">
+        <span className="asset-icon">{icon}</span>
+        <div>
+          <div className="asset-title">{title}</div>
+          <div className="asset-subtitle">{subtitle}</div>
+        </div>
+      </div>
+      <div className="asset-body">
+        <div className="asset-label">{t("profile.assets.value")}</div>
+        <div className="asset-value">
+          {isNP ? `रु. ${toNepaliNumber(value)}` : `Rs. ${value}`}
+        </div>
+        <div className="asset-label">{t("profile.assets.description")}</div>
+        <div className="asset-desc">{description}</div>
       </div>
     </div>
-    <div className="asset-body">
-      <div className="asset-label">Value</div>
-      <div className="asset-value">Rs. {value}</div>
-      <div className="asset-label">Description</div>
-      <div className="asset-desc">{description}</div>
-    </div>
-  </div>
-);
+  );
+};
 
 // Map asset types to icons
 const getAssetIcon = (assetType) => {
@@ -36,6 +44,8 @@ const getAssetIcon = (assetType) => {
 };
 
 export default function Assets({ embedded = false }) {
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const { municipality, ward, wardId } = useWard();
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +56,7 @@ export default function Assets({ embedded = false }) {
     setError(null);
     try {
       const res = await fetch(
-        `${API_ENDPOINTS.assets.manageWardAssets}?ward_id=${wardId}`
+        `${API_ENDPOINTS.assets.manageWardAssets}?ward_id=${wardId}`,
       );
       const data = await res.json();
       if (data.success) {
@@ -80,15 +90,13 @@ export default function Assets({ embedded = false }) {
         )}
 
         {isLoading ? (
-          <div className="assets-note">Loading assets...</div>
+          <div className="assets-note">{t("profile.assets.loading")}</div>
         ) : error ? (
           <div className="assets-note" style={{ color: "#ef4444" }}>
-            {error}
+            {isNP ? "संपत्ति लोड गर्न असफल भयो" : error}
           </div>
         ) : assets.length === 0 ? (
-          <div className="assets-note">
-            No assets have been registered for Ward {ward} yet.
-          </div>
+          <div className="assets-note">{t("profile.assets.none")}</div>
         ) : (
           <>
             <div className="assets-grid">
@@ -97,15 +105,19 @@ export default function Assets({ embedded = false }) {
                   key={asset.id}
                   icon={getAssetIcon(asset.asset_type)}
                   title={asset.asset_name}
-                  subtitle={`${asset.asset_type} - Ward ${ward}`}
+                  subtitle={`${asset.asset_type} - ${t("nav.ward")} ${isNP ? toNepaliNumber(ward) : ward}`}
                   value={parseInt(asset.value || 0).toLocaleString()}
-                  description={asset.description || "No description"}
+                  description={
+                    asset.description ||
+                    (isNP ? "कुनै विवरण छैन" : "No description")
+                  }
                 />
               ))}
             </div>
             <div className="assets-note">
-              Showing {assets.length} asset{assets.length !== 1 ? "s" : ""} for
-              Ward {ward}.
+              {isNP
+                ? `वडा ${toNepaliNumber(ward)} को लागि ${toNepaliNumber(assets.length)} सम्पत्तिहरू देखाइँदै।`
+                : `Showing ${assets.length} asset${assets.length !== 1 ? "s" : ""} for Ward ${ward}.`}
             </div>
           </>
         )}

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "../Nav/Navbar";
 import "./Documents.css";
+import { useLanguage } from "../Context/LanguageContext";
 
 export default function Documents() {
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCards, setExpandedCards] = useState({});
@@ -10,231 +12,167 @@ export default function Documents() {
 
   // Service categories with labels from image
   const categories = [
-    { id: "all", name: "All Services", icon: "⊞" },
-    { id: "certificates", name: "Certificates", icon: "📜" },
-    { id: "registration", name: "Registration", icon: "📋" },
-    { id: "tax", name: "Tax & Revenue", icon: "💰" },
-    { id: "social", name: "Social Welfare", icon: "❤️" },
-    { id: "other", name: "Other Services", icon: "⋯" },
+    { id: "all", name: t("documents.categories.all"), icon: "⊞" },
+    {
+      id: "certificates",
+      name: t("documents.categories.certificates"),
+      icon: "📜",
+    },
+    {
+      id: "registration",
+      name: t("documents.categories.registration"),
+      icon: "📋",
+    },
+    { id: "tax", name: t("documents.categories.tax"), icon: "💰" },
+    { id: "social", name: t("documents.categories.social"), icon: "❤️" },
+    { id: "other", name: t("documents.categories.other"), icon: "⋯" },
   ];
 
   // Complete service catalog
   const documents = [
     {
       id: 1,
-      title: "Citizenship Certificate",
+      title: t("documents.services.1.title"),
       category: "certificates",
       categoryLabel: "certificate",
-      description:
-        "Apply for Nepali citizenship certificate for eligible citizens",
-      time: "7-15 working days",
-      fee: "Rs. 100",
+      description: t("documents.services.1.desc"),
+      time: t("documents.services.1.time"),
+      fee: t("documents.services.1.fee"),
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       icon: "👤",
-      requiredDocs: [
-        "Birth certificate",
-        "Parents' citizenship certificates",
-        "Passport size photos (2 copies)",
-        "Recommendation letter from ward office",
-        "Proof of residence",
-      ],
+      requiredDocs: t("documents.services.1.docs"),
     },
     {
       id: 2,
-      title: "Birth Certificate",
+      title: t("documents.services.2.title"),
       category: "certificates",
       categoryLabel: "certificate",
-      description: "Register birth and obtain birth certificate",
-      time: "1-3 working days",
-      fee: "Rs. 50",
+      description: t("documents.services.2.desc"),
+      time: t("documents.services.2.time"),
+      fee: t("documents.services.2.fee"),
       gradient: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
       icon: "👶",
-      requiredDocs: [
-        "Hospital birth certificate",
-        "Parents' citizenship certificates",
-        "Parents' marriage certificate",
-        "Passport size photo of child",
-        "Application form",
-      ],
+      requiredDocs: t("documents.services.2.docs"),
     },
     {
       id: 3,
-      title: "Marriage Certificate",
+      title: t("documents.services.3.title"),
       category: "certificates",
       categoryLabel: "certificate",
-      description: "Register marriage and obtain marriage certificate",
-      time: "1-2 working days",
-      fee: "Rs. 100",
+      description: t("documents.services.3.desc"),
+      time: t("documents.services.3.time"),
+      fee: t("documents.services.3.fee"),
       gradient: "linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)",
       icon: "💑",
-      requiredDocs: [
-        "Both parties' citizenship certificates",
-        "Passport size photos (2 copies each)",
-        "Two witnesses with citizenship",
-        "Age verification documents",
-        "Divorce decree (if applicable)",
-      ],
+      requiredDocs: t("documents.services.3.docs"),
     },
     {
       id: 4,
-      title: "Death Certificate",
+      title: t("documents.services.4.title"),
       category: "certificates",
       categoryLabel: "certificate",
-      description: "Register death and obtain death certificate",
-      time: "1-2 working days",
-      fee: "Rs. 50",
+      description: t("documents.services.4.desc"),
+      time: t("documents.services.4.time"),
+      fee: t("documents.services.4.fee"),
       gradient: "linear-gradient(135deg, #434343 0%, #000000 100%)",
       icon: "🕊️",
-      requiredDocs: [
-        "Hospital death certificate or police report",
-        "Deceased's citizenship certificate",
-        "Applicant's citizenship certificate",
-        "Passport size photos (2 copies)",
-        "Relationship proof document",
-      ],
+      requiredDocs: t("documents.services.4.docs"),
     },
     {
       id: 5,
-      title: "Business Registration",
+      title: t("documents.services.5.title"),
       category: "registration",
       categoryLabel: "registration",
-      description: "Register new business or company",
-      time: "5-10 working days",
-      fee: "Rs. 500-2000 (based on type)",
+      description: t("documents.services.5.desc"),
+      time: t("documents.services.5.time"),
+      fee: t("documents.services.5.fee"),
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
       icon: "🏢",
-      requiredDocs: [
-        "Owner's citizenship certificate",
-        "PAN certificate",
-        "Business location proof",
-        "Business plan document",
-        "Partnership agreement (if applicable)",
-        "Passport size photos",
-      ],
+      requiredDocs: t("documents.services.5.docs"),
     },
     {
       id: 6,
-      title: "Land Tax Payment",
+      title: t("documents.services.6.title"),
       category: "tax",
       categoryLabel: "tax",
-      description: "Pay annual land tax and property tax",
-      time: "Same day",
-      fee: "Based on land value",
+      description: t("documents.services.6.desc"),
+      time: t("documents.services.6.time"),
+      fee: t("documents.services.6.fee"),
       gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
       icon: "🏞️",
-      requiredDocs: [
-        "Land ownership certificate",
-        "Previous year tax receipt",
-        "Citizenship certificate",
-        "Land survey document",
-      ],
+      requiredDocs: t("documents.services.6.docs"),
     },
     {
       id: 7,
-      title: "House Tax Payment",
+      title: t("documents.services.7.title"),
       category: "tax",
       categoryLabel: "tax",
-      description: "Pay annual house and building tax",
-      time: "Same day",
-      fee: "Based on house value",
+      description: t("documents.services.7.desc"),
+      time: t("documents.services.7.time"),
+      fee: t("documents.services.7.fee"),
       gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
       icon: "🏠",
-      requiredDocs: [
-        "House ownership certificate",
-        "Previous year tax receipt",
-        "Citizenship certificate",
-        "Building completion certificate",
-      ],
+      requiredDocs: t("documents.services.7.docs"),
     },
     {
       id: 8,
-      title: "Senior Citizen Allowance",
+      title: t("documents.services.8.title"),
       category: "social",
       categoryLabel: "social welfare",
-      description: "Apply for senior citizen monthly allowance",
-      time: "15-30 working days",
-      fee: "Free",
+      description: t("documents.services.8.desc"),
+      time: t("documents.services.8.time"),
+      fee: t("documents.services.8.fee"),
       gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
       icon: "👴",
-      requiredDocs: [
-        "Citizenship certificate (age 70+)",
-        "Bank account details",
-        "Passport size photos (2 copies)",
-        "Age verification document",
-        "Recommendation letter from ward",
-      ],
+      requiredDocs: t("documents.services.8.docs"),
     },
     {
       id: 9,
-      title: "Disability ID Card",
+      title: t("documents.services.9.title"),
       category: "social",
       categoryLabel: "social welfare",
-      description: "Apply for disability identification card",
-      time: "10-20 working days",
-      fee: "Free",
+      description: t("documents.services.9.desc"),
+      time: t("documents.services.9.time"),
+      fee: t("documents.services.9.fee"),
       gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
       icon: "♿",
-      requiredDocs: [
-        "Citizenship certificate",
-        "Medical certificate from authorized hospital",
-        "Passport size photos (3 copies)",
-        "Guardian's citizenship (if minor)",
-        "Disability assessment report",
-      ],
+      requiredDocs: t("documents.services.9.docs"),
     },
     {
       id: 10,
-      title: "Ward Recommendation",
+      title: t("documents.services.10.title"),
       category: "other",
       categoryLabel: "recommendation",
-      description: "Get ward recommendation letter for various purposes",
-      time: "1-2 working days",
-      fee: "Rs. 50-100",
+      description: t("documents.services.10.desc"),
+      time: t("documents.services.10.time"),
+      fee: t("documents.services.10.fee"),
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       icon: "📝",
-      requiredDocs: [
-        "Citizenship certificate",
-        "Passport size photos (2 copies)",
-        "Purpose description letter",
-        "Supporting documents for purpose",
-      ],
+      requiredDocs: t("documents.services.10.docs"),
     },
     {
       id: 11,
-      title: "Income Certificate",
+      title: t("documents.services.11.title"),
       category: "other",
       categoryLabel: "certificate",
-      description: "Get income verification certificate",
-      time: "3-5 working days",
-      fee: "Rs. 100",
+      description: t("documents.services.11.desc"),
+      time: t("documents.services.11.time"),
+      fee: t("documents.services.11.fee"),
       gradient: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
       icon: "💵",
-      requiredDocs: [
-        "Citizenship certificate",
-        "Income source documents",
-        "Tax clearance certificate",
-        "Bank statements (6 months)",
-        "Employer letter (if employed)",
-      ],
+      requiredDocs: t("documents.services.11.docs"),
     },
     {
       id: 12,
-      title: "Building Permit",
+      title: t("documents.services.12.title"),
       category: "other",
       categoryLabel: "permit",
-      description: "Get permission for building construction",
-      time: "15-30 working days",
-      fee: "Rs. 2000-10000 (based on size)",
+      description: t("documents.services.12.desc"),
+      time: t("documents.services.12.time"),
+      fee: t("documents.services.12.fee"),
       gradient: "linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)",
       icon: "🏗️",
-      requiredDocs: [
-        "Land ownership certificate",
-        "Building design and map",
-        "Engineer's certificate",
-        "Environmental clearance",
-        "Neighbor's no objection",
-        "Citizenship certificate",
-      ],
+      requiredDocs: t("documents.services.12.docs"),
     },
   ];
 
@@ -272,16 +210,14 @@ export default function Documents() {
         <div className="documents-hero">
           <div className="hero-content">
             <div className="hero-icon">📄</div>
-            <h1>Required Documents</h1>
-            <p>
-              Complete information about documents required for various services
-            </p>
+            <h1>{t("documents.page_title")}</h1>
+            <p>{t("documents.page_subtitle")}</p>
 
             <div className="hero-search">
               <span className="search-icon">🔍</span>
               <input
                 type="text"
-                placeholder="Search for services or documents..."
+                placeholder={t("documents.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -294,7 +230,7 @@ export default function Documents() {
           <div className="filter-section">
             <div className="filter-header">
               <span className="filter-toggle-icon">≡</span>
-              <h2>Filter by Category</h2>
+              <h2>{t("documents.filter_title")}</h2>
             </div>
 
             <div className="category-grid">
@@ -317,7 +253,7 @@ export default function Documents() {
 
           <div className="services-count">
             <span className="count-bar">|</span> {filteredDocuments.length}{" "}
-            services found
+            {t("documents.services_found")}
           </div>
 
           {/* Services Grid */}
@@ -345,14 +281,18 @@ export default function Documents() {
                       <div className="info-item time">
                         <span className="info-icon">🕐</span>
                         <div className="info-text">
-                          <span className="info-label">Time</span>
+                          <span className="info-label">
+                            {t("documents.time")}
+                          </span>
                           <span className="info-value">{doc.time}</span>
                         </div>
                       </div>
                       <div className="info-item fee">
                         <span className="info-icon">✓</span>
                         <div className="info-text">
-                          <span className="info-label">Fee</span>
+                          <span className="info-label">
+                            {t("documents.fee")}
+                          </span>
                           <span className="info-value">{doc.fee}</span>
                         </div>
                       </div>
@@ -361,7 +301,7 @@ export default function Documents() {
                     <div className="required-docs-section">
                       <div className="docs-header">
                         <span className="docs-icon">📋</span>
-                        <strong>Required Documents</strong>
+                        <strong>{t("documents.required_docs_title")}</strong>
                       </div>
                       <ul className="docs-list">
                         {visibleDocs.map((reqDoc, index) => (
@@ -376,8 +316,8 @@ export default function Documents() {
                           onClick={() => toggleExpand(doc.id)}
                         >
                           {isExpanded
-                            ? "Show less"
-                            : `${doc.requiredDocs.length - 3} more...`}
+                            ? t("documents.show_less")
+                            : `${doc.requiredDocs.length - 3} ${t("documents.more")}`}
                         </button>
                       )}
                     </div>
@@ -386,7 +326,7 @@ export default function Documents() {
                       className="view-details-btn"
                       onClick={() => openModal(doc)}
                     >
-                      View Full Details
+                      {t("documents.view_details")}
                     </button>
                   </div>
                 </div>
@@ -427,7 +367,7 @@ export default function Documents() {
                     <span className="documents-modal-info-icon">🕐</span>
                     <div className="documents-modal-info-text">
                       <span className="documents-modal-label">
-                        Processing Time
+                        {t("documents.processing_time")}
                       </span>
                       <span className="documents-modal-value">
                         {selectedService.time}
@@ -437,7 +377,9 @@ export default function Documents() {
                   <div className="documents-modal-info-card fee">
                     <span className="documents-modal-info-icon">💰</span>
                     <div className="documents-modal-info-text">
-                      <span className="documents-modal-label">Fee</span>
+                      <span className="documents-modal-label">
+                        {t("documents.fee")}
+                      </span>
                       <span className="documents-modal-value">
                         {selectedService.fee}
                       </span>
@@ -446,7 +388,7 @@ export default function Documents() {
                 </div>
 
                 <div className="documents-modal-docs-section">
-                  <h3>Required Documents</h3>
+                  <h3>{t("documents.required_docs_title")}</h3>
                   <ul className="documents-modal-docs-list">
                     {selectedService.requiredDocs.map((doc, index) => (
                       <li key={index}>

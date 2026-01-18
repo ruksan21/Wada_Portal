@@ -11,8 +11,11 @@ import Status from "../Pages/Status.jsx";
 import { useWard } from "../Context/WardContext.jsx";
 // import { useAuth } from "../Context/AuthContext.jsx";
 
+import { useLanguage } from "../Context/LanguageContext.jsx";
+
 const Navbar = ({ showHomeContent = false }) => {
   const { municipality, ward } = useWard();
+  const { t, language, toggleLanguage } = useLanguage();
   // const { user } = useAuth(); // User no longer needed for notification logic
 
   const location = useLocation();
@@ -21,19 +24,19 @@ const Navbar = ({ showHomeContent = false }) => {
   const selectedMuni = useMemo(
     () =>
       municipality && ward
-        ? `${municipality} - Ward ${ward}`
-        : "Select Municipality",
-    [municipality, ward]
+        ? `${municipality} - ${t("nav.ward")} ${ward}`
+        : t("nav.select_muni"),
+    [municipality, ward, t],
   );
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Documents", path: "/documents" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: t("nav.home"), path: "/" },
+    { name: t("nav.documents"), path: "/documents" },
+    { name: t("nav.about"), path: "/about" },
+    { name: t("nav.contact"), path: "/contact" },
   ];
 
   return (
@@ -69,15 +72,7 @@ const Navbar = ({ showHomeContent = false }) => {
           {/* Language Toggle */}
           <button
             className="lang-toggle-btn"
-            onClick={() => {
-              const newLang =
-                localStorage.getItem("app_lang") === "NP" ? "EN" : "NP";
-              localStorage.setItem("app_lang", newLang);
-              window.dispatchEvent(new Event("storage")); // Trigger update if needed
-              // Force update for demo
-              const btn = document.querySelector(".lang-toggle-text");
-              if (btn) btn.innerText = newLang;
-            }}
+            onClick={toggleLanguage}
             style={{
               background: "none",
               border: "1px solid #e2e8f0",
@@ -93,7 +88,7 @@ const Navbar = ({ showHomeContent = false }) => {
               className="lang-toggle-text"
               style={{ fontSize: "14px", fontWeight: "600", color: "#4a5568" }}
             >
-              {localStorage.getItem("app_lang") === "NP" ? "NP" : "EN"}
+              {language}
             </span>
             <i
               className="fa-solid fa-globe"

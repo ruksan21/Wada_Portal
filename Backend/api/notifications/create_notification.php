@@ -14,7 +14,7 @@ ob_clean();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ob_clean();
-    echo json_encode(["success" => false, "message" => "Only POST method allowed"]);
+    echo json_encode(["success" => false, "message" => "POST विधि मात्र अनुमति छ"]);
     exit();
 }
 
@@ -26,7 +26,7 @@ try {
         ob_clean();
         echo json_encode([
             "success" => false,
-            "message" => "Title, message, and type are required"
+            "message" => "शीर्षक, सन्देश र प्रकार आवश्यक छ"
         ]);
         exit();
     }
@@ -53,14 +53,14 @@ try {
         ob_clean();
         echo json_encode([
             "success" => true,
-            "message" => "Notification created successfully",
+            "message" => "सूचना सफलतापूर्वक सिर्जना गरियो",
             "notification_id" => $stmt->insert_id
         ]);
     } else {
         ob_clean();
         echo json_encode([
             "success" => false,
-            "message" => "Failed to create notification: " . $stmt->error
+            "message" => "सूचना सिर्जना गर्न असफल: " . $stmt->error
         ]);
     }
     

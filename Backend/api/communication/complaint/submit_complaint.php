@@ -6,7 +6,7 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require_once '../../db_connect.php';
 
-$response = array("success" => false, "message" => "Unknown error");
+$response = array("success" => false, "message" => "अज्ञात त्रुटि");
 
 // 1. Get Inputs
 $ward_id = isset($_POST['ward_id']) ? intval($_POST['ward_id']) : null;
@@ -52,7 +52,7 @@ if (!$ward_id && $municipality && $ward_number) {
 
 
 if (!$ward_id) {
-    echo json_encode(["success" => false, "message" => "Ward not found. Please verify municipality and ward number."]);
+    echo json_encode(["success" => false, "message" => "वडा फेला परेन। कृपया नगरपालिका र वडा नम्बर प्रमाणित गर्नुहोस्।"]);
     exit;
 }
 
@@ -114,7 +114,7 @@ try {
     $stmt->bind_param("iisssssssss", $ward_id, $user_id, $subject, $message, $priority, $image_path, $full_name, $email, $phone, $current_date);
     
     if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Complaint sent successfully!"]);
+        echo json_encode(["success" => true, "message" => "गुनासो सफलतापूर्वक पठाइयो!"]);
         $stmt->close();
         $conn->close();
         exit;
@@ -131,7 +131,7 @@ try {
         $stmt_fallback->bind_param("iissssss", $ward_id, $user_id, $subject, $message, $priority, $image_path, $full_name);
         
         if ($stmt_fallback->execute()) {
-            echo json_encode(["success" => true, "message" => "Complaint sent (limited fields)!"]);
+            echo json_encode(["success" => true, "message" => "गुनासो पठाइयो (सीमित क्षेत्रहरू)!"]);
             exit;
         }
         throw new Exception("Deep error");
@@ -141,10 +141,10 @@ try {
         $stmt_minimal = $conn->prepare($sql_minimal);
         $stmt_minimal->bind_param("iisss", $ward_id, $user_id, $subject, $message, $priority);
         if ($stmt_minimal->execute()) {
-             echo json_encode(["success" => true, "message" => "Complaint sent (minimal fields)!"]);
+             echo json_encode(["success" => true, "message" => "गुनासो पठाइयो (न्यूनतम क्षेत्रहरू)!"]);
              exit;
         }
-        echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
+        echo json_encode(["success" => false, "message" => "डाटाबेस त्रुटि: " . $e->getMessage()]);
         exit;
     }
 }

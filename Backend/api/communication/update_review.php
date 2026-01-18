@@ -7,38 +7,38 @@ header("Content-Type: application/json");
 require_once '../db_connect.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
-$reply_id = isset($data['reply_id']) ? intval($data['reply_id']) : 0;
+$review_id = isset($data['review_id']) ? intval($data['review_id']) : 0;
 $user_id = isset($data['user_id']) ? intval($data['user_id']) : 0;
-$reply_text = isset($data['reply_text']) ? $conn->real_escape_string($data['reply_text']) : '';
+$comment = isset($data['comment']) ? $conn->real_escape_string($data['comment']) : '';
 
-if ($reply_id === 0 || $user_id === 0 || empty($reply_text)) {
-    echo json_encode(["success" => false, "message" => "ID and text are required."]);
+if ($review_id === 0 || $user_id === 0 || empty($comment)) {
+    echo json_encode(["success" => false, "message" => "ID and comment are required."]);
     exit();
 }
 
 // Check authorization: Owner ONLY for editing
-$check_sql = "SELECT user_id FROM feedback_replies WHERE id = ?";
+$check_sql = "SELECT user_id FROM reviews WHERE id = ?";
 $stmt = $conn->prepare($check_sql);
-$stmt->bind_param("i", $reply_id);
+$stmt->bind_param("i", $review_id);
 $stmt->execute();
 $res = $stmt->get_result();
 
 if ($row = $res->fetch_assoc()) {
     if ($row['user_id'] == $user_id) {
         // Authorized to edit
-        $upd = $conn->prepare("UPDATE feedback_replies SET reply_text = ? WHERE id = ?");
-        $upd->bind_param("si", $reply_text, $reply_id);
+        $upd = $conn->prepare("UPDATE reviews SET comment = ? WHERE id = ?");
+        $upd->bind_param("si", $comment, $review_id);
         if ($upd->execute()) {
-            echo json_encode(["success" => true, "message" => "Reply updated."]);
+            echo json_encode(["success" => true, "message" => "Review updated."]);
         } else {
             echo json_encode(["success" => false, "message" => "Update failed."]);
         }
         $upd->close();
     } else {
-        echo json_encode(["success" => false, "message" => "Unauthorized to edit this reply."]);
+        echo json_encode(["success" => false, "message" => "Unauthorized to edit this review."]);
     }
 } else {
-    echo json_encode(["success" => false, "message" => "Reply not found."]);
+    echo json_encode(["success" => false, "message" => "Review not found."]);
 }
 
 $stmt->close();

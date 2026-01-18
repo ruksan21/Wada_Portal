@@ -77,6 +77,7 @@ $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 
 $sql = "SELECT 
             r.id, 
+            r.user_id,
             r.rating, 
             r.comment, 
             r.created_at, 
@@ -96,7 +97,7 @@ $sql = "SELECT
             u.work_municipality,
             u.work_ward,
             (SELECT COUNT(*) FROM feedback_replies WHERE review_id = r.id) as reply_count,
-             (SELECT COUNT(*) FROM feedback_votes WHERE review_id = r.id AND vote_type = 1) as likes,
+            (SELECT COUNT(*) FROM feedback_votes WHERE review_id = r.id AND vote_type = 1) as likes,
             (SELECT COUNT(*) FROM feedback_votes WHERE review_id = r.id AND vote_type = -1) as dislikes
             " . ($user_id > 0 ? ", (SELECT vote_type FROM feedback_votes WHERE review_id = r.id AND user_id = ?) as user_vote" : ", 0 as user_vote") . "
         FROM reviews r

@@ -1,21 +1,25 @@
-import React from 'react';
-import HeroImage from '../../Image/Home.png';
+import React from "react";
+import { useLanguage } from "../Context/LanguageContext.jsx";
+import HeroImage from "../../Image/Home.png";
 
 // Reusable hero section component.
 // Displays ward chairperson heading and currently selected municipality/ward.
 // Props:
 // - selectedMuni: string to show current selection (defaults to placeholder)
-const HeroSection = ({ selectedMuni = 'Select Municipality' }) => {
-	return (
-		<section className="hero">
-			<img src={HeroImage} alt="Hero" />
-			<div className="hero-overlay">
-				<h1>Ward Chairperson</h1>
-				<p>View your Ward Chairperson details</p>
-				<div className="selected-muni">{selectedMuni}</div>
-			</div>
-		</section>
-	);
+const HeroSection = ({ selectedMuni }) => {
+  const { t } = useLanguage();
+  const displayMuni = selectedMuni || t("hero.select_placeholder");
+
+  return (
+    <section className="hero">
+      <img src={HeroImage} alt="Hero" />
+      <div className="hero-overlay">
+        <h1>{t("hero.title")}</h1>
+        <p>{t("hero.subtitle")}</p>
+        <div className="selected-muni">{displayMuni}</div>
+      </div>
+    </section>
+  );
 };
 
 export default HeroSection;

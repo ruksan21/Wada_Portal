@@ -6,27 +6,93 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Koshi Province",
+    name_np: "कोशी प्रदेश",
     districts: [
       {
         name: "Morang",
+        name_np: "मोरङ",
         municipalities: [
-          { name: "Biratnagar Metropolitan City", wards: 19 },
-          { name: "Sundarharaicha Municipality", wards: 12 },
-          { name: "Belbari Municipality", wards: 11 },
-          { name: "Pathari Shanischare Municipality", wards: 10 },
-          { name: "Ratuwamai Municipality", wards: 10 },
-          { name: "Urlabari Municipality", wards: 9 },
-          { name: "Rangeli Municipality", wards: 9 },
-          { name: "Sunwarnshi Municipality", wards: 9 },
-          { name: "Letang Municipality", wards: 9 },
-          { name: "Jahada Rural Municipality", wards: 7 },
-          { name: "Budi Ganga Rural Municipality", wards: 7 },
-          { name: "Katahari Rural Municipality", wards: 7 },
-          { name: "Dhanpalthan Rural Municipality", wards: 7 },
-          { name: "Kanepokhari Rural Municipality", wards: 7 },
-          { name: "Gramthan Rural Municipality", wards: 7 },
-          { name: "Kerabari Rural Municipality", wards: 10 },
-          { name: "Miklung Rural Municipality", wards: 9 },
+          {
+            name: "Biratnagar Metropolitan City",
+            name_np: "विराटनगर महानगरपालिका",
+            wards: 19,
+          },
+          {
+            name: "Sundarharaicha Municipality",
+            name_np: "सुन्दरहरैंचा नगरपालिका",
+            wards: 12,
+          },
+          {
+            name: "Belbari Municipality",
+            name_np: "बेलबारी नगरपालिका",
+            wards: 11,
+          },
+          {
+            name: "Pathari Shanischare Municipality",
+            name_np: "पथरी शनिश्चरे नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Ratuwamai Municipality",
+            name_np: "रतुवामाई नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Urlabari Municipality",
+            name_np: "उर्लाबारी नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Rangeli Municipality",
+            name_np: "रंगेली नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Sunwarnshi Municipality",
+            name_np: "सुनवर्षि नगरपालिका",
+            wards: 9,
+          },
+          { name: "Letang Municipality", name_np: "लेटाङ नगरपालिका", wards: 9 },
+          {
+            name: "Jahada Rural Municipality",
+            name_np: "जहदा गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Budi Ganga Rural Municipality",
+            name_np: "बुढीगंगा गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Katahari Rural Municipality",
+            name_np: "कटहरी गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Dhanpalthan Rural Municipality",
+            name_np: "धनपालथान गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Kanepokhari Rural Municipality",
+            name_np: "कानेपोखरी गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Gramthan Rural Municipality",
+            name_np: "ग्रामथान गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Kerabari Rural Municipality",
+            name_np: "केराबारी गाउँपालिका",
+            wards: 10,
+          },
+          {
+            name: "Miklung Rural Municipality",
+            name_np: "मिक्लाजुङ गाउँपालिका",
+            wards: 9,
+          },
         ],
       },
       {
@@ -159,6 +225,7 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Madhesh Province",
+    name_np: "मधेश प्रदेश",
     districts: [
       {
         name: "Parsa",
@@ -248,123 +315,335 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Bagmati Province",
+    name_np: "बागमती प्रदेश",
     districts: [
       {
         name: "Kathmandu",
+        name_np: "काठमाडौं",
         municipalities: [
-          { name: "Kathmandu Metropolitan City", wards: 32 },
-          { name: "Kirtipur Municipality", wards: 10 },
-          { name: "Gokarneshwar Municipality", wards: 9 },
-          { name: "Budhanilkantha Municipality", wards: 13 },
-          { name: "Tokha Municipality", wards: 11 },
-          { name: "Tarakeshwor Municipality", wards: 11 },
-          { name: "Nagarjun Municipality", wards: 10 },
-          { name: "Chandragiri Municipality", wards: 15 },
-          { name: "Dakshinkali Municipality", wards: 9 },
-          { name: "Shankharapur Municipality", wards: 9 },
-          { name: "Kageshwari Manohara Municipality", wards: 9 },
+          {
+            name: "Kathmandu Metropolitan City",
+            name_np: "काठमाडौं महानगरपालिका",
+            wards: 32,
+          },
+          {
+            name: "Kirtipur Municipality",
+            name_np: "कीर्तिपुर नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Gokarneshwar Municipality",
+            name_np: "गोकर्णेश्वर नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Budhanilkantha Municipality",
+            name_np: "बुढानीलकण्ठ नगरपालिका",
+            wards: 13,
+          },
+          {
+            name: "Tokha Municipality",
+            name_np: "टोखा नगरपालिका",
+            wards: 11,
+          },
+          {
+            name: "Tarakeshwor Municipality",
+            name_np: "तार्केश्वर नगरपालिका",
+            wards: 11,
+          },
+          {
+            name: "Nagarjun Municipality",
+            name_np: "नागार्जुन नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Chandragiri Municipality",
+            name_np: "चन्द्रागिरी नगरपालिका",
+            wards: 15,
+          },
+          {
+            name: "Dakshinkali Municipality",
+            name_np: "दक्षिणकाली नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Shankharapur Municipality",
+            name_np: "शंखरापुर नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Kageshwari Manohara Municipality",
+            name_np: "कागेश्वरी मनोहरा नगरपालिका",
+            wards: 9,
+          },
         ],
       },
       {
         name: "Lalitpur",
+        name_np: "ललितपुर",
         municipalities: [
-          { name: "Lalitpur Metropolitan City", wards: 29 },
-          { name: "Mahalaxmi Municipality", wards: 10 },
-          { name: "Godawari Municipality", wards: 14 },
-          { name: "Konjyosom Rural Municipality", wards: 5 },
-          { name: "Bagmati Rural Municipality", wards: 7 },
-          { name: "Mahankal Rural Municipality", wards: 6 },
+          {
+            name: "Lalitpur Metropolitan City",
+            name_np: "ललितपुर महानगरपालिका",
+            wards: 29,
+          },
+          {
+            name: "Mahalaxmi Municipality",
+            name_np: "महालक्ष्मी नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Godawari Municipality",
+            name_np: "गोदावरी नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Konjyosom Rural Municipality",
+            name_np: "कोन् ज्योसोम गाउँपालिका",
+            wards: 5,
+          },
+          {
+            name: "Bagmati Rural Municipality",
+            name_np: "बागमती गाउँपालिका",
+            wards: 7,
+          },
+          {
+            name: "Mahankal Rural Municipality",
+            name_np: "महाङ्काल गाउँपालिका",
+            wards: 6,
+          },
         ],
       },
       {
         name: "Bhaktapur",
+        name_np: "भक्तपुर",
         municipalities: [
-          { name: "Bhaktapur Municipality", wards: 10 },
-          { name: "Changunarayan Municipality", wards: 9 },
-          { name: "Madhyapur Thimi Municipality", wards: 9 },
-          { name: "Suryabinayak Municipality", wards: 10 },
+          {
+            name: "Bhaktapur Municipality",
+            name_np: "भक्तपुर नगरपालिका",
+            wards: 10,
+          },
+          {
+            name: "Changunarayan Municipality",
+            name_np: "चाँगुनारायण नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Madhyapur Thimi Municipality",
+            name_np: "मध्यपुर थिमी नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Suryabinayak Municipality",
+            name_np: "सूर्यविनायक नगरपालिका",
+            wards: 10,
+          },
         ],
       },
       {
         name: "Chitwan",
         municipalities: [
-          { name: "Bharatpur Metropolitan City", wards: 29 },
-          { name: "Ratnanagar Municipality", wards: 16 },
-          { name: "Khairahani Municipality", wards: 13 },
-          { name: "Rapti Municipality", wards: 13 },
-          { name: "Kalika Municipality", wards: 11 },
-          { name: "Madi Municipality", wards: 9 },
-          { name: "Ichchhakamana Rural Municipality", wards: 7 },
+          {
+            name: "Bharatpur Metropolitan City",
+            name_np: "भरतपुर महानगरपालिका",
+            wards: 29,
+          },
+          {
+            name: "Ratnanagar Municipality",
+            name_np: "रत्ननगर नगरपालिका",
+            wards: 16,
+          },
+          {
+            name: "Khairahani Municipality",
+            name_np: "खैरहनी नगरपालिका",
+            wards: 13,
+          },
+          {
+            name: "Rapti Municipality",
+            name_np: "राप्ती नगरपालिका",
+            wards: 13,
+          },
+          {
+            name: "Kalika Municipality",
+            name_np: "कालिका नगरपालिका",
+            wards: 11,
+          },
+          {
+            name: "Madi Municipality",
+            name_np: "माडी नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Ichchhakamana Rural Municipality",
+            name_np: "इच्छाकामना गाउँपालिका",
+            wards: 7,
+          },
         ],
       },
       {
         name: "Makwanpur",
         municipalities: [
-          { name: "Hetauda Sub-Metropolitan City", wards: 19 },
-          { name: "Thaha Municipality", wards: 12 },
-          { name: "Bhimphedi Rural Municipality", wards: 9 },
-          { name: "Makawanpur Gadhi Rural Municipality", wards: 8 },
+          {
+            name: "Hetauda Sub-Metropolitan City",
+            name_np: "हेटौंडा उपमहानगरपालिका",
+            wards: 19,
+          },
+          {
+            name: "Thaha Municipality",
+            name_np: "थाहा नगरपालिका",
+            wards: 12,
+          },
+          {
+            name: "Bhimphedi Rural Municipality",
+            name_np: "भीमफेदी गाउँपालिका",
+            wards: 9,
+          },
+          {
+            name: "Makawanpur Gadhi Rural Municipality",
+            name_np: "मकवानपुरगढी गाउँपालिका",
+            wards: 8,
+          },
         ],
       },
       {
         name: "Sindhuli",
         municipalities: [
-          { name: "Kamalamai Municipality", wards: 14 },
-          { name: "Dudhouli Municipality", wards: 14 },
+          {
+            name: "Kamalamai Municipality",
+            name_np: "कमलामाई नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Dudhouli Municipality",
+            name_np: "दुधौली नगरपालिका",
+            wards: 14,
+          },
         ],
       },
       {
         name: "Ramechhap",
         municipalities: [
-          { name: "Manthali Municipality", wards: 14 },
-          { name: "Ramechhap Municipality", wards: 9 },
+          {
+            name: "Manthali Municipality",
+            name_np: "मन्थली नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Ramechhap Municipality",
+            name_np: "रामेछाप नगरपालिका",
+            wards: 9,
+          },
         ],
       },
       {
         name: "Dolakha",
         municipalities: [
-          { name: "Bhimeshwor Municipality", wards: 9 },
-          { name: "Jiri Municipality", wards: 9 },
+          {
+            name: "Bhimeshwor Municipality",
+            name_np: "भीमेश्वर नगरपालिका",
+            wards: 9,
+          },
+          { name: "Jiri Municipality", name_np: "जिरी नगरपालिका", wards: 9 },
         ],
       },
       {
         name: "Sindhupalchok",
         municipalities: [
-          { name: "Chautara SangachokGadhi Municipality", wards: 14 },
-          { name: "Barhabise Municipality", wards: 9 },
-          { name: "Melamchi Municipality", wards: 13 },
+          {
+            name: "Chautara SangachokGadhi Municipality",
+            name_np: "चौतारा साँगाचोकगढी नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Barhabise Municipality",
+            name_np: "बाह्रबिसे नगरपालिका",
+            wards: 9,
+          },
+          {
+            name: "Melamchi Municipality",
+            name_np: "मेलम्ची नगरपालिका",
+            wards: 13,
+          },
         ],
       },
       {
         name: "Kavrepalanchok",
         municipalities: [
-          { name: "Dhulikhel Municipality", wards: 12 },
-          { name: "Banepa Municipality", wards: 14 },
-          { name: "Panauti Municipality", wards: 12 },
-          { name: "Panchkhal Municipality", wards: 13 },
-          { name: "Namobuddha Municipality", wards: 11 },
-          { name: "Mandandeupur Municipality", wards: 12 },
+          {
+            name: "Dhulikhel Municipality",
+            name_np: "धुलिखेल नगरपालिका",
+            wards: 12,
+          },
+          {
+            name: "Banepa Municipality",
+            name_np: "बनेपा नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Panauti Municipality",
+            name_np: "पनौती नगरपालिका",
+            wards: 12,
+          },
+          {
+            name: "Panchkhal Municipality",
+            name_np: "पाँचखाल नगरपालिका",
+            wards: 13,
+          },
+          {
+            name: "Namobuddha Municipality",
+            name_np: "नमोबुद्ध नगरपालिका",
+            wards: 11,
+          },
+          {
+            name: "Mandandeupur Municipality",
+            name_np: "मण्डनदेउपुर नगरपालिका",
+            wards: 12,
+          },
         ],
       },
       {
         name: "Nuwakot",
         municipalities: [
-          { name: "Bidur Municipality", wards: 13 },
-          { name: "Belkotgadhi Municipality", wards: 13 },
+          {
+            name: "Bidur Municipality",
+            name_np: "विदुर नगरपालिका",
+            wards: 13,
+          },
+          {
+            name: "Belkotgadhi Municipality",
+            name_np: "बेलकोटगढी नगरपालिका",
+            wards: 13,
+          },
         ],
       },
       {
         name: "Rasuwa",
         municipalities: [
-          { name: "Gosaikunda Rural Municipality", wards: 6 },
-          { name: "Kalika Rural Municipality", wards: 5 },
+          {
+            name: "Gosaikunda Rural Municipality",
+            name_np: "गोसाईकुण्ड गाउँपालिका",
+            wards: 6,
+          },
+          {
+            name: "Kalika Rural Municipality",
+            name_np: "कालिका गाउँपालिका",
+            wards: 5,
+          },
         ],
       },
       {
         name: "Dhading",
         municipalities: [
-          { name: "Nilkantha Municipality", wards: 14 },
-          { name: "Dhunibesi Municipality", wards: 9 },
+          {
+            name: "Nilkantha Municipality",
+            name_np: "नीलकण्ठ नगरपालिका",
+            wards: 14,
+          },
+          {
+            name: "Dhunibesi Municipality",
+            name_np: "धुनिबेसी नगरपालिका",
+            wards: 9,
+          },
         ],
       },
     ],
@@ -375,9 +654,11 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Gandaki Province",
+    name_np: "गण्डकी प्रदेश",
     districts: [
       {
         name: "Kaski",
+        name_np: "कास्की",
         municipalities: [
           { name: "Pokhara Metropolitan City", wards: 33 },
           { name: "Annapurna Rural Municipality", wards: 11 },
@@ -473,6 +754,7 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Lumbini Province",
+    name_np: "लुम्बिनी प्रदेश",
     districts: [
       {
         name: "Rupandehi",
@@ -579,6 +861,7 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Karnali Province",
+    name_np: "कर्णाली प्रदेश",
     districts: [
       {
         name: "Surkhet",
@@ -661,6 +944,7 @@ export const nepalLocations = [
   // ======================================================
   {
     name: "Sudurpashchim Province",
+    name_np: "सुदूरपश्चिम प्रदेश",
     districts: [
       {
         name: "Kailali",
@@ -749,11 +1033,12 @@ export const nepalLocations = [
 // HELPER FUNCTIONS
 // ======================================================
 
-export const getProvinces = () => nepalLocations.map((p) => p.name);
+export const getProvinces = () => nepalLocations;
 
 export const getDistricts = (provinceName) => {
   const province = nepalLocations.find((p) => p.name === provinceName);
-  return province ? province.districts.map((d) => d.name) : [];
+  // Return the full district objects
+  return province ? province.districts : [];
 };
 
 export const getMunicipalities = (provinceName, districtName) => {
@@ -761,7 +1046,7 @@ export const getMunicipalities = (provinceName, districtName) => {
   if (province) {
     const district = province.districts.find((d) => d.name === districtName);
     if (district) {
-      return district.municipalities; // Returns [{name, wards}, ...]
+      return district.municipalities; // Already returns [{name, wards, name_np}, ...]
     }
   }
   return [];
@@ -772,10 +1057,32 @@ export const getMunicipalityInfo = (districtName, municipalityName) => {
     const district = province.districts.find((d) => d.name === districtName);
     if (district) {
       const muni = district.municipalities.find(
-        (m) => m.name === municipalityName
+        (m) => m.name === municipalityName,
       );
       if (muni) return muni;
     }
   }
+
   return null;
+};
+
+export const toNepaliNumber = (num) => {
+  if (num === null || num === undefined) return "";
+  const englishToNepali = {
+    0: "०",
+    1: "१",
+    2: "२",
+    3: "३",
+    4: "४",
+    5: "५",
+    6: "६",
+    7: "७",
+    8: "८",
+    9: "९",
+  };
+  return num
+    .toString()
+    .split("")
+    .map((char) => englishToNepali[char] || char)
+    .join("");
 };

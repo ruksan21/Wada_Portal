@@ -6,18 +6,21 @@ import {
   getDistricts,
   getMunicipalities,
   getMunicipalityInfo,
+  toNepaliNumber,
 } from "../../data/nepal_locations";
 import API_ENDPOINTS from "../../config/api";
 import { toast } from "react-toastify";
+import { useLanguage } from "../Context/LanguageContext";
 
 export default function RegisterPage({
   initialRole = "citizen",
   hideRoleSelector = false,
 }) {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
 
   const [role, setRole] = useState(
-    initialRole === "officer" ? "officer" : "citizen"
+    initialRole === "officer" ? "officer" : "citizen",
   );
 
   const [email, setEmail] = useState("");
@@ -126,37 +129,39 @@ export default function RegisterPage({
 
   const validate = () => {
     const newErrors = {};
-    if (!firstName.trim()) newErrors.firstName = "Required";
-    if (!lastName.trim()) newErrors.lastName = "Required";
+    if (!firstName.trim()) newErrors.firstName = t("auth.required");
+    if (!lastName.trim()) newErrors.lastName = t("auth.required");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    if (!emailRegex.test(email)) newErrors.email = "Invalid email";
-    if (password.length < 8) newErrors.password = "Min 8 characters";
+    if (!emailRegex.test(email)) newErrors.email = t("auth.email_invalid");
+    if (password.length < 8) newErrors.password = t("auth.password_min");
     if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords don't match";
-    if (!province) newErrors.province = "Province required";
-    if (!district) newErrors.district = "District required";
-    if (!city) newErrors.city = "Municipality required";
-    if (!wardNumber) newErrors.wardNumber = "Ward required";
-    if (!contactNumber.trim()) newErrors.contactNumber = "Required";
-    if (!dob) newErrors.dob = "Required";
-    if (!gender) newErrors.gender = "Required";
-    if (!citizenshipNumber) newErrors.citizenshipNumber = "Required";
-    if (!citizenshipIssueDate) newErrors.citizenshipIssueDate = "Required";
+      newErrors.confirmPassword = t("auth.password_mismatch");
+    if (!province) newErrors.province = t("auth.province_required");
+    if (!district) newErrors.district = t("auth.district_required");
+    if (!city) newErrors.city = t("auth.muni_required");
+    if (!wardNumber) newErrors.wardNumber = t("auth.ward_required");
+    if (!contactNumber.trim()) newErrors.contactNumber = t("auth.required");
+    if (!dob) newErrors.dob = t("auth.required");
+    if (!gender) newErrors.gender = t("auth.required");
+    if (!citizenshipNumber) newErrors.citizenshipNumber = t("auth.required");
+    if (!citizenshipIssueDate)
+      newErrors.citizenshipIssueDate = t("auth.required");
     if (!citizenshipIssueDistrict)
-      newErrors.citizenshipIssueDistrict = "Required";
-    if (!citizenshipPhoto) newErrors.citizenshipPhoto = "Upload required";
+      newErrors.citizenshipIssueDistrict = t("auth.required");
+    if (!citizenshipPhoto)
+      newErrors.citizenshipPhoto = t("auth.upload_required");
 
     if (role === "officer") {
-      if (!officerId.trim()) newErrors.officerId = "Required";
-      if (!department) newErrors.department = "Required";
-      if (!workProvince) newErrors.workProvince = "Required";
-      if (!workDistrict) newErrors.workDistrict = "Required";
-      if (!workMunicipality) newErrors.workMunicipality = "Required";
-      if (!workWard) newErrors.workWard = "Required";
-      if (!idCardPhoto) newErrors.idCardPhoto = "Upload required";
+      if (!officerId.trim()) newErrors.officerId = t("auth.required");
+      if (!department) newErrors.department = t("auth.required");
+      if (!workProvince) newErrors.workProvince = t("auth.required");
+      if (!workDistrict) newErrors.workDistrict = t("auth.required");
+      if (!workMunicipality) newErrors.workMunicipality = t("auth.required");
+      if (!workWard) newErrors.workWard = t("auth.required");
+      if (!idCardPhoto) newErrors.idCardPhoto = t("auth.upload_required");
     }
 
-    if (!termsAccepted) newErrors.terms = "Accept terms required";
+    if (!termsAccepted) newErrors.terms = t("auth.accept_terms");
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -167,7 +172,7 @@ export default function RegisterPage({
     if (!validate()) {
       // Scroll to the first error
       const firstError = document.querySelector(
-        ".form-control.error, .error-message.show"
+        ".form-control.error, .error-message.show",
       );
       if (firstError) {
         firstError.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -221,8 +226,8 @@ export default function RegisterPage({
       if (data.success) {
         toast.success(
           role === "officer"
-            ? "Registration successful! Your account is pending Admin approval."
-            : "Registration successful!"
+            ? t("auth.registration_pending")
+            : t("auth.registration_success"),
         );
         // Redirect to Login after 1.5 seconds
         setTimeout(() => navigate("/login", { replace: true }), 1500);
@@ -232,12 +237,13 @@ export default function RegisterPage({
           setErrors({ email: data.message });
           toast.error(data.message);
         } else {
-          toast.error(data.message || "Registration failed");
+          toast.error(data.message || t("auth.registration_failed"));
         }
+        setIsLoading(false);
         setIsLoading(false);
       }
     } catch (err) {
-      toast.error("Network error: " + err.message);
+      toast.error(t("auth.network_error") + err.message);
       setIsLoading(false);
     }
   };
@@ -246,7 +252,7 @@ export default function RegisterPage({
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setErrors({ ...errors, profilePhoto: "File too large (Max 5MB)" });
+        setErrors({ ...errors, profilePhoto: t("auth.file_too_large") });
         return;
       }
       setProfilePhoto(file);
@@ -264,7 +270,7 @@ export default function RegisterPage({
     if (file) {
       // Limit to 5MB
       if (file.size > 5 * 1024 * 1024) {
-        setErrors({ ...errors, citizenshipPhoto: "File too large (Max 5MB)" });
+        setErrors({ ...errors, citizenshipPhoto: t("auth.file_too_large") });
         return;
       }
       setCitizenshipPhoto(file);
@@ -311,20 +317,20 @@ export default function RegisterPage({
           <div className="logo-circle">
             <i className="fa-solid fa-building-columns"></i>
           </div>
-          <h1>Digital Ward</h1>
-          <p>Streamlining Local Governance</p>
+          <h1>{t("auth.digital_ward")}</h1>
+          <p>{t("auth.streamlining")}</p>
           <div className="brand-features">
             <div className="feature-item">
               <i className="fa-solid fa-check"></i>
-              <span>Easy Registration</span>
+              <span>{t("auth.easy_registration")}</span>
             </div>
             <div className="feature-item">
               <i className="fa-solid fa-check"></i>
-              <span>Secure Data</span>
+              <span>{t("auth.secure_data")}</span>
             </div>
             <div className="feature-item">
               <i className="fa-solid fa-check"></i>
-              <span>Quick Access</span>
+              <span>{t("auth.quick_access")}</span>
             </div>
           </div>
         </div>
@@ -334,8 +340,8 @@ export default function RegisterPage({
       <div className="register-right-panel">
         <div className="register-container">
           <div className="register-header">
-            <h1>Create Account</h1>
-            <p className="subtitle">Join us today! Enter your details below.</p>
+            <h1>{t("auth.create_account")}</h1>
+            <p className="subtitle">{t("auth.join_today")}</p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
@@ -354,7 +360,7 @@ export default function RegisterPage({
                       onChange={(e) => setRole(e.target.value)}
                     />
                     <span className="role-icon">👤</span>
-                    <span className="role-text">Citizen</span>
+                    <span className="role-text">{t("auth.role_citizen")}</span>
                   </label>
                   <label
                     className={`role-option ${
@@ -368,20 +374,18 @@ export default function RegisterPage({
                       onChange={(e) => setRole(e.target.value)}
                     />
                     <span className="role-icon">👮</span>
-                    <span className="role-text">Officer</span>
+                    <span className="role-text">{t("auth.role_officer")}</span>
                   </label>
                 </div>
               </div>
             )}
 
             <div className="form-section">
-              <h2 className="section-title">Personal Details</h2>
-
-
+              <h2 className="section-title">{t("auth.personal_details")}</h2>
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>First Name *</label>
+                  <label>{t("auth.first_name")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-user"></i>
                     <input
@@ -392,7 +396,7 @@ export default function RegisterPage({
                       }`}
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="First Name"
+                      placeholder={t("auth.first_name")}
                     />
                   </div>
                   {errors.firstName && (
@@ -400,7 +404,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Last Name *</label>
+                  <label>{t("auth.last_name")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-user"></i>
                     <input
@@ -411,7 +415,7 @@ export default function RegisterPage({
                       }`}
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Last Name"
+                      placeholder={t("auth.last_name")}
                     />
                   </div>
                   {errors.lastName && (
@@ -422,7 +426,7 @@ export default function RegisterPage({
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Middle Name</label>
+                  <label>{t("auth.middle_name")}</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-user-tag"></i>
                     <input
@@ -431,12 +435,12 @@ export default function RegisterPage({
                       className="form-control"
                       value={middleName}
                       onChange={(e) => setMiddleName(e.target.value)}
-                      placeholder="Optional"
+                      placeholder={t("auth.middle_name")}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Profile Picture</label>
+                  <label>{t("auth.profile_picture")}</label>
                   <label className="file-upload-wrapper">
                     <input
                       type="file"
@@ -460,7 +464,7 @@ export default function RegisterPage({
                       ) : (
                         <>
                           <i className="fa-solid fa-camera"></i>
-                          <span>Click to Upload</span>
+                          <span>{t("auth.click_to_upload")}</span>
                         </>
                       )}
                     </div>
@@ -473,7 +477,7 @@ export default function RegisterPage({
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Email *</label>
+                  <label>{t("auth.email")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-envelope"></i>
                     <input
@@ -482,7 +486,7 @@ export default function RegisterPage({
                       className={`form-control ${errors.email ? "error" : ""}`}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="email@example.com"
+                      placeholder={t("auth.placeholder_email")}
                     />
                   </div>
                   {errors.email && (
@@ -490,7 +494,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Phone Number *</label>
+                  <label>{t("auth.phone_number")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-phone"></i>
                     <input
@@ -505,7 +509,7 @@ export default function RegisterPage({
                           setContactNumber(val);
                         }
                       }}
-                      placeholder="98XXXXXXXX"
+                      placeholder={t("auth.placeholder_phone")}
                     />
                   </div>
                   {errors.contactNumber && (
@@ -516,7 +520,7 @@ export default function RegisterPage({
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Date of Birth *</label>
+                  <label>{t("auth.dob")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-calendar"></i>
                     <input
@@ -531,7 +535,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Gender *</label>
+                  <label>{t("auth.gender")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-venus-mars"></i>
                     <select
@@ -540,11 +544,11 @@ export default function RegisterPage({
                       onChange={(e) => setGender(e.target.value)}
                     >
                       <option value="" disabled hidden>
-                        Select Gender
+                        {t("auth.select_gender")}
                       </option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
+                      <option value="male">{t("auth.male")}</option>
+                      <option value="female">{t("auth.female")}</option>
+                      <option value="other">{t("auth.other")}</option>
                     </select>
                   </div>
                   {errors.gender && (
@@ -555,11 +559,11 @@ export default function RegisterPage({
             </div>
 
             <div className="form-section">
-              <h2 className="section-title">Address & Location</h2>
+              <h2 className="section-title">{t("auth.address_location")}</h2>
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Province *</label>
+                  <label>{t("auth.province")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-map"></i>
                     <select
@@ -570,10 +574,10 @@ export default function RegisterPage({
                       value={province}
                       onChange={handleProvinceChange}
                     >
-                      <option value="">Select Province</option>
+                      <option value="">{t("auth.select_province")}</option>
                       {getProvinces().map((p) => (
-                        <option key={p} value={p}>
-                          {p}
+                        <option key={p.name} value={p.name}>
+                          {language === "NP" ? p.name_np || p.name : p.name}
                         </option>
                       ))}
                     </select>
@@ -584,7 +588,7 @@ export default function RegisterPage({
                 </div>
 
                 <div className="form-group">
-                  <label>District *</label>
+                  <label>{t("auth.district")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-map-pin"></i>
                     <select
@@ -596,11 +600,11 @@ export default function RegisterPage({
                       onChange={handleDistrictChange}
                       disabled={!province}
                     >
-                      <option value="">Select District</option>
+                      <option value="">{t("auth.select_district")}</option>
                       {province &&
                         getDistricts(province).map((d) => (
-                          <option key={d} value={d}>
-                            {d}
+                          <option key={d.name} value={d.name}>
+                            {language === "NP" ? d.name_np || d.name : d.name}
                           </option>
                         ))}
                     </select>
@@ -613,7 +617,7 @@ export default function RegisterPage({
 
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Municipality *</label>
+                  <label>{t("auth.municipality")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-city"></i>
                     <select
@@ -623,11 +627,11 @@ export default function RegisterPage({
                       onChange={handleMunicipalityChange}
                       disabled={!district}
                     >
-                      <option value="">Select Municipality</option>
+                      <option value="">{t("auth.select_municipality")}</option>
                       {district &&
                         getMunicipalities(province, district).map((m) => (
                           <option key={m.name} value={m.name}>
-                            {m.name}
+                            {language === "NP" ? m.name_np || m.name : m.name}
                           </option>
                         ))}
                     </select>
@@ -638,7 +642,7 @@ export default function RegisterPage({
                 </div>
 
                 <div className="form-group">
-                  <label>Ward No *</label>
+                  <label>{t("auth.ward_no")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-house"></i>
                     <select
@@ -650,10 +654,11 @@ export default function RegisterPage({
                       onChange={(e) => setWardNumber(e.target.value)}
                       disabled={!city}
                     >
-                      <option value="">Select Ward</option>
+                      <option value="">{t("auth.select_ward")}</option>
                       {availableWardNumbers.map((num) => (
                         <option key={num} value={num}>
-                          Ward {num}
+                          {t("nav.ward")}{" "}
+                          {language === "NP" ? toNepaliNumber(num) : num}
                         </option>
                       ))}
                     </select>
@@ -666,10 +671,12 @@ export default function RegisterPage({
             </div>
 
             <div className="form-section">
-              <h2 className="section-title">Identity Verification</h2>
+              <h2 className="section-title">
+                {t("auth.identity_verification")}
+              </h2>
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Citizenship Number *</label>
+                  <label>{t("auth.citizenship_number")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-id-card"></i>
                     <input
@@ -679,7 +686,7 @@ export default function RegisterPage({
                       }`}
                       value={citizenshipNumber}
                       onChange={(e) => setCitizenshipNumber(e.target.value)}
-                      placeholder="Number"
+                      placeholder={t("auth.citizenship_number")}
                       name="citizenshipNumber"
                     />
                   </div>
@@ -690,7 +697,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Issue Date *</label>
+                  <label>{t("auth.issue_date")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-calendar-check"></i>
                     <input
@@ -711,7 +718,7 @@ export default function RegisterPage({
               </div>
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Issue District *</label>
+                  <label>{t("auth.issue_district")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-map-pin"></i>
                     <select
@@ -723,14 +730,14 @@ export default function RegisterPage({
                         setCitizenshipIssueDistrict(e.target.value)
                       }
                     >
-                      <option value="">Select District</option>
+                      <option value="">{t("auth.select_district")}</option>
                       {getProvinces()
-                        .map((p) => getDistricts(p))
+                        .map((p) => getDistricts(p.name))
                         .flat()
-                        .sort()
+                        .sort((a, b) => a.name.localeCompare(b.name))
                         .map((d) => (
-                          <option key={d} value={d}>
-                            {d}
+                          <option key={d.name} value={d.name}>
+                            {language === "NP" ? d.name_np || d.name : d.name}
                           </option>
                         ))}
                     </select>
@@ -742,7 +749,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Citizenship Photo *</label>
+                  <label>{t("auth.citizenship_photo")} *</label>
                   <label className="file-upload-wrapper">
                     <input
                       type="file"
@@ -766,7 +773,7 @@ export default function RegisterPage({
                       ) : (
                         <>
                           <i className="fa-solid fa-camera"></i>
-                          <span>Click to Upload</span>
+                          <span>{t("auth.click_to_upload")}</span>
                         </>
                       )}
                     </div>
@@ -782,10 +789,12 @@ export default function RegisterPage({
 
             {role === "officer" && (
               <div className="form-section">
-                <h2 className="section-title">Officer Credentials</h2>
+                <h2 className="section-title">
+                  {t("auth.officer_credentials")}
+                </h2>
                 <div className="form-row two-cols">
                   <div className="form-group">
-                    <label>Officer ID *</label>
+                    <label>{t("auth.officer_id")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-hashtag"></i>
                       <input
@@ -795,7 +804,7 @@ export default function RegisterPage({
                         }`}
                         value={officerId}
                         onChange={(e) => setOfficerId(e.target.value)}
-                        placeholder="OFF-XXXX"
+                        placeholder={t("auth.officer_id_placeholder")}
                       />
                     </div>
                     {errors.officerId && (
@@ -803,30 +812,18 @@ export default function RegisterPage({
                     )}
                   </div>
                   <div className="form-group">
-                    <label>Department *</label>
+                    <label>{t("auth.department")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-briefcase"></i>
-                      <select
+                      <input
+                        type="text"
                         className={`form-control ${
                           errors.department ? "error" : ""
                         }`}
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
-                      >
-                        <option value="">Select Department</option>
-                        <option value="Health">Health</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Education">Education</option>
-                        <option value="Transportation">Transportation</option>
-                        <option value="Public Safety">Public Safety</option>
-                        <option value="Environmental Services">
-                          Environmental Services
-                        </option>
-                        <option value="IT">Information Technology</option>
-                        <option value="Social Services">Social Services</option>
-                        <option value="Urban Planning">Urban Planning</option>
-                        <option value="Other">Other</option>
-                      </select>
+                        placeholder={t("auth.dept_placeholder")}
+                      />
                     </div>
                     {errors.department && (
                       <p className="error-message show">{errors.department}</p>
@@ -854,8 +851,8 @@ export default function RegisterPage({
                       >
                         <option value="">Select Province</option>
                         {getProvinces().map((p) => (
-                          <option key={p} value={p}>
-                            {p}
+                          <option key={p.name} value={p.name}>
+                            {language === "NP" ? p.name_np || p.name : p.name}
                           </option>
                         ))}
                       </select>
@@ -882,8 +879,8 @@ export default function RegisterPage({
                         <option value="">Select District</option>
                         {workProvince &&
                           getDistricts(workProvince).map((d) => (
-                            <option key={d} value={d}>
-                              {d}
+                            <option key={d.name} value={d.name}>
+                              {language === "NP" ? d.name_np || d.name : d.name}
                             </option>
                           ))}
                       </select>
@@ -914,9 +911,11 @@ export default function RegisterPage({
                           getMunicipalities(workProvince, workDistrict).map(
                             (m) => (
                               <option key={m.name} value={m.name}>
-                                {m.name}
+                                {language === "NP"
+                                  ? m.name_np || m.name
+                                  : m.name}
                               </option>
-                            )
+                            ),
                           )}
                       </select>
                     </div>
@@ -1006,10 +1005,10 @@ export default function RegisterPage({
             )}
 
             <div className="form-section">
-              <h2 className="section-title">Security</h2>
+              <h2 className="section-title">{t("auth.password")}</h2>
               <div className="form-row two-cols">
                 <div className="form-group">
-                  <label>Password *</label>
+                  <label>{t("auth.password")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-lock"></i>
                     <input
@@ -1028,7 +1027,7 @@ export default function RegisterPage({
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Confirm Password *</label>
+                  <label>{t("auth.password")} *</label>
                   <div className="input-wrapper">
                     <i className="fa-solid fa-shield-halved"></i>
                     <input
@@ -1058,9 +1057,7 @@ export default function RegisterPage({
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
                 />{" "}
-                <span>
-                  I agree to the <Link to="/terms">Terms & Conditions</Link>
-                </span>
+                <span>{t("auth.terms_conditions")}</span>
               </label>
               {errors.terms && (
                 <p className="error-message show">{errors.terms}</p>
@@ -1068,7 +1065,7 @@ export default function RegisterPage({
             </div>
 
             <button type="submit" className="btn-register" disabled={isLoading}>
-              {isLoading ? "Processing..." : "Create Account"}
+              {isLoading ? t("common.loading") : t("auth.register_title")}
             </button>
           </form>
           <div className="form-footer">

@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./RoleSelection.css";
+import { useLanguage } from "../Context/LanguageContext.jsx";
 
 export default function RoleSelection() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleRoleSelect = (role) => {
     if (role === "citizen") {
@@ -22,8 +24,8 @@ export default function RoleSelection() {
 
       <div className="role-selection-container">
         <div className="role-selection-header">
-          <h1>Welcome to Ward Portal</h1>
-          <p>Please choose your role to continue registration</p>
+          <h1>{t("role.welcome")}</h1>
+          <p>{t("role.choose_role")}</p>
         </div>
 
         <div className="role-cards">
@@ -34,10 +36,10 @@ export default function RoleSelection() {
             <div className="role-card-icon citizen">
               <i className="fa-solid fa-user"></i>
             </div>
-            <h2>Citizen</h2>
-            <p>Register as a citizen to access ward services and information</p>
+            <h2>{t("role.citizen")}</h2>
+            <p>{t("role.citizen_desc")}</p>
             <button className="role-card-btn citizen-btn">
-              Register as Citizen
+              {t("role.citizen_btn")}
             </button>
           </div>
 
@@ -48,17 +50,18 @@ export default function RoleSelection() {
             <div className="role-card-icon officer">
               <i className="fa-solid fa-user-tie"></i>
             </div>
-            <h2>Ward Officer</h2>
-            <p>Register as an officer to manage ward operations and services</p>
+            <h2>{t("role.officer")}</h2>
+            <p>{t("role.officer_desc")}</p>
             <button className="role-card-btn officer-btn">
-              Register as Officer
+              {t("role.officer_btn")}
             </button>
           </div>
         </div>
 
         <div className="already-account">
           <p>
-            Already have an account? <Link to="/login">Login here</Link>
+            {t("role.already_account")}{" "}
+            <Link to="/login">{t("role.login_here")}</Link>
           </p>
         </div>
       </div>

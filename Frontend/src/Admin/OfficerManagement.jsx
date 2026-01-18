@@ -7,8 +7,10 @@ import {
   getProvinces,
   getDistricts,
   getMunicipalities,
+  toNepaliNumber,
 } from "../data/nepal_locations";
 import "./OfficerManagement.css";
+import { useLanguage } from "../Home/Context/LanguageContext";
 
 const OfficerManagement = () => {
   const {
@@ -17,6 +19,7 @@ const OfficerManagement = () => {
     rejectOfficer,
     fetchPendingOfficers,
   } = useAuth();
+  const { language } = useLanguage();
 
   // Create Officer State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -86,12 +89,12 @@ const OfficerManagement = () => {
               `${
                 API_ENDPOINTS.wards.base
               }/verify_ward_exists.php?province=${encodeURIComponent(
-                officer.work_province
+                officer.work_province,
               )}&district=${encodeURIComponent(
-                officer.work_district
+                officer.work_district,
               )}&municipality=${encodeURIComponent(
-                officer.work_municipality
-              )}&ward_number=${officer.work_ward}`
+                officer.work_municipality,
+              )}&ward_number=${officer.work_ward}`,
             );
             const data = await response.json();
             statusMap[officer.id] = data.exists || false;
@@ -140,7 +143,7 @@ const OfficerManagement = () => {
   const handleProvinceChange = (e) => {
     const newProv = e.target.value;
     const newDists = getDistricts(newProv);
-    const firstDist = newDists[0] || "";
+    const firstDist = newDists[0] ? newDists[0].name : "";
     const newMuns = getMunicipalities(newProv, firstDist);
     const firstMun = newMuns[0] ? newMuns[0].name : "";
 
@@ -540,8 +543,8 @@ const OfficerManagement = () => {
                       className="form-input"
                     >
                       {getProvinces().map((p) => (
-                        <option key={p} value={p}>
-                          {p}
+                        <option key={p.name} value={p.name}>
+                          {language === "NP" ? p.name_np || p.name : p.name}
                         </option>
                       ))}
                     </select>
@@ -555,8 +558,8 @@ const OfficerManagement = () => {
                       className="form-input"
                     >
                       {districts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
+                        <option key={d.name} value={d.name}>
+                          {language === "NP" ? d.name_np || d.name : d.name}
                         </option>
                       ))}
                     </select>
@@ -576,7 +579,7 @@ const OfficerManagement = () => {
                       <option value="">Select Municipality</option>
                       {municipalities.map((m) => (
                         <option key={m.name} value={m.name}>
-                          {m.name}
+                          {language === "NP" ? m.name_np || m.name : m.name}
                         </option>
                       ))}
                     </select>
@@ -591,7 +594,7 @@ const OfficerManagement = () => {
                     >
                       {wardsList.map((n) => (
                         <option key={n} value={n}>
-                          {n}
+                          {language === "NP" ? toNepaliNumber(n) : n}
                         </option>
                       ))}
                     </select>
@@ -667,8 +670,8 @@ const OfficerManagement = () => {
                       className="form-input"
                     >
                       {getProvinces().map((p) => (
-                        <option key={p} value={p}>
-                          {p}
+                        <option key={p.name} value={p.name}>
+                          {language === "NP" ? p.name_np || p.name : p.name}
                         </option>
                       ))}
                     </select>
@@ -684,7 +687,7 @@ const OfficerManagement = () => {
                         const newDist = e.target.value;
                         const newMuns = getMunicipalities(
                           formData.workProvince,
-                          newDist
+                          newDist,
                         );
                         const firstMun = newMuns[0] ? newMuns[0].name : "";
                         setFormData((prev) => ({
@@ -697,8 +700,8 @@ const OfficerManagement = () => {
                       className="form-input"
                     >
                       {getDistricts(formData.workProvince).map((d) => (
-                        <option key={d} value={d}>
-                          {d}
+                        <option key={d.name} value={d.name}>
+                          {language === "NP" ? d.name_np || d.name : d.name}
                         </option>
                       ))}
                     </select>
@@ -721,10 +724,10 @@ const OfficerManagement = () => {
                     >
                       {getMunicipalities(
                         formData.workProvince,
-                        formData.workDistrict
+                        formData.workDistrict,
                       ).map((m) => (
                         <option key={m.name} value={m.name}>
-                          {m.name}
+                          {language === "NP" ? m.name_np || m.name : m.name}
                         </option>
                       ))}
                     </select>
@@ -745,15 +748,15 @@ const OfficerManagement = () => {
                       {(() => {
                         const mun = getMunicipalities(
                           formData.workProvince,
-                          formData.workDistrict
+                          formData.workDistrict,
                         ).find((m) => m.name === formData.workMunicipality);
                         const wardCount = mun ? mun.wards : 32;
                         return Array.from(
                           { length: wardCount },
-                          (_, i) => i + 1
+                          (_, i) => i + 1,
                         ).map((n) => (
                           <option key={n} value={n}>
-                            Ward {n}
+                            Ward {language === "NP" ? toNepaliNumber(n) : n}
                           </option>
                         ));
                       })()}
@@ -928,7 +931,6 @@ const OfficerManagement = () => {
             </span>
           </div>
           <div className="header-buttons">
-
             <button
               className="btn-primary"
               onClick={() => {
@@ -978,8 +980,8 @@ const OfficerManagement = () => {
                           officer.work_ward || ""
                         }`
                       : officer.work_ward
-                      ? `Ward ${officer.work_ward}`
-                      : "N/A"}
+                        ? `Ward ${officer.work_ward}`
+                        : "N/A"}
                   </td>
                   <td>
                     {wardStatus[officer.id] === true ? (

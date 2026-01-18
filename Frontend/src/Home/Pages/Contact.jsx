@@ -4,8 +4,10 @@ import "./Contact.css";
 import { useWard } from "../Context/WardContext";
 import { useAuth } from "../Context/AuthContext";
 import { API_ENDPOINTS } from "../../config/api";
+import { useLanguage } from "../Context/LanguageContext";
 
 export default function Contact() {
+  const { t } = useLanguage();
   const {
     municipality: selectedMunicipality,
     ward: selectedWard,
@@ -18,7 +20,7 @@ export default function Contact() {
     email: "---",
     contactEmail: "---",
     address: selectedMunicipality + ", Ward No. " + selectedWard,
-    location: "Loading...",
+    location: t("common.loading"),
     district: "",
     latitude: null,
     longitude: null,
@@ -86,7 +88,7 @@ export default function Contact() {
           }
           console.log(
             "Contact: Fetching social media with params:",
-            params.toString()
+            params.toString(),
           );
           fetch(`${API_ENDPOINTS.socialMedia.get}?${params}`)
             .then((res) => res.json())
@@ -101,7 +103,7 @@ export default function Contact() {
                 });
                 console.log(
                   "Contact: Social media state updated:",
-                  socialData.data
+                  socialData.data,
                 );
               }
             })
@@ -147,7 +149,7 @@ export default function Contact() {
 
     setFormStatus({
       type: "loading",
-      message: "Sending...",
+      message: t("contact.form.sending"),
     });
 
     (async () => {
@@ -246,23 +248,23 @@ export default function Contact() {
     if (wardInfo?.latitude && wardInfo?.longitude) {
       window.open(
         `https://www.google.com/maps?q=${wardInfo.latitude},${wardInfo.longitude}`,
-        "_blank"
+        "_blank",
       );
       return;
     }
 
     // Priority 3: Fallback - Search by Address
     const query = encodeURIComponent(
-      `${wardInfo.address}, ${wardInfo.district}, Nepal`
+      `${wardInfo.address}, ${wardInfo.district}, Nepal`,
     );
     window.open(
       `https://www.google.com/maps/search/?api=1&query=${query}`,
-      "_blank"
+      "_blank",
     );
   }
 
   if (loading && !wardInfo.location) {
-    return <div className="loading-container">Loading Ward Details...</div>;
+    return <div className="loading-container">{t("common.loading")}</div>;
   }
 
   return (
@@ -271,8 +273,8 @@ export default function Contact() {
       <div className="contact-page">
         <div className="contact-hero">
           <div className="contact-hero-overlay">
-            <h1>Contact Us</h1>
-            <p>We are always ready to serve you</p>
+            <h1>{t("contact.title")}</h1>
+            <p>{t("contact.subtitle")}</p>
           </div>
         </div>
         <div className="contact-container">
@@ -281,10 +283,8 @@ export default function Contact() {
               <div className="contact-icon-wrapper blue">
                 <i className="fa-solid fa-phone contact-icon"></i>
               </div>
-              <h3>Call Us</h3>
-              <p className="contact-timing">
-                Monday - Friday, 9:00 AM - 5:00 PM
-              </p>
+              <h3>{t("contact.call_us")}</h3>
+              <p className="contact-timing">{t("contact.timing_weekdays")}</p>
               <>
                 <a href={`tel:${wardInfo?.phone1}`} className="contact-link">
                   {wardInfo?.phone1}
@@ -298,8 +298,8 @@ export default function Contact() {
               <div className="contact-icon-wrapper green">
                 <i className="fa-solid fa-envelope contact-icon"></i>
               </div>
-              <h3>Email Us</h3>
-              <p className="contact-timing">You can email us anytime</p>
+              <h3>{t("contact.email_us")}</h3>
+              <p className="contact-timing">{t("contact.timing_anytime")}</p>
               <>
                 <a href={`mailto:${wardInfo?.email}`} className="contact-link">
                   {wardInfo?.email}
@@ -316,31 +316,30 @@ export default function Contact() {
               <div className="contact-icon-wrapper purple">
                 <i className="fa-solid fa-location-dot contact-icon"></i>
               </div>
-              <h3>Visit Us</h3>
-              <p className="contact-timing">Office Hours: 9:00 AM - 5:00 PM</p>
+              <h3>{t("contact.visit_us")}</h3>
+              <p className="contact-timing">
+                {t("contact.office_hours_label")}
+              </p>
               <p className="contact-address">{wardInfo.address}</p>
             </div>
           </div>
 
           <div className="contact-content-grid">
             <div className="contact-form-section">
-              <h2>Send us a Message</h2>
+              <h2>{t("contact.send_message")}</h2>
 
               <div className="message-recipient-info">
                 <div className="recipient-badge">
                   <i className="fa-solid fa-paper-plane"></i>
                   <span>
-                    Recipient:{" "}
+                    {t("contact.recipient")}:{" "}
                     <strong>
-                      Officer of {selectedMunicipality}, Ward No. {selectedWard}
+                      {t("about.roles.officer")} {selectedMunicipality},{" "}
+                      {t("auth.ward_no")} {selectedWard}
                     </strong>
                   </span>
                 </div>
-                <p className="recipient-note">
-                  This message will be routed directly to the representative of
-                  the selected ward. To message a different ward, please change
-                  your location from the top navigation bar.
-                </p>
+                <p className="recipient-note">{t("contact.recipient_note")}</p>
               </div>
 
               {formStatus && (
@@ -351,81 +350,101 @@ export default function Contact() {
               <form className="contact-form" onSubmit={handleSubmit}>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Full Name *</label>
+                    <label>{t("contact.form.full_name")} *</label>
                     <input
                       type="text"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      placeholder="Your full name"
+                      placeholder={t("contact.form.full_name")}
                       required
                     />
                   </div>
                   <div className="form-group">
-                    <label>Email Address *</label>
+                    <label>{t("contact.form.email")} *</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="Your email address"
+                      placeholder={t("contact.form.email")}
                       required
                     />
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Phone Number</label>
+                    <label>{t("contact.form.phone")}</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="Your phone number"
+                      placeholder={t("contact.form.phone")}
                     />
                   </div>
                   <div className="form-group">
-                    <label>Subject *</label>
+                    <label>{t("contact.form.subject")} *</label>
                     <select
                       name="subject"
                       value={formData.subject}
                       onChange={handleInputChange}
                       required
                     >
-                      <option value="">Select a subject</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="complaint">Complaint</option>
-                      <option value="suggestion">Suggestion</option>
-                      <option value="feedback">Feedback</option>
-                      <option value="service">Service Request</option>
-                      <option value="other">Other</option>
+                      <option value="">
+                        {t("contact.form.select_subject")}
+                      </option>
+                      <option value="general">
+                        {t("contact.form.subjects.general")}
+                      </option>
+                      <option value="complaint">
+                        {t("contact.form.subjects.complaint")}
+                      </option>
+                      <option value="suggestion">
+                        {t("contact.form.subjects.suggestion")}
+                      </option>
+                      <option value="feedback">
+                        {t("contact.form.subjects.feedback")}
+                      </option>
+                      <option value="service">
+                        {t("contact.form.subjects.service")}
+                      </option>
+                      <option value="other">
+                        {t("contact.form.subjects.other")}
+                      </option>
                     </select>
 
                     {/* Priority appears only when submitting a complaint */}
                     {formData.subject === "complaint" && (
                       <div style={{ marginTop: 12 }}>
-                        <label>Priority</label>
+                        <label>{t("contact.form.priority")}</label>
                         <select
                           name="priority"
                           value={formData.priority}
                           onChange={handleInputChange}
                           style={{ width: "100%", marginTop: 6 }}
                         >
-                          <option value="High">High</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Low">Low</option>
+                          <option value="High">
+                            {t("contact.form.priorities.high")}
+                          </option>
+                          <option value="Medium">
+                            {t("contact.form.priorities.medium")}
+                          </option>
+                          <option value="Low">
+                            {t("contact.form.priorities.low")}
+                          </option>
                         </select>
                       </div>
                     )}
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Message *</label>
+                  <label>{t("contact.form.message")} *</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
-                    placeholder="Write your message here..."
+                    placeholder={t("contact.form.message")}
                     rows="5"
                     maxLength="500"
                     required
@@ -438,7 +457,7 @@ export default function Contact() {
                 {/* File Upload with better design */}
                 <div className="form-group">
                   <label>
-                    📎 Attach Image (Optional)
+                    📎 {t("contact.form.attach_image")}
                     <small
                       style={{
                         marginLeft: "8px",
@@ -446,7 +465,7 @@ export default function Contact() {
                         fontWeight: "normal",
                       }}
                     >
-                      (JPG, PNG, GIF - Max 5MB)
+                      {t("contact.form.file_hint")}
                     </small>
                   </label>
                   <div className="file-upload-wrapper">
@@ -465,7 +484,7 @@ export default function Contact() {
                           ✓ {formData.file.name}
                         </span>
                       ) : (
-                        <span>Click to upload image</span>
+                        <span>{t("contact.form.click_upload")}</span>
                       )}
                     </label>
                     {formData.file && (
@@ -490,11 +509,13 @@ export default function Contact() {
                 >
                   {formStatus?.type === "loading" ? (
                     <>
-                      <span className="spinner"></span> Sending...
+                      <span className="spinner"></span>{" "}
+                      {t("contact.form.sending")}
                     </>
                   ) : (
                     <>
-                      <i className="fa-solid fa-paper-plane"></i> Send Message
+                      <i className="fa-solid fa-paper-plane"></i>{" "}
+                      {t("contact.form.send_btn")}
                     </>
                   )}
                 </button>
@@ -502,7 +523,7 @@ export default function Contact() {
             </div>
             <div className="location-section">
               <div className="location-card">
-                <h2>Our Location</h2>
+                <h2>{t("contact.location_title")}</h2>
                 <div className="map-container">
                   {wardInfo.google_map_link &&
                   wardInfo.google_map_link.includes("iframe") ? (
@@ -529,30 +550,33 @@ export default function Contact() {
                     <strong>{selectedMunicipality}</strong>
                   </p>
                   <p className="location-address">
-                    Ward No. {selectedWard}, {wardInfo.district}, Nepal
+                    {t("auth.ward_no")} {selectedWard}, {wardInfo.district},
+                    Nepal
                   </p>
                   <button className="open-map-btn" onClick={openLocation}>
-                    🗺️ Open in Google Maps
+                    🗺️ {t("contact.open_maps")}
                   </button>
                 </div>
               </div>
               <div className="office-hours-card">
-                <h2>Office Hours</h2>
+                <h2>{t("contact.office_hours_title")}</h2>
                 <div className="hours-list">
                   <div className="hours-item">
-                    <span className="day">Sunday - Thursday</span>
+                    <span className="day">
+                      {t("contact.days.sunday_thursday")}
+                    </span>
                     <span className="time">
                       {wardInfo?.officeHours?.weekdays}
                     </span>
                   </div>
                   <div className="hours-item">
-                    <span className="day">Friday</span>
+                    <span className="day">{t("contact.days.friday")}</span>
                     <span className="time">
                       {wardInfo?.officeHours?.friday}
                     </span>
                   </div>
                   <div className="hours-item">
-                    <span className="day">Saturday</span>
+                    <span className="day">{t("contact.days.saturday")}</span>
                     <span className="time closed">
                       {wardInfo?.officeHours?.saturday}
                     </span>
@@ -560,14 +584,14 @@ export default function Contact() {
                 </div>
                 <div className="office-note">
                   <span>ℹ️</span>
-                  <p>Office remains closed on public holidays</p>
+                  <p>{t("contact.office_note")}</p>
                 </div>
               </div>
             </div>
           </div>
           {/* Department Contacts Section */}
           <div className="section-header">
-            <h2>Department Contacts</h2>
+            <h2>{t("contact.dept_contacts")}</h2>
           </div>
           <div className="department-grid">
             {/* 
@@ -583,7 +607,7 @@ export default function Contact() {
                   color: "#888",
                 }}
               >
-                No department contacts listed for this ward yet.
+                {t("contact.no_depts")}
               </p>
             ) : (
               departments.map((dept, index) => (
@@ -608,39 +632,28 @@ export default function Contact() {
 
           {/* FAQ Section */}
           <div className="section-header" style={{ marginTop: "60px" }}>
-            <h2>Frequently Asked Questions</h2>
+            <h2>{t("contact.faq_title")}</h2>
           </div>
           <div className="faq-section">
             <div className="faq-card">
               <div className="faq-icon">❓</div>
               <div className="faq-content">
-                <h3>How to schedule a meeting with Ward Chairperson?</h3>
-                <p>
-                  You can schedule an appointment by calling or sending an
-                  email. Generally available Monday to Friday from 10:00 AM to
-                  4:00 PM.
-                </p>
+                <h3>{t("contact.faqs.meeting.q")}</h3>
+                <p>{t("contact.faqs.meeting.a")}</p>
               </div>
             </div>
             <div className="faq-card">
               <div className="faq-icon">❓</div>
               <div className="faq-content">
-                <h3>How to get recommendation letter?</h3>
-                <p>
-                  Come to ward office with required documents. Citizenship
-                  certificate, land ownership certificate and other related
-                  documents are needed.
-                </p>
+                <h3>{t("contact.faqs.recommendation.q")}</h3>
+                <p>{t("contact.faqs.recommendation.a")}</p>
               </div>
             </div>
             <div className="faq-card">
               <div className="faq-icon">❓</div>
               <div className="faq-content">
-                <h3>How to register complaints?</h3>
-                <p>
-                  You can use the contact form on this website or visit the ward
-                  office directly to register complaints.
-                </p>
+                <h3>{t("contact.faqs.complaint.q")}</h3>
+                <p>{t("contact.faqs.complaint.a")}</p>
               </div>
             </div>
           </div>
@@ -651,7 +664,7 @@ export default function Contact() {
             socialMedia.twitter ||
             socialMedia.whatsapp) && (
             <div className="social-media-section">
-              <h2>Follow Us on Social Media</h2>
+              <h2>{t("contact.social_title")}</h2>
               <div className="social-buttons">
                 {socialMedia.facebook && (
                   <a

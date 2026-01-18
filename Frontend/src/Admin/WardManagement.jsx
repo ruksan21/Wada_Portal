@@ -9,11 +9,14 @@ import {
   getProvinces,
   getDistricts,
   getMunicipalities,
+  toNepaliNumber,
 } from "../data/nepal_locations";
 import "./WardManagement.css";
+import { useLanguage } from "../Home/Context/LanguageContext";
 
 const WardManagement = () => {
   const { refreshWards } = useAuth();
+  const { t, language } = useLanguage();
 
   // State for District Management
   const [isAddingDistrict, setIsAddingDistrict] = useState(false);
@@ -174,9 +177,9 @@ const WardManagement = () => {
 
     // Find province for this district
     const province = getProvinces().find((p) =>
-      getDistricts(p).includes(districtName)
+      getDistricts(p.name).some((d) => d.name === districtName),
     );
-    setFormProvince(province || "");
+    setFormProvince(province ? province.name : "");
 
     setIsEditing(true);
     setIsAdding(false);
@@ -248,7 +251,7 @@ const WardManagement = () => {
 
     if (missingFields.length > 0) {
       toast.error(
-        `Please fill in all required fields:\n\n• ${missingFields.join("\n• ")}`
+        `Please fill in all required fields:\n\n• ${missingFields.join("\n• ")}`,
       );
       return;
     }
@@ -316,7 +319,7 @@ const WardManagement = () => {
       const data = await res.json();
       if (data.success) {
         toast.success(
-          isAdding ? "Ward added successfully!" : "Ward updated successfully!"
+          isAdding ? "Ward added successfully!" : "Ward updated successfully!",
         );
         resetFormAndClose();
         fetchWards();
@@ -365,7 +368,7 @@ const WardManagement = () => {
       if (selectedMuni && selectedMuni.wards > 0) {
         const nums = Array.from(
           { length: selectedMuni.wards },
-          (_, i) => i + 1
+          (_, i) => i + 1,
         );
         setAvailableWardNumbers(nums);
       } else {
@@ -801,7 +804,7 @@ const WardManagement = () => {
                         <p className="profile-value">
                           {selectedWard?.chairperson_appointment_date
                             ? new Date(
-                                selectedWard.chairperson_appointment_date
+                                selectedWard.chairperson_appointment_date,
                               ).toLocaleDateString()
                             : "N/A"}
                         </p>
@@ -924,8 +927,8 @@ const WardManagement = () => {
                       >
                         <option value="">-- Select Province --</option>
                         {getProvinces().map((p) => (
-                          <option key={p} value={p}>
-                            {p}
+                          <option key={p.name} value={p.name}>
+                            {language === "NP" ? p.name_np || p.name : p.name}
                           </option>
                         ))}
                       </select>
@@ -943,7 +946,7 @@ const WardManagement = () => {
                             // Find matching district ID in our database
                             const dbD = districts.find(
                               (d) =>
-                                d.name.toLowerCase() === dName.toLowerCase()
+                                d.name.toLowerCase() === dName.toLowerCase(),
                             );
                             setFormData({
                               ...formData,
@@ -957,8 +960,10 @@ const WardManagement = () => {
                           <option value="">-- Select District --</option>
                           {formProvince &&
                             getDistricts(formProvince).map((d) => (
-                              <option key={d} value={d}>
-                                {d}
+                              <option key={d.name} value={d.name}>
+                                {language === "NP"
+                                  ? d.name_np || d.name
+                                  : d.name}
                               </option>
                             ))}
                         </select>
@@ -986,9 +991,11 @@ const WardManagement = () => {
                           getMunicipalities(formProvince, formDistrictName).map(
                             (m) => (
                               <option key={m.name} value={m.name}>
-                                {m.name}
+                                {language === "NP"
+                                  ? m.name_np || m.name
+                                  : m.name}
                               </option>
-                            )
+                            ),
                           )}
                       </select>
                     </div>
@@ -1009,7 +1016,7 @@ const WardManagement = () => {
                         <option value="">-- Select Ward --</option>
                         {availableWardNumbers.map((n) => (
                           <option key={n} value={n}>
-                            Ward {n}
+                            Ward {language === "NP" ? toNepaliNumber(n) : n}
                           </option>
                         ))}
                       </select>

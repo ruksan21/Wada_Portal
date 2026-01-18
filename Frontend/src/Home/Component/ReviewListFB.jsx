@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { API_ENDPOINTS } from "../../config/api";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 import "./CommentSection.css"; // Reuse the Facebook styles
 
 const ReviewListFB = ({ wardId, refreshTrigger }) => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const [reviews, setReviews] = useState([]);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [replies, setReplies] = useState({});
   const [replyText, setReplyText] = useState("");
   const [expandedReplies, setExpandedReplies] = useState({});
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
 
   const fetchReviews = useCallback(() => {
     if (wardId) {
       const userParam = user?.id ? `&user_id=${user.id}` : "";
       fetch(
-        `${API_ENDPOINTS.communication.getReviews}?ward_id=${wardId}${userParam}`
+        `${API_ENDPOINTS.communication.getReviews}?ward_id=${wardId}${userParam}`,
       )
         .then((res) => res.json())
         .then((data) => {
@@ -41,7 +47,7 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
   const fetchReplies = (reviewId) => {
     const userParam = user?.id ? `&user_id=${user.id}` : "";
     fetch(
-      `${API_ENDPOINTS.communication.getReplies}?review_id=${reviewId}${userParam}`
+      `${API_ENDPOINTS.communication.getReplies}?review_id=${reviewId}${userParam}`,
     )
       .then((res) => res.json())
       .then((data) => {
@@ -51,54 +57,113 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
       });
   };
 
-  const handleVote = async (reviewId, voteType) => {
-    if (!user) {
-      alert("Please login to react.");
+  const handleDeleteReview = async (reviewId) => {
+    if (
+      !window.confirm(
+        isNP
+          ? "के तपाईं यो समीक्षा मेटाउन चाहनुहुन्छ?"
+          : "Are you sure you want to delete this review?",
+      )
+    )
       return;
-    }
     try {
-      const response = await fetch(API_ENDPOINTS.communication.toggleVote, {
+      const response = await fetch(API_ENDPOINTS.communication.deleteReview, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          review_id: reviewId,
-          user_id: user.id,
-          vote_type: voteType,
-        }),
+        body: JSON.stringify({ review_id: reviewId, user_id: user.id }),
       });
       const data = await response.json();
       if (data.success) {
-        setReviews((prev) =>
-          prev.map((r) =>
-            r.id === reviewId
-              ? {
-                  ...r,
-                  likes: data.likes,
-                  dislikes: data.dislikes,
-                  user_vote: data.user_vote,
-                }
-              : r
-          )
-        );
+        setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+      } else {
+        alert(data.message);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleReplyVote = async (reviewId, replyId, voteType) => {
-    if (!user) {
-      alert("Please login to react.");
+  const handleDeleteReply = async (replyId, reviewId) => {
+    if (
+      !window.confirm(
+        isNP
+          ? "के तपाईं यो जवाफ मेटाउन चाहनुहुन्छ?"
+          : "Are you sure you want to delete this reply?",
+      )
+    )
       return;
-    }
     try {
-      const response = await fetch(API_ENDPOINTS.communication.toggleVote, {
+      const response = await fetch(API_ENDPOINTS.communication.deleteReply, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reply_id: replyId, user_id: user.id }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setReplies((prev) => ({
+          ...prev,
+          [reviewId]: (prev[reviewId] || []).filter(
+            (rep) => rep.id !== replyId,
+          ),
+        }));
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.id === reviewId
+              ? { ...r, reply_count: Math.max(0, (r.reply_count || 1) - 1) }
+              : r,
+          ),
+        );
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const startEditing = (id, text) => {
+    setEditingId(id);
+    setEditText(text);
+  };
+
+  const handleUpdateReview = async (reviewId) => {
+    if (!editText.trim()) return;
+    try {
+      const response = await fetch(API_ENDPOINTS.communication.updateReview, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          review_id: reviewId,
+          user_id: user.id,
+          comment: editText,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.id === reviewId ? { ...r, comment: editText } : r,
+          ),
+        );
+        setEditingId(null);
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateReply = async (replyId, reviewId) => {
+    if (!editText.trim()) return;
+    try {
+      const response = await fetch(API_ENDPOINTS.communication.updateReply, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reply_id: replyId,
           user_id: user.id,
-          vote_type: voteType,
+          reply_text: editText,
         }),
       });
       const data = await response.json();
@@ -106,16 +171,12 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
         setReplies((prev) => ({
           ...prev,
           [reviewId]: (prev[reviewId] || []).map((rep) =>
-            rep.id === replyId
-              ? {
-                  ...rep,
-                  likes: data.likes,
-                  dislikes: data.dislikes,
-                  user_vote: data.user_vote,
-                }
-              : rep
+            rep.id === replyId ? { ...rep, reply_text: editText } : rep,
           ),
         }));
+        setEditingId(null);
+      } else {
+        alert(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -149,8 +210,8 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
           prev.map((r) =>
             r.id === reviewId
               ? { ...r, reply_count: (r.reply_count || 0) + 1 }
-              : r
-          )
+              : r,
+          ),
         );
         // Ensure expanded
         setExpandedReplies((prev) => ({ ...prev, [reviewId]: true }));
@@ -167,10 +228,11 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString("en-GB");
+    if (diffDays === 0) return isNP ? "आज" : "Today";
+    if (diffDays === 1) return isNP ? "हिजो" : "Yesterday";
+    if (diffDays < 7)
+      return isNP ? `${toNepaliNumber(diffDays)} दिन अघि` : `${diffDays}d ago`;
+    return date.toLocaleDateString(isNP ? "ne-NP" : "en-GB");
   };
 
   const getPhotoUrl = (photoPath) => {
@@ -181,9 +243,12 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
 
   return (
     <div className="fb-comments-list">
-      <h3>Recent Reviews ({reviews.length})</h3>
+      <h3>
+        {t("profile.reviews_form.recent_title")} (
+        {isNP ? toNepaliNumber(reviews.length) : reviews.length})
+      </h3>
       {reviews.length === 0 ? (
-        <p className="no-comments">No reviews yet.</p>
+        <p className="no-comments">{t("profile.reviews_form.no_reviews")}</p>
       ) : (
         reviews.map((r) => (
           <div key={r.id} className="fb-comment-card">
@@ -195,10 +260,15 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
               />
               <div className="fb-bubble-container">
                 <div className="fb-bubble">
-                  <div className="fb-user-name">
-                    {r.first_name} {r.last_name}
+                  <div className="fb-user-info-header">
+                    <span className="fb-user-name">
+                      {r.first_name} {r.last_name}
+                    </span>
                     {r.role === "officer" && (
-                      <span className="fb-badge-official">Official</span>
+                      <span className="fb-badge-official">
+                        <i className="fas fa-check-circle"></i>{" "}
+                        {t("profile.reviews_form.official")}
+                      </span>
                     )}
                     {r.rating > 0 && (
                       <span className="fb-rating-tag">
@@ -209,43 +279,75 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                               r.rating > i ? "fa-solid" : "fa-regular"
                             } fa-star`}
                             style={{
-                              fontSize: "0.8rem",
+                              fontSize: "0.9rem",
                               color: "#f1c40f",
-                              marginRight: "1px",
+                              marginRight: "2px",
                             }}
                           ></i>
                         ))}
                       </span>
                     )}
                   </div>
-                  <div className="fb-text">{r.comment}</div>
+                  {editingId === r.id ? (
+                    <div className="fb-edit-area">
+                      <textarea
+                        className="fb-edit-textarea"
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        autoFocus
+                      />
+                      <div className="fb-edit-actions">
+                        <button
+                          className="fb-btn-cancel-edit"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className="fb-btn-save-edit"
+                          onClick={() => handleUpdateReview(r.id)}
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="fb-text">{r.comment}</div>
+                  )}
                 </div>
                 {/* Action Bar */}
                 <div className="fb-action-bar">
-                  <button
-                    className={`fb-action-btn ${
-                      r.user_vote === 1 ? "active" : ""
-                    }`}
-                    onClick={() => handleVote(r.id, 1)}
-                  >
-                    Like {r.likes > 0 && `(${r.likes})`}
-                  </button>
-                  <button
-                    className={`fb-action-btn ${
-                      r.user_vote === -1 ? "active" : ""
-                    }`}
-                    onClick={() => handleVote(r.id, -1)}
-                  >
-                    Dislike {r.dislikes > 0 && `(${r.dislikes})`}
-                  </button>
                   <button
                     className="fb-action-btn"
                     onClick={() =>
                       setActiveReplyId(activeReplyId === r.id ? null : r.id)
                     }
                   >
-                    Reply
+                    {t("profile.reviews_form.reply")}
                   </button>
+
+                  {/* Edit/Delete for Owner or Admin/Officer */}
+                  {(user?.id == r.user_id ||
+                    user?.role === "admin" ||
+                    user?.role === "officer") && (
+                    <>
+                      {user?.id == r.user_id && (
+                        <button
+                          className="fb-action-btn"
+                          onClick={() => startEditing(r.id, r.comment)}
+                        >
+                          {t("profile.reviews_form.edit")}
+                        </button>
+                      )}
+                      <button
+                        className="fb-action-btn delete-action"
+                        onClick={() => handleDeleteReview(r.id)}
+                      >
+                        {t("profile.reviews_form.delete")}
+                      </button>
+                    </>
+                  )}
+
                   <span className="fb-timestamp">
                     {formatDate(r.created_at)}
                   </span>
@@ -266,7 +368,7 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                   <div className="fb-reply-bubble">
                     <div className="fb-reply-content">
                       <span className="fb-reply-user">
-                        Official Response
+                        {t("profile.reviews_form.official_response")}
                         <i className="fas fa-check-circle fb-verified-icon"></i>
                       </span>
                       <span className="fb-reply-text">{r.reply_text}</span>
@@ -291,7 +393,11 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                   <input
                     type="text"
                     autoFocus
-                    placeholder={`Reply to ${r.first_name}...`}
+                    placeholder={
+                      isNP
+                        ? `${r.first_name} लाई जवाफ दिनुहोस्...`
+                        : `Reply to ${r.first_name}...`
+                    }
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     onKeyDown={(e) => {
@@ -313,8 +419,11 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                     className="fb-view-replies"
                     onClick={() => toggleViewReplies(r.id)}
                   >
-                    <i className="fa-solid fa-share"></i> View {r.reply_count}{" "}
-                    replies
+                    <i className="fa-solid fa-share"></i>{" "}
+                    {t("profile.reviews_form.view_replies").replace(
+                      "{count}",
+                      isNP ? toNepaliNumber(r.reply_count) : r.reply_count,
+                    )}
                   </div>
                 ) : (
                   <div className="fb-replies-list">
@@ -329,7 +438,7 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                         <div className="fb-reply-bubble">
                           <div className="fb-reply-content">
                             <span className="fb-reply-user">
-                              Official Response{" "}
+                              {t("profile.reviews_form.official_response")}{" "}
                               <i className="fas fa-check-circle fb-verified-icon"></i>
                             </span>
                             <span className="fb-reply-text">
@@ -355,37 +464,75 @@ const ReviewListFB = ({ wardId, refreshTrigger }) => {
                                 <i className="fas fa-check-circle fb-verified-icon"></i>
                               )}
                             </span>
-                            <span className="fb-reply-text">
-                              {rep.reply_text}
-                            </span>
+                            {editingId === rep.id ? (
+                              <div className="fb-edit-area">
+                                <textarea
+                                  className="fb-edit-textarea sm"
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  autoFocus
+                                />
+                                <div className="fb-edit-actions">
+                                  <button
+                                    className="fb-btn-cancel-edit sm"
+                                    onClick={() => setEditingId(null)}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    className="fb-btn-save-edit sm"
+                                    onClick={() =>
+                                      handleUpdateReply(rep.id, r.id)
+                                    }
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="fb-reply-text">
+                                {rep.reply_text}
+                              </span>
+                            )}
                           </div>
                           <div className="fb-reply-meta">
-                            <button
-                              className={`fb-reply-action-btn ${
-                                rep.user_vote === 1 ? "active" : ""
-                              }`}
-                              onClick={() => handleReplyVote(r.id, rep.id, 1)}
-                            >
-                              Like {rep.likes > 0 && `(${rep.likes})`}
-                            </button>
-                            <button
-                              className={`fb-reply-action-btn ${
-                                rep.user_vote === -1 ? "active" : ""
-                              }`}
-                              onClick={() => handleReplyVote(r.id, rep.id, -1)}
-                            >
-                              Dislike {rep.dislikes > 0 && `(${rep.dislikes})`}
-                            </button>
                             <button
                               className="fb-reply-action-btn"
                               onClick={() =>
                                 setActiveReplyId(
-                                  activeReplyId === r.id ? null : r.id
+                                  activeReplyId === r.id ? null : r.id,
                                 )
                               }
                             >
-                              Reply
+                              {t("profile.reviews_form.reply")}
                             </button>
+
+                            {/* Edit/Delete for Replies */}
+                            {(user?.id == rep.user_id ||
+                              user?.role === "admin" ||
+                              user?.role === "officer") && (
+                              <>
+                                {user?.id == rep.user_id && (
+                                  <button
+                                    className="fb-reply-action-btn"
+                                    onClick={() =>
+                                      startEditing(rep.id, rep.reply_text)
+                                    }
+                                  >
+                                    {t("profile.reviews_form.edit")}
+                                  </button>
+                                )}
+                                <button
+                                  className="fb-reply-action-btn delete-action"
+                                  onClick={() =>
+                                    handleDeleteReply(rep.id, r.id)
+                                  }
+                                >
+                                  {t("profile.reviews_form.delete")}
+                                </button>
+                              </>
+                            )}
+
                             <span className="fb-reply-time">
                               {formatDate(rep.created_at)}
                             </span>

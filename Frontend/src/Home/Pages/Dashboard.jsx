@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
 import { useWard } from "../Context/WardContext";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 import Navbar from "../Nav/Navbar";
 import { API_ENDPOINTS } from "../../config/api";
 
-const BudgetCard = ({ title, amount, color, icon }) => (
-  <div className={`budget-card ${color}`}>
-    <div className="budget-card-header">
-      <span className="budget-title">{title}</span>
-      <span className="budget-icon">{icon}</span>
+const BudgetCard = ({ title, amount, color, icon }) => {
+  const { language } = useLanguage();
+  const isNP = language === "NP";
+  return (
+    <div className={`budget-card ${color}`}>
+      <div className="budget-card-header">
+        <span className="budget-title">{title}</span>
+        <span className="budget-icon">{icon}</span>
+      </div>
+      <div className="budget-amount">
+        {isNP ? `रु. ${toNepaliNumber(amount)}` : `Rs. ${amount}`}
+      </div>
     </div>
-    <div className="budget-amount">Rs. {amount}</div>
-  </div>
-);
+  );
+};
 
 const ProgressBar = ({ label, value, color }) => (
   <div className="progress-row">
@@ -40,9 +48,11 @@ const ActivityItem = ({ title, desc, date }) => (
 );
 
 export default function Dashboard({ embedded = false, wardId }) {
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
   const { municipality, ward, wardId: contextWardId } = useWard();
   const currentWardId = wardId || contextWardId;
-  
+
   const [budgetData, setBudgetData] = useState(null);
   const [worksData, setWorksData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,25 +96,48 @@ export default function Dashboard({ embedded = false, wardId }) {
   const remaining = totalAllocated - totalSpent;
 
   const budget = {
-    total: totalAllocated.toLocaleString('en-IN'),
-    spent: totalSpent.toLocaleString('en-IN'),
-    remaining: remaining.toLocaleString('en-IN'),
+    total: totalAllocated.toLocaleString("en-IN"),
+    spent: totalSpent.toLocaleString("en-IN"),
+    remaining: remaining.toLocaleString("en-IN"),
   };
 
   // Calculate work progress
   const totalWorks = worksData.length;
-  const completedWorks = worksData.filter(w => w.status?.toLowerCase() === 'completed').length;
-  const ongoingWorks = worksData.filter(w => w.status?.toLowerCase() === 'ongoing').length;
-  const pendingWorks = worksData.filter(w => w.status?.toLowerCase() === 'pending' || w.status?.toLowerCase() === 'upcoming').length;
+  const completedWorks = worksData.filter(
+    (w) => w.status?.toLowerCase() === "completed",
+  ).length;
+  const ongoingWorks = worksData.filter(
+    (w) => w.status?.toLowerCase() === "ongoing",
+  ).length;
+  const pendingWorks = worksData.filter(
+    (w) =>
+      w.status?.toLowerCase() === "pending" ||
+      w.status?.toLowerCase() === "upcoming",
+  ).length;
 
-  const completedPercent = totalWorks > 0 ? Math.round((completedWorks / totalWorks) * 100) : 0;
-  const ongoingPercent = totalWorks > 0 ? Math.round((ongoingWorks / totalWorks) * 100) : 0;
-  const pendingPercent = totalWorks > 0 ? Math.round((pendingWorks / totalWorks) * 100) : 0;
+  const completedPercent =
+    totalWorks > 0 ? Math.round((completedWorks / totalWorks) * 100) : 0;
+  const ongoingPercent =
+    totalWorks > 0 ? Math.round((ongoingWorks / totalWorks) * 100) : 0;
+  const pendingPercent =
+    totalWorks > 0 ? Math.round((pendingWorks / totalWorks) * 100) : 0;
 
   const progress = [
-    { label: "Completed", value: completedPercent, color: "blue" },
-    { label: "Ongoing", value: ongoingPercent, color: "green" },
-    { label: "Planned", value: pendingPercent, color: "orange" },
+    {
+      label: t("profile.dashboard.completed"),
+      value: completedPercent,
+      color: "blue",
+    },
+    {
+      label: isNP ? "सञ्चालनमा" : "Ongoing",
+      value: ongoingPercent,
+      color: "green",
+    },
+    {
+      label: isNP ? "योजनाबद्ध" : "Planned",
+      value: pendingPercent,
+      color: "orange",
+    },
   ];
 
   const beneficiaries = {
@@ -113,30 +146,14 @@ export default function Dashboard({ embedded = false, wardId }) {
     indirect: budgetData?.indirect_beneficiaries || 0,
   };
 
-  const activities = [
-    {
-      title: "Ward Assembly Meeting",
-      desc: "General ward assembly meeting completed",
-      date: "2025/11/23",
-    },
-    {
-      title: "Road Construction Progress",
-      desc: "On-site inspection of road construction",
-      date: "2025/11/22",
-    },
-    {
-      title: "Health Campaign Program",
-      desc: "Health campaign organized",
-      date: "2025/11/21",
-    },
-  ];
-
   if (loading) {
     return (
       <>
         {!embedded && <Navbar showHomeContent={false} />}
         <div className="dashboard-page">
-          <div className="loading-state">Loading dashboard...</div>
+          <div className="loading-state">
+            {isNP ? "ड्यासबोर्ड लोड हुँदैछ..." : "Loading dashboard..."}
+          </div>
         </div>
       </>
     );
@@ -150,25 +167,26 @@ export default function Dashboard({ embedded = false, wardId }) {
           <div className="embedded-header" style={{ marginBottom: 12 }}>
             <span className="embedded-pin">📍</span>
             <span className="embedded-title">
-              {municipality} - Ward {ward}
+              {municipality} - {t("nav.ward")}{" "}
+              {isNP ? toNepaliNumber(ward) : ward}
             </span>
           </div>
         )}
         <div className="cards-row">
           <BudgetCard
-            title="Total Budget"
+            title={t("profile.dashboard.total_budget")}
             amount={budget.total}
             color="blue"
             icon="💰"
           />
           <BudgetCard
-            title="Spent Amount"
+            title={t("profile.dashboard.spent_amount")}
             amount={budget.spent}
             color="green"
             icon="💳"
           />
           <BudgetCard
-            title="Remaining Budget"
+            title={t("profile.dashboard.remaining_budget")}
             amount={budget.remaining}
             color="purple"
             icon="🧾"
@@ -177,13 +195,15 @@ export default function Dashboard({ embedded = false, wardId }) {
 
         <div className="grid-row">
           <div className="panel work-progress">
-            <div className="panel-title">Work Progress</div>
+            <div className="panel-title">
+              {t("profile.dashboard.work_progress")}
+            </div>
             <div className="progress-list">
               {progress.map((p) => (
                 <ProgressBar
                   key={p.label}
                   label={p.label}
-                  value={p.value}
+                  value={isNP ? toNepaliNumber(p.value) : p.value}
                   color={p.color}
                 />
               ))}
@@ -191,22 +211,34 @@ export default function Dashboard({ embedded = false, wardId }) {
           </div>
 
           <div className="panel beneficiaries">
-            <div className="panel-title">Beneficiary Population</div>
+            <div className="panel-title">
+              {t("profile.dashboard.beneficiary_population")}
+            </div>
             <div className="beneficiary-total">
-              {beneficiaries.total.toLocaleString()}
+              {isNP
+                ? toNepaliNumber(beneficiaries.total.toLocaleString())
+                : beneficiaries.total.toLocaleString()}
             </div>
             <div className="beneficiary-sub">
               <div>
                 <div className="beneficiary-count">
-                  {beneficiaries.direct.toLocaleString()}
+                  {isNP
+                    ? toNepaliNumber(beneficiaries.direct.toLocaleString())
+                    : beneficiaries.direct.toLocaleString()}
                 </div>
-                <div className="beneficiary-label">Direct</div>
+                <div className="beneficiary-label">
+                  {isNP ? "प्रत्यक्ष" : "Direct"}
+                </div>
               </div>
               <div>
                 <div className="beneficiary-count">
-                  {beneficiaries.indirect.toLocaleString()}
+                  {isNP
+                    ? toNepaliNumber(beneficiaries.indirect.toLocaleString())
+                    : beneficiaries.indirect.toLocaleString()}
                 </div>
-                <div className="beneficiary-label">Indirect</div>
+                <div className="beneficiary-label">
+                  {isNP ? "अप्रत्यक्ष" : "Indirect"}
+                </div>
               </div>
             </div>
           </div>

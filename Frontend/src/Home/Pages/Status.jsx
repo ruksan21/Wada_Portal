@@ -1,9 +1,13 @@
 import React, { useEffect } from "react";
 import { useWard } from "../Context/WardContext";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 
 // Working, backend-ready Status component.
 const Status = () => {
   const { stats, wardId, refreshStats } = useWard();
+  const { t, language } = useLanguage();
+  const isNP = language === "NP";
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -16,23 +20,31 @@ const Status = () => {
     <section className="stats-section">
       <div className="stat-card">
         <div className="icon">💼</div>
-        <h3>{stats.totalWorks}</h3>
-        <p>Total Works</p>
+        <h3>
+          {isNP ? toNepaliNumber(stats.totalWorks || 0) : stats.totalWorks || 0}
+        </h3>
+        <p>{t("profile.total_works")}</p>
       </div>
       <div className="stat-card">
         <div className="icon">✅</div>
-        <h3>{stats.completedWorks}</h3>
-        <p>Completed Works</p>
+        <h3>
+          {isNP
+            ? toNepaliNumber(stats.completedWorks || 0)
+            : stats.completedWorks || 0}
+        </h3>
+        <p>{t("profile.completed_works")}</p>
       </div>
       <div className="stat-card">
         <div className="icon">⭐</div>
-        <h3>{stats.rating}</h3>
-        <p>Average Rating</p>
+        <h3>{isNP ? toNepaliNumber(stats.rating || 0) : stats.rating || 0}</h3>
+        <p>{t("profile.avg_rating")}</p>
       </div>
       <div className="stat-card">
         <div className="icon">👥</div>
-        <h3>{stats.followers}</h3>
-        <p>Followers</p>
+        <h3>
+          {isNP ? toNepaliNumber(stats.followers || 0) : stats.followers || 0}
+        </h3>
+        <p>{t("profile.followers")}</p>
       </div>
     </section>
   );

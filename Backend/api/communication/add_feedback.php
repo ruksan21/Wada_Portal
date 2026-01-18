@@ -45,7 +45,7 @@ if ($user_id) {
 $is_valid_rating = ($user_role === 'officer') ? true : ($rating >= 1 && $rating <= 5);
 
 if ($work_id === 0 || !$is_valid_rating || ($rating != 0 && ($rating < 1 || $rating > 5)) || empty($comment)) {
-    echo json_encode(["success" => false, "message" => "Invalid input data. Rating and comment are required."]);
+    echo json_encode(["success" => false, "message" => "अमान्य इनपुट डाटा। मूल्याङ्कन र टिप्पणी आवश्यक छ।"]);
     exit();
 }
 
@@ -54,9 +54,9 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("iisis", $work_id, $user_id, $user_name, $rating, $comment);
 
 if ($stmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Feedback submitted successfully!"]);
+    echo json_encode(["success" => true, "message" => "प्रतिक्रिया सफलतापूर्वक पेश गरियो!"]);
 } else {
-    echo json_encode(["success" => false, "message" => "Error submitting feedback: " . $conn->error]);
+    echo json_encode(["success" => false, "message" => "प्रतिक्रिया पेश गर्दा त्रुटि: " . $conn->error]);
 }
 
 $stmt->close();

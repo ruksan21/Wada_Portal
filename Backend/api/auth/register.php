@@ -45,7 +45,7 @@ $citizenship_issue_district = $conn->real_escape_string($_POST['citizenshipIssue
 // Helper function for file upload
 function handleFileUpload($file, $prefix, $upload_dir) {
     if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
-        return ["success" => false, "message" => "Upload failed or no file provided."];
+        return ["success" => false, "message" => "अपलोड असफल भयो वा कुनै फाइल प्रदान गरिएको छैन।"];
     }
     
     // Validate file type
@@ -61,7 +61,7 @@ function handleFileUpload($file, $prefix, $upload_dir) {
     }
     
     if (!in_array($mime_type, $allowed_types)) {
-        return ["success" => false, "message" => "Invalid file type ($mime_type). Only images allow."];
+        return ["success" => false, "message" => "अमान्य फाइल प्रकार ($mime_type)। केवल छविहरूलाई अनुमति छ।"];
     }
     
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -71,14 +71,14 @@ function handleFileUpload($file, $prefix, $upload_dir) {
         return ["success" => true, "filename" => $new_filename];
     }
     
-    return ["success" => false, "message" => "Failed to move uploaded file."];
+    return ["success" => false, "message" => "अपलोड गरिएको फाइल सार्न असफल भयो।"];
 }
 
 // Validation for Common Fields
 if (!$first_name || !$last_name || !$email || !$password_plain || !$contact_number || !$dob || !$gender || 
     !$province || !$district || !$city || $ward_number === 'NULL' || !$citizenship_number || 
     !$citizenship_issue_date || !$citizenship_issue_district) {
-    echo json_encode(["success" => false, "message" => "All address and personal fields are mandatory except middle name."]);
+    echo json_encode(["success" => false, "message" => "बीचको नाम बाहेक सबै ठेगाना र व्यक्तिगत विवरणहरू अनिवार्य छन्।"]);
     exit();
 }
 
@@ -89,11 +89,11 @@ if (isset($_FILES['citizenshipPhoto']) && $_FILES['citizenshipPhoto']['error'] =
     if ($upload_result['success']) {
         $citizenship_photo = $upload_result['filename'];
     } else {
-        echo json_encode(["success" => false, "message" => "Citizenship Photo Error: " . $upload_result['message']]);
+        echo json_encode(["success" => false, "message" => "नागरिकता फोटो त्रुटि: " . $upload_result['message']]);
         exit();
     }
 } else {
-    echo json_encode(["success" => false, "message" => "Citizenship Photo is required."]);
+    echo json_encode(["success" => false, "message" => "नागरिकता फोटो आवश्यक छ।"]);
     exit();
     exit();
 }
@@ -119,7 +119,7 @@ $id_card_photo = "";
 
 if ($role === 'officer') {
     if (!$officer_id || !$department || !$work_province || !$work_district || !$work_municipality || $work_ward === 'NULL') {
-        echo json_encode(["success" => false, "message" => "Officer ID, Department, and complete Work Location (Province, District, Municipality, Ward) are required."]);
+        echo json_encode(["success" => false, "message" => "कर्मचारी आईडी, विभाग, र पूरा कामको ठेगाना (प्रदेश, जिल्ला, नगरपालिका, वडा) आवश्यक छ।"]);
         exit();
     }
     
@@ -128,11 +128,11 @@ if ($role === 'officer') {
         if ($upload_result['success']) {
             $id_card_photo = $upload_result['filename'];
         } else {
-            echo json_encode(["success" => false, "message" => "ID Card Photo Error: " . $upload_result['message']]);
+            echo json_encode(["success" => false, "message" => "परिचयपत्र फोटो त्रुटि: " . $upload_result['message']]);
             exit();
         }
     } else {
-         echo json_encode(["success" => false, "message" => "Officer ID Card Photo is required."]);
+         echo json_encode(["success" => false, "message" => "कर्मचारी परिचयपत्र फोटो आवश्यक छ।"]);
          exit();
     }
 }
@@ -161,8 +161,8 @@ try {
         // Create System Alert
         // Create System Alert
         $alert_type = $role === 'officer' ? "alert" : "success";
-        $alert_title = $role === 'officer' ? "New Officer Pending Approval" : "New User Registration";
-        $alert_message = "A new " . $role . " (" . $first_name . " " . $last_name . ") has registered.";
+        $alert_title = $role === 'officer' ? "नयाँ कर्मचारी अनुमोदनको पर्खाइमा" : "नयाँ प्रयोगकर्ता दर्ता";
+        $alert_message = "एक नयाँ " . ($role === 'officer' ? "कर्मचारी" : "नागरिक") . " (" . $first_name . " " . $last_name . ") दर्ता हुनुभएको छ।";
         
         // Determine Ward ID for the alert
         $alert_ward_id = "NULL";
@@ -189,7 +189,7 @@ try {
             $conn->query($alert_query); 
 
             $notif_type = $role === 'officer' ? 'alert' : 'system';
-            $notif_message = "New " . ucfirst($role) . ": " . $first_name . " " . $last_name;
+            $notif_message = "नयाँ " . ($role === 'officer' ? "कर्मचारी" : "नागरिक") . ": " . $first_name . " " . $last_name;
             
             // For admin notifications, find an admin user ID or default to 1 if not found
             $admin_res = $conn->query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
@@ -201,16 +201,16 @@ try {
             error_log("Non-critical registration tasks failed: " . $e->getMessage());
         }
 
-        echo json_encode(array("success" => true, "message" => "Registration successful!"));
+        echo json_encode(array("success" => true, "message" => "दर्ता सफल भयो!"));
     }
 } catch (mysqli_sql_exception $e) {
     // Catch specific MySQL errors
     if ($e->getCode() == 1062) { // Duplicate entry
-         echo json_encode(array("success" => false, "message" => "This email is already registered. Please login or use a different email."));
+         echo json_encode(array("success" => false, "message" => "यो इमेल पहिले नै दर्ता गरिएको छ। कृपया लगइन गर्नुहोस् वा अर्को इमेल प्रयोग गर्नुहोस्।"));
     } else {
-         echo json_encode(array("success" => false, "message" => "Database Error: " . $e->getMessage()));
+         echo json_encode(array("success" => false, "message" => "डाटाबेस त्रुटि: " . $e->getMessage()));
     }
 } catch (Exception $e) {
-    echo json_encode(array("success" => false, "message" => "System Error: " . $e->getMessage()));
+    echo json_encode(array("success" => false, "message" => "प्रणाली त्रुटि: " . $e->getMessage()));
 }
 ?>

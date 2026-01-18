@@ -81,6 +81,7 @@ export const API_ENDPOINTS = {
     addReply: `${BASE_URL}/communication/add_reply.php`,
     addReviewReply: `${BASE_URL}/communication/add_review_reply.php`,
     deleteReview: `${BASE_URL}/communication/delete_review.php`,
+    updateReview: `${BASE_URL}/communication/update_review.php`,
     toggleVote: `${BASE_URL}/communication/toggle_vote.php`,
     deleteFeedback: `${BASE_URL}/communication/delete_feedback.php`,
     updateFeedback: `${BASE_URL}/communication/update_feedback.php`,

@@ -1,320 +1,254 @@
 import React, { useState } from "react";
 import Navbar from "../Nav/Navbar";
 import "./OfficerPublicProfile.css";
+import { useLanguage } from "../Context/LanguageContext";
+import { toNepaliNumber } from "../../data/nepal_locations";
 
 export default function OfficerPublicProfile() {
-  const [activeTab, setActiveTab] = useState("details");
+  const { t, language } = useLanguage();
+  const [activeTab, setActiveTab] = useState("dashboard");
 
+  const isNP = language === "NP";
+
+  // Mock Data matching the screenshot
   const officerData = {
-    name: "Ram Bahadur Shrestha",
-    address: "Ward No. 1, Kathmandu",
-    education: "Master's Degree (Political Science)",
-    experience: "15 years in local politics",
-    politicalParty: "Nepali Congress",
-    appointmentDate: "2022/08/31",
-    phone: "9841234567",
-    email: "ram.shrestha@ktm.gov.np",
-    ward: "Ward No. 1, Kathmandu",
+    name: isNP ? "के छ के" : "k xa k",
+    role: isNP
+      ? "वडा अध्यक्ष - इटहरी उप-महानगरपालिका, वडा नं. २"
+      : "wardChairperson - Itahari Sub-Metropolitan City , Ward No. 2",
+    phone: isNP ? toNepaliNumber("9807314413") : "9807314413",
+    email: "ugherughoreughr@gmail.com",
+    address: isNP
+      ? "इटहरी उप-महानगरपालिका - वडा २"
+      : "Itahari Sub-Metropolitan City - Ward 2",
+    followers: 3,
+    rating: 3.3,
+    reviewCount: 4,
   };
 
-  const worksData = [
+  const topStats = [
     {
-      id: 1,
-      title: "Road Construction - Main Street",
-      budget: "Rs. 50,00,000",
-      status: "Completed",
-      startDate: "2024/01/15",
-      endDate: "2024/06/30",
-      beneficiaries: "500+ families",
+      label: t("profile.total_works"),
+      value: isNP ? toNepaliNumber(4) : 4,
+      icon: "💼",
+      color: "#8e44ad",
     },
     {
-      id: 2,
-      title: "Community Health Center Renovation",
-      budget: "Rs. 35,00,000",
-      status: "Ongoing",
-      startDate: "2024/07/01",
-      endDate: "2025/02/28",
-      beneficiaries: "2000+ citizens",
+      label: t("profile.completed_works"),
+      value: isNP ? toNepaliNumber(2) : 2,
+      icon: "✅",
+      color: "#27ae60",
     },
     {
-      id: 3,
-      title: "Water Supply System Upgrade",
-      budget: "Rs. 25,00,000",
-      status: "Planned",
-      startDate: "2025/03/01",
-      endDate: "2025/08/31",
-      beneficiaries: "300+ households",
+      label: t("profile.avg_rating"),
+      value: isNP ? toNepaliNumber(3.3) : 3.3,
+      icon: "⭐",
+      color: "#f1c40f",
+    },
+    {
+      label: t("profile.followers"),
+      value: isNP ? toNepaliNumber(3) : 3,
+      icon: "👥",
+      color: "#2c3e50",
     },
   ];
 
-  const assetsData = [
-    { type: "Land", description: "Residential plot in Kathmandu", value: "Rs. 1,50,00,000" },
-    { type: "Vehicle", description: "Car (Honda Civic 2020)", value: "Rs. 35,00,000" },
-    { type: "Savings", description: "Bank deposits", value: "Rs. 25,00,000" },
-  ];
-
-  const activitiesData = [
-    { date: "2024/12/15", activity: "Community meeting on sanitation", attendees: "50+ residents" },
-    { date: "2024/12/10", activity: "Inauguration of new park", attendees: "200+ citizens" },
-    { date: "2024/12/05", activity: "Budget planning session", attendees: "Ward committee" },
-    { date: "2024/11/28", activity: "School visit and donation drive", attendees: "100+ students" },
-  ];
-
-  const reviewsData = [
-    { name: "Sita Sharma", rating: 5, comment: "Excellent work on road construction!", date: "2024/12/18" },
-    { name: "Hari Prasad", rating: 4, comment: "Good communication with residents.", date: "2024/12/15" },
-    { name: "Maya Gurung", rating: 5, comment: "Very responsive to community needs.", date: "2024/12/10" },
-  ];
-
-  // Dashboard stats
-  const dashboardStats = {
-    totalWorks: 15,
-    completedWorks: 8,
-    ongoingWorks: 5,
-    plannedWorks: 2,
-    totalBudget: "Rs. 2,50,00,000",
-    averageRating: 4.7,
+  const dashboardData = {
+    totalBudget: isNP
+      ? `रु. ${toNepaliNumber("4000000000.00")}`
+      : "Rs. 4000000000.00",
+    spentAmount: isNP ? `रु. ${toNepaliNumber("4.01")}` : "Rs. 4.01",
+    remainingBudget: isNP
+      ? `रु. ${toNepaliNumber("3,99,99,99,995.99")}`
+      : "Rs. 3,99,99,99,995.99",
+    progress: 50,
+    beneficiaryPopulation: 31,
   };
 
   const tabs = [
-    { id: "details", label: "Details", icon: "👤" },
-    { id: "works", label: "Works", icon: "💼" },
-    { id: "assets", label: "Assets", icon: "🏠" },
-    { id: "activities", label: "Activities", icon: "📅" },
-    { id: "reviews", label: "Reviews", icon: "⭐" },
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "details", label: t("profile.tabs.details") },
+    { id: "property", label: t("profile.tabs.property") },
+    { id: "works", label: t("profile.tabs.works") },
+    { id: "assets", label: t("profile.tabs.assets") },
+    { id: "activities", label: t("profile.tabs.activities") },
+    { id: "reviews", label: t("profile.tabs.reviews") },
+    { id: "dashboard", label: t("profile.tabs.dashboard") },
   ];
 
   return (
     <>
       <Navbar showHomeContent={false} />
       <div className="officer-public-profile">
-        <div className="officer-profile-container">
-          {/* Tabs Navigation */}
-          <div className="profile-tabs">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <span className="tab-icon">{tab.icon}</span>
-                {tab.label}
-              </button>
+        <div className="profile-wrapper">
+          {/* 1. Top Stats Row */}
+          <div className="stats-overview">
+            {topStats.map((stat, index) => (
+              <div key={index} className="stat-box">
+                <div
+                  className="stat-icon-wrapper"
+                  style={{ color: stat.color }}
+                >
+                  {stat.icon}
+                </div>
+                <div className="stat-info">
+                  <span className="stat-value">{stat.value}</span>
+                  <span className="stat-label">{stat.label}</span>
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Tab Content */}
-          <div className="tab-content">
-            {activeTab === "details" && (
-              <div className="details-section">
-                <div className="info-grid">
-                  {/* Personal Information */}
-                  <div className="info-column">
-                    <h3>Personal Information</h3>
-                    <div className="info-items">
-                      <div className="info-item">
-                        <label>Address</label>
-                        <p>{officerData.address}</p>
-                      </div>
-                      <div className="info-item">
-                        <label>Education</label>
-                        <p>{officerData.education}</p>
-                      </div>
-                      <div className="info-item">
-                        <label>Experience</label>
-                        <p>{officerData.experience}</p>
-                      </div>
-                      <div className="info-item">
-                        <label>Political Party</label>
-                        <p>{officerData.politicalParty}</p>
-                      </div>
-                      <div className="info-item">
-                        <label>Appointment Date</label>
-                        <p>{officerData.appointmentDate}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Contact Details */}
-                  <div className="info-column">
-                    <h3>Contact Details</h3>
-                    <div className="contact-items">
-                      <div className="contact-item">
-                        <span className="contact-icon">📞</span>
-                        <span>{officerData.phone}</span>
-                      </div>
-                      <div className="contact-item">
-                        <span className="contact-icon">✉️</span>
-                        <span>{officerData.email}</span>
-                      </div>
-                      <div className="contact-item">
-                        <span className="contact-icon">📍</span>
-                        <span>{officerData.ward}</span>
-                      </div>
-                    </div>
-                    <button className="download-btn">
-                      <span className="download-icon">⬇️</span>
-                      Download Details
-                    </button>
+          {/* 2. Profile Header Card */}
+          <div className="profile-header-card">
+            <div className="profile-header-top">
+              <div className="profile-avatar">
+                <div className="avatar-circle">
+                  <span style={{ color: "white", fontSize: "1.5rem" }}>
+                    {officerData.name.charAt(0)}
+                  </span>
+                </div>
+              </div>
+              <div className="profile-main-info">
+                <div className="profile-name-row">
+                  <h1>{officerData.name}</h1>
+                  <div className="rating-display">
+                    <span className="stars">⭐⭐⭐☆☆</span>
+                    <span className="rating-text">
+                      {isNP
+                        ? toNepaliNumber(officerData.rating)
+                        : officerData.rating}{" "}
+                      (
+                      {isNP
+                        ? toNepaliNumber(officerData.reviewCount)
+                        : officerData.reviewCount}{" "}
+                      {t("profile.reviews")})
+                    </span>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === "works" && (
-              <div className="works-section">
-                <h3>Development Works</h3>
-                <div className="works-grid">
-                  {worksData.map((work) => (
-                    <div key={work.id} className="work-card">
-                      <div className="work-header">
-                        <h4>{work.title}</h4>
-                        <span className={`status-badge ${work.status.toLowerCase()}`}>
-                          {work.status}
-                        </span>
-                      </div>
-                      <div className="work-details">
-                        <div className="work-detail-item">
-                          <span className="label">💰 Budget:</span>
-                          <span className="value">{work.budget}</span>
-                        </div>
-                        <div className="work-detail-item">
-                          <span className="label">📅 Duration:</span>
-                          <span className="value">{work.startDate} - {work.endDate}</span>
-                        </div>
-                        <div className="work-detail-item">
-                          <span className="label">👥 Beneficiaries:</span>
-                          <span className="value">{work.beneficiaries}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <p className="profile-role">{officerData.role}</p>
+                <div className="profile-contact-row">
+                  <span className="contact-pill">
+                    <i className="fa-solid fa-phone"></i> {officerData.phone}
+                  </span>
+                  <span className="contact-pill">
+                    <i className="fa-solid fa-envelope"></i> {officerData.email}
+                  </span>
                 </div>
               </div>
-            )}
-
-            {activeTab === "assets" && (
-              <div className="assets-section">
-                <h3>Asset Declaration</h3>
-                <div className="assets-table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Asset Type</th>
-                        <th>Description</th>
-                        <th>Estimated Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assetsData.map((asset, index) => (
-                        <tr key={index}>
-                          <td><strong>{asset.type}</strong></td>
-                          <td>{asset.description}</td>
-                          <td className="value-col">{asset.value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="total-assets">
-                    <span>Total Declared Assets:</span>
-                    <strong>Rs. 2,10,00,000</strong>
-                  </div>
+              <div className="profile-actions">
+                <div className="followers-count">
+                  <i className="fa-solid fa-user"></i>{" "}
+                  {isNP
+                    ? toNepaliNumber(officerData.followers)
+                    : officerData.followers}{" "}
+                  {t("profile.followers")}
                 </div>
+                <button className="follow-btn">{t("profile.follow")}</button>
               </div>
-            )}
+            </div>
 
-            {activeTab === "activities" && (
-              <div className="activities-section">
-                <h3>Recent Activities & Events</h3>
-                <div className="timeline">
-                  {activitiesData.map((activity, index) => (
-                    <div key={index} className="timeline-item">
-                      <div className="timeline-date">{activity.date}</div>
-                      <div className="timeline-content">
-                        <h4>{activity.activity}</h4>
-                        <p>👥 {activity.attendees}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* 3. Tabs Navigation (inside card) */}
+            <div className="profile-tabs-nav">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`tab-link ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {activeTab === "reviews" && (
-              <div className="reviews-section">
-                <h3>Public Reviews & Ratings</h3>
-                <div className="reviews-summary">
-                  <div className="average-rating">
-                    <span className="rating-number">4.7</span>
-                    <div className="stars">⭐⭐⭐⭐⭐</div>
-                    <p>Based on {reviewsData.length} reviews</p>
-                  </div>
-                </div>
-                <div className="reviews-list">
-                  {reviewsData.map((review, index) => (
-                    <div key={index} className="review-card">
-                      <div className="review-header">
-                        <strong>{review.name}</strong>
-                        <span className="review-date">{review.date}</span>
-                      </div>
-                      <div className="review-rating">
-                        {"⭐".repeat(review.rating)}
-                      </div>
-                      <p className="review-comment">{review.comment}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
+          {/* 4. Tab Content Area */}
+          <div className="tab-content-area">
             {activeTab === "dashboard" && (
-              <div className="dashboard-section">
-                <h3>Performance Dashboard</h3>
-                <div className="dashboard-grid">
-                  <div className="dash-card">
-                    <div className="dash-icon">🏗️</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Total Works</span>
-                      <span className="dash-value">{dashboardStats.totalWorks}</span>
+              <div className="dashboard-content">
+                <div className="dashboard-header-text">
+                  <span className="location-pin">📍</span> {officerData.address}
+                </div>
+
+                {/* Budget Cards Grid */}
+                <div className="budget-dashboard-grid">
+                  <div className="budget-card blue-card">
+                    <div className="card-header">
+                      <span className="card-title">
+                        {t("profile.dashboard.total_budget")}
+                      </span>
+                      <span className="card-icon">💰</span>
+                    </div>
+                    <div className="card-amount blue-text">
+                      {dashboardData.totalBudget}
                     </div>
                   </div>
-                  <div className="dash-card">
-                    <div className="dash-icon">✅</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Completed</span>
-                      <span className="dash-value">{dashboardStats.completedWorks}</span>
+
+                  <div className="budget-card orange-card">
+                    <div className="card-header">
+                      <span className="card-title">
+                        {t("profile.dashboard.spent_amount")}
+                      </span>
+                      <span className="card-icon">💳</span>
+                    </div>
+                    <div className="card-amount orange-text">
+                      {dashboardData.spentAmount}
                     </div>
                   </div>
-                  <div className="dash-card">
-                    <div className="dash-icon">🔄</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Ongoing</span>
-                      <span className="dash-value">{dashboardStats.ongoingWorks}</span>
+
+                  <div className="budget-card green-card">
+                    <div className="card-header">
+                      <span className="card-title">
+                        {t("profile.dashboard.remaining_budget")}
+                      </span>
+                      <span className="card-icon">📄</span>
                     </div>
-                  </div>
-                  <div className="dash-card">
-                    <div className="dash-icon">📋</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Planned</span>
-                      <span className="dash-value">{dashboardStats.plannedWorks}</span>
-                    </div>
-                  </div>
-                  <div className="dash-card">
-                    <div className="dash-icon">💰</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Total Budget</span>
-                      <span className="dash-value">{dashboardStats.totalBudget}</span>
-                    </div>
-                  </div>
-                  <div className="dash-card">
-                    <div className="dash-icon">⭐</div>
-                    <div className="dash-info">
-                      <span className="dash-label">Avg Rating</span>
-                      <span className="dash-value">{dashboardStats.averageRating}/5</span>
+                    <div className="card-amount green-text">
+                      {dashboardData.remainingBudget}
                     </div>
                   </div>
                 </div>
+
+                {/* Bottom Row: Work Progress & Beneficiary */}
+                <div className="dashboard-bottom-row">
+                  <div className="progress-card">
+                    <h4>{t("profile.dashboard.work_progress")}</h4>
+                    <div className="progress-status">
+                      <span>{t("profile.dashboard.completed")}</span>
+                      <span>
+                        {isNP
+                          ? toNepaliNumber(dashboardData.progress)
+                          : dashboardData.progress}
+                        %
+                      </span>
+                    </div>
+                    <div className="progress-bar-container">
+                      <div
+                        className="progress-bar-fill"
+                        style={{ width: `${dashboardData.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="beneficiary-card">
+                    <h4>{t("profile.dashboard.beneficiary_population")}</h4>
+                    <div className="beneficiary-number">
+                      {isNP
+                        ? toNepaliNumber(dashboardData.beneficiaryPopulation)
+                        : dashboardData.beneficiaryPopulation}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Placeholders for other tabs */}
+            {activeTab !== "dashboard" && (
+              <div className="content-placeholder">
+                <h3>
+                  {tabs.find((t) => t.id === activeTab)?.label}{" "}
+                  {t("common.success")}
+                </h3>
+                <p>{t("common.loading")}</p>
               </div>
             )}
           </div>
