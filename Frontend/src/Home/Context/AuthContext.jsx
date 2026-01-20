@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../../config/api";
+import Loading from "../Component/Loading";
 
 // Create Auth Context
 const AuthContext = createContext(null);
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     return Promise.race([
       fetch(url),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timeout")), timeout)
+        setTimeout(() => reject(new Error("Request timeout")), timeout),
       ),
     ]);
   };
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     hasFetchedOfficers.current = true;
     try {
       const response = await fetchWithTimeout(
-        API_ENDPOINTS.users.getPendingOfficers
+        API_ENDPOINTS.users.getPendingOfficers,
       );
       const data = await response.json();
       if (data.success) {
@@ -106,7 +107,7 @@ export const AuthProvider = ({ children }) => {
     if (!user?.id) return;
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.users.getAll}?id=${user.id}`
+        `${API_ENDPOINTS.users.getAll}?id=${user.id}`,
       );
       const data = await response.json();
       if (data.success && data.data && data.data.length > 0) {
@@ -253,7 +254,7 @@ export const AuthProvider = ({ children }) => {
   // Getter function for backward compatibility
   const getOfficerWorkLocation = React.useCallback(
     () => officerWorkLocation,
-    [officerWorkLocation]
+    [officerWorkLocation],
   );
 
   const logout = () => {
@@ -276,7 +277,7 @@ export const AuthProvider = ({ children }) => {
 
     // Also update in allUsers list if applicable
     const updatedAllUsers = allUsers.map((u) =>
-      u.email === user.email ? { ...u, ...updatedData } : u
+      u.email === user.email ? { ...u, ...updatedData } : u,
     );
     setAllUsers(updatedAllUsers);
     localStorage.setItem("allUsers", JSON.stringify(updatedAllUsers));
@@ -291,7 +292,7 @@ export const AuthProvider = ({ children }) => {
 
     // Also update in allUsers list
     const updatedAllUsers = allUsers.map((u) =>
-      u.email === user.email ? { ...u, photoUrl } : u
+      u.email === user.email ? { ...u, photoUrl } : u,
     );
     setAllUsers(updatedAllUsers);
     localStorage.setItem("allUsers", JSON.stringify(updatedAllUsers));
@@ -330,7 +331,7 @@ export const AuthProvider = ({ children }) => {
     const exists = allUsers.some(
       (u) =>
         u.employeeId === officerData.employeeId ||
-        u.officerId === officerData.officerId
+        u.officerId === officerData.officerId,
     );
     if (exists) {
       return { success: false, message: "Officer ID already exists." };
@@ -407,7 +408,7 @@ export const AuthProvider = ({ children }) => {
         createSystemAlert(
           "success",
           "Officer Approved",
-          `An officer (ID: ${officerId}) has been approved and activated.`
+          `An officer (ID: ${officerId}) has been approved and activated.`,
         );
       } else {
         addNotification("error", data.message);
@@ -431,7 +432,7 @@ export const AuthProvider = ({ children }) => {
         createSystemAlert(
           "warning",
           "Officer Rejected",
-          `An officer application (ID: ${officerId}) was rejected.`
+          `An officer application (ID: ${officerId}) was rejected.`,
         );
       } else {
         addNotification("error", data.message);
@@ -456,7 +457,7 @@ export const AuthProvider = ({ children }) => {
           createSystemAlert(
             "info",
             "User Deleted",
-            `A user (ID: ${userId}) has been deleted from the system.`
+            `A user (ID: ${userId}) has been deleted from the system.`,
           );
         } else {
           addNotification("error", data.message);
@@ -471,7 +472,7 @@ export const AuthProvider = ({ children }) => {
   // Ward Management
   const updateWard = (wardId, wardData) => {
     const updatedWards = wards.map((w) =>
-      w.id === wardId ? { ...w, ...wardData } : w
+      w.id === wardId ? { ...w, ...wardData } : w,
     );
     setWards(updatedWards);
     localStorage.setItem("wards", JSON.stringify(updatedWards));
@@ -559,89 +560,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return (
-      <div
-        className="app-splash-screen"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          width: "100vw",
-          background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
-          color: "white",
-          fontFamily: "'Inter', sans-serif",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          zIndex: 9999,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          className="splash-content"
-          style={{ textAlign: "center", animation: "fadeInUp 0.8s ease-out" }}
-        >
-          <div
-            className="splash-logo"
-            style={{
-              fontSize: "4rem",
-              marginBottom: "20px",
-              filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.2))",
-            }}
-          >
-            🏛️
-          </div>
-          <h1
-            style={{
-              fontSize: "2.2rem",
-              margin: "0",
-              fontWeight: "700",
-              letterSpacing: "-0.5px",
-              background: "linear-gradient(to right, #fff, #bfdbfe)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Ward Management
-          </h1>
-          <p
-            style={{
-              fontSize: "1rem",
-              opacity: 0.8,
-              marginTop: "8px",
-              fontWeight: "300",
-            }}
-          >
-            Building efficient communities
-          </p>
-
-          <div className="loader-container" style={{ marginTop: "40px" }}>
-            <div
-              className="premium-loader"
-              style={{
-                width: "48px",
-                height: "48px",
-                border: "3px solid rgba(255, 255, 255, 0.2)",
-                borderTop: "3px solid #fff",
-                borderRadius: "50%",
-                display: "inline-block",
-                animation: "spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-              }}
-            ></div>
-          </div>
-        </div>
-
-        <style>{`
-          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-          @keyframes fadeInUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-          }
-        `}</style>
-      </div>
-    );
+    return <Loading />;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
