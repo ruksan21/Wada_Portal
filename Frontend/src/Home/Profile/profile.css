@@ -128,10 +128,6 @@
   background-color: #2563eb;
 }
 
-.follow-button:hover {
-  background-color: #2563eb;
-}
-
 /* Official Badge Styling */
 .fb-user-info-header {
   display: flex;
