@@ -47,8 +47,8 @@ const AlertCentre = () => {
       if (data.success) {
         setAlerts((prev) =>
           prev.map((alert) =>
-            alert.id === id ? { ...alert, status: "read" } : alert
-          )
+            alert.id === id ? { ...alert, status: "read" } : alert,
+          ),
         );
       }
     } catch (err) {
