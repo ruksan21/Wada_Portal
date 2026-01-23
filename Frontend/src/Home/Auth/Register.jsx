@@ -17,7 +17,7 @@ export default function RegisterPage({
   hideRoleSelector = false,
 }) {
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
 
   const [role, setRole] = useState(
     initialRole === "officer" ? "officer" : "citizen",
@@ -339,6 +339,51 @@ export default function RegisterPage({
       {/* RIGHT PANEL: Scrollable Form */}
       <div className="register-right-panel">
         <div className="register-container">
+          {/* Language Toggle Button */}
+          <button
+            onClick={toggleLanguage}
+            className="language-toggle-btn"
+            title={
+              language === "NP"
+                ? "Switch to English"
+                : "नेपालीमा स्विच गर्नुहोस्"
+            }
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              border: "none",
+              borderRadius: "50px",
+              padding: "10px 20px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "14px",
+              fontWeight: "600",
+              color: "white",
+              boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+              transition: "all 0.3s ease",
+              zIndex: 10,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 20px rgba(102, 126, 234, 0.6)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 15px rgba(102, 126, 234, 0.4)";
+            }}
+          >
+            <span style={{ fontSize: "18px" }}>
+              {language === "NP" ? "🇬🇧" : "🇳🇵"}
+            </span>
+            <span>{language === "NP" ? "English" : "नेपाली"}</span>
+          </button>
+
           <div className="register-header">
             <h1>{t("auth.create_account")}</h1>
             <p className="subtitle">{t("auth.join_today")}</p>
