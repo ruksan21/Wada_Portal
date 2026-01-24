@@ -370,7 +370,7 @@ const CommentSection = ({
 
     // Validation
     const newErrors = {};
-    if (user.role !== "officer" && rating === 0) {
+    if (rating === 0) {
       newErrors.rating = "Please select a rating";
     }
     if (comment.trim().length < 5) {
@@ -516,12 +516,10 @@ const CommentSection = ({
                   className="fb-avatar"
                 />
                 <div className="fb-input-wrapper">
-                  {user.role !== "officer" && (
-                    <div className="fb-rating-select">
-                      <span className="rating-label">Rate this project:</span>
-                      {renderStars(rating, true)}
-                    </div>
-                  )}
+                  <div className="fb-rating-select">
+                    <span className="rating-label">Rate this project:</span>
+                    {renderStars(rating, true)}
+                  </div>
                   <form onSubmit={handleSubmit}>
                     <textarea
                       className="fb-textarea"
@@ -570,13 +568,13 @@ const CommentSection = ({
                     <div className="fb-comment-row">
                       <img
                         src={getPhotoUrl(c.user_photo)}
-                        alt={sanitizeName(c.user_name) || 'User'}
+                        alt={sanitizeName(c.user_name) || "User"}
                         className="fb-avatar-small"
                       />
                       <div className="fb-bubble-container">
                         <div className="fb-bubble">
                           <div className="fb-user-name">
-                            {sanitizeName(c.user_name) || 'Anonymous'}
+                            {sanitizeName(c.user_name) || "Anonymous"}
                             {c.user_role === "officer" && (
                               <span className="fb-badge-official">
                                 Official
@@ -861,13 +859,14 @@ const CommentSection = ({
                                 <div className="fb-reply-card">
                                   <img
                                     src={getPhotoUrl(r.user_photo)}
-                                    alt={sanitizeName(r.user_name) || 'User'}
+                                    alt={sanitizeName(r.user_name) || "User"}
                                     className="fb-avatar-xs"
                                   />
                                   <div className="fb-reply-bubble">
                                     <div className="fb-reply-content">
                                       <span className="fb-reply-user">
-                                        {sanitizeName(r.user_name) || 'Anonymous'}
+                                        {sanitizeName(r.user_name) ||
+                                          "Anonymous"}
                                         {r.user_role === "officer" && (
                                           <i
                                             className="fas fa-check-circle fb-verified-icon"
@@ -982,7 +981,9 @@ const CommentSection = ({
                                           // Set active reply to THIS specific reply
                                           setActiveReplyId(r.id);
                                           // Pre-fill mention
-                                          const first = getFirstName(r.user_name);
+                                          const first = getFirstName(
+                                            r.user_name,
+                                          );
                                           if (first) setReplyText(`@${first} `);
                                         }}
                                       >
@@ -1098,7 +1099,7 @@ const CommentSection = ({
                                     <div className="fb-reply-box-modern">
                                       <textarea
                                         autoFocus
-                                        placeholder={`Reply to ${getFirstName(r.user_name) || ''}...`}
+                                        placeholder={`Reply to ${getFirstName(r.user_name) || ""}...`}
                                         value={replyText}
                                         onChange={(e) =>
                                           setReplyText(e.target.value)
@@ -1143,7 +1144,7 @@ const CommentSection = ({
                         <div className="fb-reply-box-modern">
                           <textarea
                             autoFocus
-                            placeholder={`Reply to ${getFirstName(c.user_name) || ''}...`}
+                            placeholder={`Reply to ${getFirstName(c.user_name) || ""}...`}
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             onKeyDown={(e) => {

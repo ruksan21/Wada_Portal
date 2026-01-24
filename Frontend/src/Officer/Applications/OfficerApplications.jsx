@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import OfficerLayout from "./OfficerLayout";
+import OfficerLayout from "../Layout/OfficerLayout";
 import "./OfficerApplications.css";
-import { useAuth } from "../Home/Context/AuthContext";
-import { API_ENDPOINTS } from "../config/api";
+import { useAuth } from "../../Home/Context/AuthContext";
+import { API_ENDPOINTS } from "../../config/api";
 
 const OfficerApplications = () => {
   const { pendingOfficers, approveOfficer, rejectOfficer, deleteUser } =
@@ -16,7 +16,7 @@ const OfficerApplications = () => {
     (app) =>
       app.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.officer_id?.toLowerCase().includes(searchTerm.toLowerCase())
+      app.officer_id?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getOfficerName = (officer) => {

@@ -17,7 +17,6 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
   );
   const [showComments, setShowComments] = useState(false);
 
-  // Sync props to state (crucial for when list refreshes or component is reused)
   useEffect(() => {
     setLikes(parseInt(work.likes_count) || 0);
     setIsLiked(work.user_liked > 0);
@@ -25,7 +24,6 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
     setReactionBreakdown(work.reaction_breakdown || {});
   }, [work]);
 
-  // Reaction Types
   const reactionTypes = [
     { type: "like", icon: "👍", label: "Like", color: "#dab748ff" },
     { type: "love", icon: "❤️", label: "Love", color: "#f33e58" },
@@ -52,7 +50,6 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
       if (data.success) {
         setLikes(data.likes);
         setIsLiked(data.liked);
-        // Update user reaction state
         setUserReaction(data.user_reaction);
         if (data.reaction_breakdown) {
           setReactionBreakdown(data.reaction_breakdown);
@@ -64,36 +61,34 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="work-card" style={{ position: "relative" }}>
-      {/* Action Buttons and Status on Top Right */}
-      <div className="work-actions">
-        <button className="btn-edit-work" onClick={() => onEdit(work)}>
-          <span>✏️</span> Edit
-        </button>
-        <button className="btn-delete-work" onClick={() => onDelete(work.id)}>
-          <span>🗑️</span> Delete
-        </button>
-      </div>
-
-      <div className="work-header">
-        <div className="work-header-main">
+    <div className="work-card">
+      <div className="work-card-header">
+        <div className="work-info-section">
           <div className="work-label-group">
             <span className="work-label">WORKS</span>
             <span
-              className={`status-badge status-${work.status.toLowerCase()}`}
+              className={`status-badge status-${work.status.replace(/\s+/g, "-").toLowerCase()}`}
             >
               {work.status}
             </span>
           </div>
           <h3 className="work-title">{work.title}</h3>
-
-          <div className="work-location-pill">
-            <span className="pill-icon">📍</span>
-            <span className="pill-text">
-              {work.province}, {work.district_name}, {work.municipality}, Ward{" "}
-              {work.ward_number}
-            </span>
+          <div className="work-location-text">
+            {work.ward_number ? `Ward ${work.ward_number}, ` : ""}
+            {work.municipality || work.district_name || work.province}
           </div>
+        </div>
+
+        <div className="work-card-actions">
+          <button className="btn-edit-work-glass" onClick={() => onEdit(work)}>
+            <span>✏️</span> Edit
+          </button>
+          <button
+            className="btn-delete-work-glass"
+            onClick={() => onDelete(work.id)}
+          >
+            <span>🗑️</span> Delete
+          </button>
         </div>
       </div>
 
@@ -102,31 +97,25 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
           src={
             work.image
               ? `${API_BASE_URL}/${work.image}`
-              : "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80"
+              : "https://placehold.co/800x400?text=No+Image"
           }
           alt={work.title}
           className="work-image"
-          onError={(e) => {
-            e.target.src =
-              "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80";
-          }}
         />
       </div>
 
       <div className="work-stats-grid">
         <div className="stat-item">
           <label>Start Date</label>
-          <div>{work.start_date || work.startDate || "N/A"}</div>
+          <div>{work.start_date || "N/A"}</div>
         </div>
         <div className="stat-item">
           <label>End Date</label>
-          <div>{work.end_date || work.endDate || "N/A"}</div>
+          <div>{work.end_date || "N/A"}</div>
         </div>
         <div className="stat-item">
           <label>Budget</label>
-          <div>
-            {work.budget.startsWith("Rs.") ? work.budget : `Rs. ${work.budget}`}
-          </div>
+          <div>Rs. {work.budget}</div>
         </div>
         <div className="stat-item">
           <label>Beneficiaries</label>
@@ -138,70 +127,60 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
         <p>{work.description}</p>
       </div>
 
+      {/* Facebook Style Feedback Bar */}
       <div className="fb-feedback-summary">
-        {likes > 0 && (
-          <div className="fb-reaction-icons">
-            {Object.keys(reactionBreakdown).length > 0 ? (
-              Object.entries(reactionBreakdown)
-                .filter(([, count]) => count > 0)
-                .slice(0, 3)
-                .map(([rt]) => {
-                  const r = reactionTypes.find((item) => item.type === rt);
-                  return r ? (
-                    <span
-                      key={rt}
-                      className={`reaction-icon type-${rt}`}
-                      style={{ fontSize: "20px" }}
-                    >
-                      {r.icon}
-                    </span>
-                  ) : null;
-                })
-            ) : (
-              <span className="reaction-icon like" style={{ fontSize: "20px" }}>
-                <i className="fa-solid fa-thumbs-up"></i>
-              </span>
-            )}
-            <span className="reaction-count">{likes}</span>
-
-            {/* Reaction Breakdown Tooltip */}
-            <div className="reaction-tooltip">
-              {Object.keys(reactionBreakdown).length > 0 ? (
-                Object.entries(reactionBreakdown).map(([type, count]) => {
-                  const reaction = reactionTypes.find((r) => r.type === type);
-                  return count > 0 && reaction ? (
-                    <div key={type} className="reaction-breakdown-item">
-                      <span className="reaction-icon">{reaction.icon}</span>
-                      <span className="reaction-label">{reaction.label}</span>
-                      <span className="reaction-count">{count}</span>
-                    </div>
-                  ) : null;
-                })
-              ) : (
-                <div className="reaction-breakdown-item">
-                  <span className="reaction-icon">👍</span>
-                  <span className="reaction-label">Like</span>
+        {(likes > 0 || work.comments_count > 0) && (
+          <>
+            <div
+              className="fb-reaction-icons"
+              style={{ cursor: "pointer", position: "relative" }}
+            >
+              {likes > 0 && (
+                <>
+                  <div className="reaction-badges">
+                    {Object.keys(reactionBreakdown).length > 0 ? (
+                      Object.entries(reactionBreakdown)
+                        .filter(([, count]) => count > 0)
+                        .slice(0, 3)
+                        .map(([rt]) => {
+                          const icon = reactionTypes.find(
+                            (r) => r.type === rt,
+                          )?.icon;
+                          return icon ? (
+                            <span
+                              key={rt}
+                              className={`summary-icon badge-${rt}`}
+                            >
+                              {icon}
+                            </span>
+                          ) : null;
+                        })
+                    ) : (
+                      <span className="summary-icon badge-like">👍</span>
+                    )}
+                  </div>
                   <span className="reaction-count">{likes}</span>
-                </div>
+                </>
               )}
             </div>
-          </div>
+            {work.comments_count > 0 && (
+              <div
+                className="fb-stats-summary"
+                onClick={() => setShowComments(!showComments)}
+              >
+                <span className="stat-text">
+                  {work.comments_count} comments
+                </span>
+              </div>
+            )}
+          </>
         )}
-        <div className="fb-stats-summary">
-          <span className="stat-text">{work.comments_count || 0} comments</span>
-        </div>
       </div>
 
       {/* Functional Interaction Bar */}
       <div className="fb-interaction-bar">
-        <div
-          className="fb-interaction-wrapper"
-          style={{ position: "relative" }}
-        >
-          <div
-            className="fb-reaction-dock top-dock"
-            style={{ bottom: "100%", marginBottom: "5px" }}
-          >
+        <div className="fb-interaction-wrapper">
+          <div className="fb-reaction-dock top-dock">
             {reactionTypes.map((r) => (
               <span
                 key={r.type}
@@ -210,16 +189,14 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
                   e.stopPropagation();
                   handleLike(r.type);
                 }}
-                title={r.label}
+                data-label={r.label}
               >
                 {r.icon}
               </span>
             ))}
           </div>
           <button
-            className={`fb-btn like-btn ${
-              isLiked ? `reacted type-${userReaction || "like"}` : ""
-            }`}
+            className={`fb-btn like-btn ${isLiked ? `reacted type-${userReaction || "like"}` : ""}`}
             onClick={() =>
               handleLike(
                 isLiked && userReaction === "like"
@@ -275,7 +252,6 @@ const WorkCard = ({ work, onEdit, onDelete }) => {
         </button>
       </div>
 
-      {/* Comment Section Integration */}
       {showComments && (
         <div className="fb-comments-section-container">
           <CommentSection
@@ -294,7 +270,6 @@ export default function OfficerWorks() {
   const workLocation = getOfficerWorkLocation();
   const [works, setWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [wardError, setWardError] = useState(null);
 
   const fetchWorks = React.useCallback(
     (loc) => {
@@ -306,19 +281,14 @@ export default function OfficerWorks() {
         work_ward: String(loc.work_ward || ""),
         current_user_id: user?.id || "",
       });
-      const url = `${API_ENDPOINTS.works.getAll}?${params.toString()}`;
-      fetch(url)
+      fetch(`${API_ENDPOINTS.works.getAll}?${params.toString()}`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.success) {
-            setWorks(data.data || []);
-          } else {
-            setWorks([]);
-          }
+          if (data.success) setWorks(data.data || []);
           setIsLoading(false);
         })
         .catch((err) => {
-          console.error("Error fetching works:", err);
+          console.error(err);
           setIsLoading(false);
         });
     },
@@ -326,9 +296,7 @@ export default function OfficerWorks() {
   );
 
   useEffect(() => {
-    if (workLocation) {
-      fetchWorks(workLocation);
-    }
+    if (workLocation) fetchWorks(workLocation);
   }, [workLocation, fetchWorks]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -337,13 +305,10 @@ export default function OfficerWorks() {
     title: "",
     description: "",
     status: "pending",
-    fiscalYear: "",
     budget: "",
     startDate: "",
     endDate: "",
-    contractorName: "",
     beneficiaries: "",
-    image: "",
     imageFile: null,
   });
 
@@ -351,16 +316,9 @@ export default function OfficerWorks() {
     if (work) {
       setEditingWork(work);
       setFormData({
-        title: work.title,
-        description: work.description,
-        status: work.status,
-        fiscalYear: work.fiscalYear,
-        budget: work.budget,
-        startDate: work.startDate,
-        endDate: work.endDate,
-        contractorName: work.contractorName,
-        beneficiaries: work.beneficiaries,
-        image: work.image,
+        ...work,
+        startDate: work.start_date,
+        endDate: work.end_date,
       });
     } else {
       setEditingWork(null);
@@ -368,16 +326,34 @@ export default function OfficerWorks() {
         title: "",
         description: "",
         status: "pending",
-        fiscalYear: "",
         budget: "",
         startDate: "",
         endDate: "",
-        contractorName: "",
         beneficiaries: "",
-        image: "",
+        imageFile: null,
       });
     }
     setIsFormOpen(true);
+  };
+
+  const handleDeleteWork = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
+    try {
+      const res = await fetch(`${API_ENDPOINTS.works.delete}?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Project deleted successfully");
+        fetchWorks(workLocation);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete project");
+    }
   };
 
   const handleCloseForm = () => {
@@ -385,284 +361,213 @@ export default function OfficerWorks() {
     setEditingWork(null);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, image: imageUrl, imageFile: file });
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const fd = new FormData();
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("title", formData.title);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("budget", formData.budget);
-    formDataToSend.append("start_date", formData.startDate);
-    formDataToSend.append("end_date", formData.endDate);
-    formDataToSend.append("beneficiaries", formData.beneficiaries);
-    formDataToSend.append("status", formData.status);
-    formDataToSend.append("officer_id", user.id);
-
-    // Add work ID for update
-    if (editingWork) {
-      formDataToSend.append("id", editingWork.id);
-    }
-
-    if (workLocation) {
-      formDataToSend.append("work_province", workLocation.work_province || "");
-      formDataToSend.append("work_district", workLocation.work_district || "");
-      formDataToSend.append(
-        "work_municipality",
-        workLocation.work_municipality || "",
-      );
-      formDataToSend.append("work_ward", String(workLocation.work_ward || ""));
-    }
+    // Explicit mapping to match backend expectations
+    fd.append("title", formData.title);
+    fd.append("description", formData.description);
+    fd.append("status", formData.status);
+    fd.append("budget", formData.budget);
+    fd.append("start_date", formData.startDate);
+    fd.append("end_date", formData.endDate);
+    fd.append("beneficiaries", formData.beneficiaries || "");
+    fd.append("officer_id", user.id);
 
     if (formData.imageFile) {
-      formDataToSend.append("image", formData.imageFile);
+      fd.append("image", formData.imageFile);
+    }
+
+    if (editingWork) fd.append("id", editingWork.id);
+
+    if (workLocation) {
+      fd.append("work_province", workLocation.work_province);
+      fd.append("work_district", workLocation.work_district || "");
+      fd.append("work_municipality", workLocation.work_municipality);
+      fd.append("work_ward", String(workLocation.work_ward));
     }
 
     try {
       const url = editingWork
-        ? `${API_ENDPOINTS.works.update}`
-        : `${API_ENDPOINTS.works.add}`;
-
-      const response = await fetch(url, {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      const data = await response.json();
-
-      if (response.status === 422) {
-        setWardError(
-          data.message || "Ward not found. Ask admin to create this ward.",
-        );
-        handleCloseForm();
-        return;
-      }
-
+        ? API_ENDPOINTS.works.update
+        : API_ENDPOINTS.works.add;
+      const res = await fetch(url, { method: "POST", body: fd });
+      const data = await res.json();
       if (data.success) {
-        setWardError(null);
-        toast.success(
-          editingWork
-            ? "Work updated successfully!"
-            : "Work saved successfully!",
-        );
+        toast.success(editingWork ? "Work updated!" : "Work added!");
         fetchWorks(workLocation);
         handleCloseForm();
       } else {
-        toast.error("Error: " + data.message);
+        toast.error(data.message || "Failed to save work");
       }
-    } catch (error) {
-      console.error("Error saving work:", error);
-      toast.error("Failed to save work");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (
-      window.confirm("Are you sure you want to delete this development work?")
-    ) {
-      try {
-        const response = await fetch(API_ENDPOINTS.works.delete, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id, officer_id: user.id }),
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          toast.success("Work deleted successfully!");
-          fetchWorks(workLocation);
-        } else {
-          toast.error("Error: " + data.message);
-        }
-      } catch (error) {
-        console.error("Error deleting work:", error);
-        toast.error("Failed to delete work");
-      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error");
     }
   };
 
   return (
     <OfficerLayout title="Development Works">
-      <div className="officer-works-header">
-        <div className="header-info">
-          <p style={{ color: "#718096", margin: 0 }}>
+      <div className="officer-works-page-header">
+        <div className="header-text-group">
+          <p className="header-subtitle">
             Manage and monitor development projects in your ward
           </p>
-          {wardError && (
-            <div
-              className="ward-error-alert"
-              style={{
-                marginTop: "8px",
-                color: "#e53e3e",
-                fontSize: "0.875rem",
-              }}
-            >
-              ⚠️ {wardError}
-            </div>
-          )}
         </div>
-        <button className="btn-create-work" onClick={() => handleOpenForm()}>
+        <button
+          className="btn-add-work-primary"
+          onClick={() => handleOpenForm()}
+        >
           + Add New Work
         </button>
       </div>
 
       {isFormOpen && (
         <div className="work-form-overlay">
-          <div className="work-form-modal">
-            <div className="form-modal-header">
-              <h2>{editingWork ? "Edit Project" : "Add New Project"}</h2>
-              <button className="btn-close-modal" onClick={handleCloseForm}>
-                ✕
-              </button>
+          <form onSubmit={handleSubmit} className="work-form-modal">
+            <h3>{editingWork ? "Edit Work" : "Add New Work"}</h3>
+            <div className="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Project Title"
+              />
             </div>
-
-            <form onSubmit={handleSubmit} className="work-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Project Title *</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="e.g., Ward 4 Road Maintenance"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Status *</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Upcoming">Upcoming</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Completed">Completed</option>
-                  </select>
-                </div>
-              </div>
-
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                required
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Project Description"
+              />
+            </div>
+            <div
+              className="form-row"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "15px",
+              }}
+            >
               <div className="form-group">
-                <label>Description *</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
+                <label>Budget (Rs.)</label>
+                <input
+                  type="number"
                   required
-                  placeholder="Provide project details..."
+                  value={formData.budget}
+                  onChange={(e) =>
+                    setFormData({ ...formData, budget: e.target.value })
+                  }
+                  placeholder="e.g. 500000"
                 />
               </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Budget (Rs.) *</label>
-                  <input
-                    type="number"
-                    name="budget"
-                    value={formData.budget}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Beneficiaries *</label>
-                  <input
-                    type="text"
-                    name="beneficiaries"
-                    value={formData.beneficiaries}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="e.g., 500+ households"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Start Date</label>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={formData.startDate}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>End Date</label>
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-
               <div className="form-group">
-                <label>Project Image</label>
-                <div className="image-upload-wrapper">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  {formData.image && (
-                    <img
-                      src={formData.image}
-                      alt="Preview"
-                      className="image-preview"
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={handleCloseForm}
+                <label>Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
                 >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-submit">
-                  {editingWork ? "Update Project" : "Save Project"}
-                </button>
+                  <option value="pending">Pending</option>
+                  <option value="on-going">On-Going</option>
+                  <option value="completed">Completed</option>
+                </select>
               </div>
-            </form>
-          </div>
+            </div>
+            <div
+              className="form-row"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "15px",
+              }}
+            >
+              <div className="form-group">
+                <label>Start Date</label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startDate: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label>End Date</label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endDate: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Beneficiaries</label>
+              <input
+                type="text"
+                value={formData.beneficiaries}
+                onChange={(e) =>
+                  setFormData({ ...formData, beneficiaries: e.target.value })
+                }
+                placeholder="e.g. 500 Households"
+              />
+            </div>
+            <div className="form-group">
+              <label>Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({ ...formData, imageFile: e.target.files[0] })
+                }
+              />
+            </div>
+            <div
+              className="form-actions"
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                marginTop: "20px",
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleCloseForm}
+                className="fb-btn-cancel-edit"
+              >
+                Cancel
+              </button>
+              <button type="submit" className="fb-btn-save-edit">
+                {editingWork ? "Update Work" : "Save Project"}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
       <div className="works-grid">
         {isLoading ? (
-          <div className="loading-state">Loading works...</div>
-        ) : works.length === 0 ? (
-          <div className="empty-state">
-            <p>No development works found for your ward.</p>
-          </div>
+          <p>Loading...</p>
         ) : (
           works.map((work) => (
             <WorkCard
               key={work.id}
               work={work}
               onEdit={handleOpenForm}
-              onDelete={handleDelete}
+              onDelete={handleDeleteWork}
             />
           ))
         )}

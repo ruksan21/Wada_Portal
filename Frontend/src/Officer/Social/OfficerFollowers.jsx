@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import OfficerLayout from "./OfficerLayout";
+import OfficerLayout from "../Layout/OfficerLayout";
 import "./OfficerFollowers.css";
-import { API_ENDPOINTS } from "../config/api";
+import { API_ENDPOINTS } from "../../config/api";
 
 const OfficerFollowers = () => {
   const [followers, setFollowers] = useState([]);
@@ -10,9 +10,7 @@ const OfficerFollowers = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.id) {
-      fetch(
-        `${API_ENDPOINTS.officers.getFollowers}?officer_id=${user.id}`
-      )
+      fetch(`${API_ENDPOINTS.officers.getFollowers}?officer_id=${user.id}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {

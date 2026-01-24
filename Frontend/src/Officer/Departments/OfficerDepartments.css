@@ -78,9 +78,7 @@
   align-items: center;
   opacity: 0;
   transform: translateY(-4px);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 /* show actions on card hover */

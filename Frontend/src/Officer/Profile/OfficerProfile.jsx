@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import OfficerLayout from "./OfficerLayout";
+import OfficerLayout from "../Layout/OfficerLayout";
 import "./OfficerProfile.css";
-import { API_ENDPOINTS, API_BASE_URL } from "../config/api";
+import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 
 const OfficerProfile = () => {
   const [formData, setFormData] = useState({
@@ -21,9 +21,7 @@ const OfficerProfile = () => {
 
   useEffect(() => {
     // Fetch current data
-    fetch(
-      `${API_ENDPOINTS.officers.getChairpersonProfile}?ward_id=${wardId}`
-    )
+    fetch(`${API_ENDPOINTS.officers.getChairpersonProfile}?ward_id=${wardId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.data) {
@@ -36,9 +34,7 @@ const OfficerProfile = () => {
             photo: null,
           });
           if (d.chairperson_photo) {
-            setCurrentPhoto(
-              `${API_BASE_URL}/uploads/${d.chairperson_photo}`
-            );
+            setCurrentPhoto(`${API_BASE_URL}/uploads/${d.chairperson_photo}`);
           }
         }
       });
@@ -72,13 +68,10 @@ const OfficerProfile = () => {
     }
 
     try {
-      const res = await fetch(
-        API_ENDPOINTS.officers.updateChairpersonProfile,
-        {
-          method: "POST",
-          body: data,
-        }
-      );
+      const res = await fetch(API_ENDPOINTS.officers.updateChairpersonProfile, {
+        method: "POST",
+        body: data,
+      });
       const result = await res.json();
       if (result.success) {
         setMessage({ type: "success", text: "Profile updated successfully!" });
@@ -111,7 +104,9 @@ const OfficerProfile = () => {
             <div className="photo-container">
               <img
                 src={
-                  preview || currentPhoto || "https://via.placeholder.com/150"
+                  preview ||
+                  currentPhoto ||
+                  "https://placehold.co/150?text=Profile"
                 }
                 alt="Profile"
                 className="profile-img"

@@ -1,166 +1,229 @@
-/* Officer Works Specific Styles */
-
-.officer-works-header {
+/* List View Redesign */
+.officer-works-page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 32px;
+  padding: 0 8px;
 }
 
-.btn-create-work {
-  padding: 12px 24px;
-  background: #2c3e50;
+.header-subtitle {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.btn-add-work-primary {
+  background-color: #1e293b;
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
-.btn-create-work:hover {
-  background: #34495e;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.btn-add-work-primary:hover {
+  background-color: #0f172a;
 }
 
-/* Work Actions on Top Right with Status */
-.work-actions {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  z-index: 10;
+.works-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px;
+}
+
+.work-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px;
+}
+
+.work-label-group {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 8px;
+}
+
+.work-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
 }
 
 .status-badge {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: lowercase;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.status-badge.status-completed {
-  background: #28a745;
+.status-pending {
+  background-color: #f97316;
+  color: white;
+}
+.status-on-going {
+  background-color: #3b82f6;
+  color: white;
+}
+.status-completed {
+  background-color: #10b981;
   color: white;
 }
 
-.status-badge.status-ongoing {
-  background: #007bff;
-  color: white;
+.work-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px 0;
 }
 
-.status-badge.status-pending {
-  background: #d97706;
-  color: white;
+.work-location-text {
+  font-size: 13px;
+  color: #94a3b8;
 }
 
-.btn-edit-work,
-.btn-delete-work {
-  padding: 8px 16px;
-  border: 2px solid;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all 0.3s;
+.work-card-actions {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-edit-work {
-  background: #e3f2fd;
-  color: #1976d2;
-  border-color: #90caf9;
-}
-
-.btn-edit-work:hover {
-  background: #1976d2;
-  color: white;
-  border-color: #1976d2;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-}
-
-.btn-delete-work {
-  background: #fee2e2;
-  color: #dc2626;
-  border-color: #fecaca;
-}
-
-.btn-delete-work:hover {
-  background: #dc2626;
-  color: white;
-  border-color: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-}
-
-/* Image Upload Styles */
-.image-upload-container {
-  display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
-.file-input {
-  display: none;
-}
-
-.file-upload-label {
+.btn-edit-work-glass,
+.btn-delete-work-glass {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  background: #f7fafc;
-  border: 2px dashed #cbd5e0;
-  border-radius: 8px;
+  gap: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.file-upload-label:hover {
-  background: #edf2f7;
-  border-color: #3182ce;
+.btn-edit-work-glass {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
 }
 
-.upload-icon {
-  font-size: 1.5rem;
+.btn-delete-work-glass {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
 }
 
-.image-preview {
+.work-image-container {
+  height: 280px;
   width: 100%;
-  max-width: 400px;
+  padding: 0 28px;
+}
+
+.work-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
 }
 
-.image-preview img {
-  width: 100%;
-  height: auto;
-  display: block;
+.work-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 24px 28px;
+  background-color: #f8fafc;
+  margin: 20px 28px;
+  border-radius: 8px;
 }
 
-/* Form Modal Overlay */
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-item label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.stat-item div {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-item label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: capitalize;
+}
+
+.stat-item div {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.work-description {
+  padding: 0 28px 28px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.fb-reaction-stats {
+  padding: 0 28px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.reaction-count {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.fb-interaction-bar {
+  display: flex;
+}
+
 .work-form-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 2000;
   padding: 20px;
 }
 
@@ -168,183 +231,62 @@
   background: white;
   border-radius: 12px;
   width: 100%;
-  max-width: 800px;
+  max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
-.form-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.form-modal-header h2 {
-  margin: 0;
+.work-form-modal h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e293b;
   font-size: 1.5rem;
-  color: #2d3748;
 }
 
-.btn-close-modal {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #718096;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.btn-close-modal:hover {
-  background: #f7fafc;
-  color: #2d3748;
-}
-
-/* Form Styles */
-.work-form {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+.modal-body {
+  padding: 20px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
+  display: block;
+  font-size: 13px;
   font-weight: 600;
-  color: #2d3748;
-  font-size: 0.9rem;
-}
-
-.required {
-  color: #e53e3e;
+  color: #475569;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px 12px;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-  font-family: inherit;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+  border-color: #4c51bf;
+  box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.1);
 }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.btn-cancel,
-.btn-submit {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.95rem;
-}
-
-.btn-cancel {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
-}
-
-.btn-cancel:hover {
-  background: #edf2f7;
-}
-
-.btn-submit {
-  background: #3182ce;
-  color: white;
-}
-
-.btn-submit:hover {
-  background: #2c5aa0;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #718096;
-  background: white;
-  border-radius: 12px;
-  border: 2px dashed #cbd5e0;
-}
-
-.empty-state p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .officer-works-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .work-actions {
-    position: static;
-    margin-bottom: 12px;
-  }
-
-  .work-form-modal {
-    max-height: 95vh;
-  }
-}
-
-/* Facebook Style Interaction Bar */
+/* Facebook Style Feedback Bar */
 .fb-feedback-summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 10px 20px;
   border-top: 1px solid #e4e6eb;
   margin-top: 15px;
 }
@@ -355,40 +297,46 @@
   gap: 4px;
 }
 
-.reaction-icon {
-  width: 20px;
-  height: 20px;
+.reaction-badges {
+  display: flex;
+  align-items: center;
+}
+
+.summary-icon {
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 11px;
-  margin-right: 2px;
+  font-size: 16px;
+  margin-right: -10px;
   border: 2px solid #fff;
   position: relative;
   z-index: 1;
 }
 
-.reaction-icon.like {
+.summary-icon.badge-like {
   background: #1877f2;
   color: #fff;
   z-index: 3;
 }
-.reaction-icon.heart {
+.summary-icon.badge-heart {
   background: #fb3958;
   color: #fff;
   z-index: 2;
 }
-.reaction-icon.sad {
+.summary-icon.badge-sad {
   background: #f7b928;
   color: #fff;
   z-index: 1;
 }
 
 .reaction-count {
-  margin-left: 8px;
+  margin-left: 18px;
   color: #65676b;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .fb-stats-summary {
@@ -397,16 +345,25 @@
   color: #65676b;
   font-size: 14px;
   margin-left: auto;
+  cursor: pointer;
 }
 
-.stat-divider {
-  color: #65676b;
+.fb-stats-summary:hover .stat-text {
+  text-decoration: underline;
 }
 
+/* FB INTERACTION BAR */
 .fb-interaction-bar {
   display: flex;
   padding: 4px;
   border-top: 1px solid #e4e6eb;
+  background: #fff;
+}
+
+.fb-interaction-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
 }
 
 .fb-btn {
@@ -427,101 +384,13 @@
 }
 
 .fb-btn i {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
 }
 
 .fb-btn:hover {
   background: #f2f2f2;
 }
 
-.fb-btn.liked {
-  color: #1877f2;
-}
-
-.fb-btn.active {
-  background: #f2f2f2;
-  color: #1877f2;
-}
-
-.fb-comments-section-container {
-  margin-top: 10px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-/* REACTION DOCK FOR OFFICER WORKS */
-.fb-interaction-wrapper {
-  position: relative;
-  display: inline-block;
-  flex: 1;
-}
-
-.fb-reaction-dock {
-  display: none;
-  position: absolute;
-  background: white;
-  padding: 6px 10px;
-  border-radius: 50px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
-  gap: 8px;
-  z-index: 9999;
-  border: 1px solid #e4e6eb;
-  animation: fbPopUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-}
-
-.fb-reaction-dock.top-dock {
-  bottom: 100%;
-  margin-bottom: 5px;
-  left: 0;
-}
-
-@keyframes fbPopUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px) scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* HOVER TRIGGER */
-.fb-interaction-wrapper:hover .fb-reaction-dock {
-  display: flex !important;
-  align-items: center;
-}
-
-.reaction-emoji {
-  font-size: 30px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-}
-
-.reaction-emoji:hover {
-  transform: scale(1.5) translateY(-10px);
-}
-
-.reaction-emoji:hover::after {
-  content: attr(title);
-  position: absolute;
-  top: -40px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* Reacted Button Styles */
 .fb-btn.reacted .reaction-label {
   font-weight: 700 !important;
 }
@@ -539,4 +408,87 @@
 }
 .reacted.type-angry {
   color: #e9710f !important;
+}
+
+/* REACTION DOCK */
+.fb-reaction-dock {
+  display: none;
+  position: absolute;
+  background: white;
+  padding: 6px 10px;
+  border-radius: 50px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  gap: 8px;
+  z-index: 9999;
+  border: 1px solid #e4e6eb;
+}
+
+.fb-reaction-dock.top-dock {
+  bottom: 100%;
+  margin-bottom: 5px;
+  left: 0;
+}
+
+.fb-interaction-wrapper:hover .fb-reaction-dock {
+  display: flex !important;
+  align-items: center;
+  animation: fbPopUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes fbPopUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.reaction-emoji {
+  font-size: 30px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.reaction-emoji:hover {
+  transform: scale(1.5) translateY(-10px);
+}
+
+/* STANDARDIZED TOOLTIP */
+.reaction-emoji:hover::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 10001;
+  pointer-events: none;
+}
+
+.fb-comments-section-container {
+  border-top: 1px solid #f1f5f9;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.current-reaction-icon {
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
 }

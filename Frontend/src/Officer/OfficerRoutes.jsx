@@ -1,30 +1,45 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import OfficerDashboard from "./OfficerDashboard";
-import OfficerWorks from "./Works/OfficerWorks";
-import OfficerBudget from "./Budget/OfficerBudget";
-import OfficerDepartments from "./Departments/OfficerDepartments";
-import OfficerNotices from "./Notices/OfficerNotices";
-import OfficerComplaints from "./Complaints/OfficerComplaints";
-import OfficerAssets from "./Assets/OfficerAssets";
-import OfficerActivities from "./OfficerActivities";
-import OfficerSocialMedia from "./OfficerSocialMedia";
-import OfficerReviews from "./OfficerReviews";
+import React, { lazy, Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Lazy loading components for better performance
+const OfficerDashboard = lazy(() => import("./Dashboard/OfficerDashboard"));
+const OfficerActivities = lazy(() => import("./Dashboard/OfficerActivities"));
+const OfficerApplications = lazy(
+  () => import("./Applications/OfficerApplications"),
+);
+const OfficerSocialMedia = lazy(() => import("./Social/OfficerSocialMedia"));
+const OfficerFollowers = lazy(() => import("./Social/OfficerFollowers"));
+const OfficerReviews = lazy(() => import("./Social/OfficerReviews"));
+const OfficerComplaints = lazy(() => import("./Complaints/OfficerComplaints"));
+const OfficerProfile = lazy(() => import("./Profile/OfficerProfile"));
+const OfficerAssets = lazy(() => import("./Assets/OfficerAssets"));
+const OfficerBudget = lazy(() => import("./Budget/OfficerBudget"));
+const OfficerDepartments = lazy(
+  () => import("./Departments/OfficerDepartments"),
+);
+const OfficerNotices = lazy(() => import("./Notices/OfficerNotices"));
+const OfficerWorks = lazy(() => import("./Works/OfficerWorks"));
 
 const OfficerRoutes = () => {
   return (
-    <Routes>
-      <Route index element={<OfficerDashboard />} />
-      <Route path="works" element={<OfficerWorks />} />
-      <Route path="budgets" element={<OfficerBudget />} />
-      <Route path="departments" element={<OfficerDepartments />} />
-      <Route path="assets" element={<OfficerAssets />} />
-      <Route path="complaints" element={<OfficerComplaints />} />
-      <Route path="notices" element={<OfficerNotices />} />
-      <Route path="activities" element={<OfficerActivities />} />
-      <Route path="social-media" element={<OfficerSocialMedia />} />
-      <Route path="reviews" element={<OfficerReviews />} />
-    </Routes>
+    <Suspense fallback={<div className="loading-screen">Loading...</div>}>
+      <Routes>
+        <Route path="dashboard" element={<OfficerDashboard />} />
+        <Route path="activities" element={<OfficerActivities />} />
+        <Route path="applications" element={<OfficerApplications />} />
+        <Route path="social-media" element={<OfficerSocialMedia />} />
+        <Route path="followers" element={<OfficerFollowers />} />
+        <Route path="reviews" element={<OfficerReviews />} />
+        <Route path="complaints" element={<OfficerComplaints />} />
+        <Route path="profile" element={<OfficerProfile />} />
+        <Route path="assets" element={<OfficerAssets />} />
+        <Route path="budgets" element={<OfficerBudget />} />
+        <Route path="departments" element={<OfficerDepartments />} />
+        <Route path="notices" element={<OfficerNotices />} />
+        <Route path="works" element={<OfficerWorks />} />
+        <Route path="/" element={<Navigate to="dashboard" replace />} />
+      </Routes>
+    </Suspense>
   );
 };
 

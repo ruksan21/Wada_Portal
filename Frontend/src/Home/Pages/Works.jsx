@@ -13,7 +13,7 @@ const WorkCard = ({ work }) => {
   const [isLiked, setIsLiked] = useState(work.user_liked > 0);
   const [userReaction, setUserReaction] = useState(work.user_reaction);
   const [reactionBreakdown, setReactionBreakdown] = useState(
-    work.reaction_breakdown || {}
+    work.reaction_breakdown || {},
   );
   const [showComments, setShowComments] = useState(false);
 
@@ -206,7 +206,7 @@ const WorkCard = ({ work }) => {
                   // Check if handleLike expects args
                   handleLike(r.type);
                 }}
-                title={r.label}
+                data-label={r.label}
               >
                 {r.icon}
               </span>
@@ -220,7 +220,7 @@ const WorkCard = ({ work }) => {
               handleLike(
                 isLiked && userReaction === "like"
                   ? "like"
-                  : userReaction || "like"
+                  : userReaction || "like",
               )
             }
           >

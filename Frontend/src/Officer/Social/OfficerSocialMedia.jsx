@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import OfficerLayout from "./OfficerLayout";
-import { useAuth } from "../Home/Context/AuthContext";
-import { API_ENDPOINTS } from "../config/api";
+import OfficerLayout from "../Layout/OfficerLayout";
+import { useAuth } from "../../Home/Context/AuthContext";
+import { API_ENDPOINTS } from "../../config/api";
 import "./OfficerSocialMedia.css";
 
 export default function OfficerSocialMedia() {
@@ -30,7 +30,7 @@ export default function OfficerSocialMedia() {
       });
 
       const response = await fetch(
-        `${API_ENDPOINTS.socialMedia.get}?${params}`
+        `${API_ENDPOINTS.socialMedia.get}?${params}`,
       );
       const data = await response.json();
 

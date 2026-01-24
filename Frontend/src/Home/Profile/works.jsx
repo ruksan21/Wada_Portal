@@ -260,7 +260,7 @@ const WorkCard = ({ work }) => {
                   e.stopPropagation();
                   handleLike(r.type);
                 }}
-                title={r.label}
+                data-label={r.label}
               >
                 {r.icon}
               </span>

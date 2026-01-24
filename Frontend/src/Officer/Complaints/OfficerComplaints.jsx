@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import { useAuth } from "../Home/Context/AuthContext";
-import OfficerLayout from "./OfficerLayout";
+import { useAuth } from "../../Home/Context/AuthContext";
+import OfficerLayout from "../Layout/OfficerLayout";
 import "./OfficerComplaints.css";
-import { API_ENDPOINTS, API_BASE_URL } from "../config/api";
+import { API_ENDPOINTS, API_BASE_URL } from "../../config/api";
 
 const OfficerComplaints = () => {
   const { user, getOfficerWorkLocation } = useAuth();
@@ -78,7 +78,7 @@ const OfficerComplaints = () => {
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(
-          `Server error (${res.status}): ${errorText.substring(0, 100)}`
+          `Server error (${res.status}): ${errorText.substring(0, 100)}`,
         );
       }
 
@@ -229,7 +229,7 @@ const OfficerComplaints = () => {
       const params = new URLSearchParams(queryParams).toString();
 
       const res = await fetch(
-        `${API_ENDPOINTS.communication.getComplaints}?${params}`
+        `${API_ENDPOINTS.communication.getComplaints}?${params}`,
       );
       if (!res.ok) return;
       const data = await res.json();
@@ -350,7 +350,7 @@ const OfficerComplaints = () => {
                     >
                       {complaint.created_at || complaint.date
                         ? new Date(
-                            complaint.created_at || complaint.date
+                            complaint.created_at || complaint.date,
                           ).toLocaleString("en-US", {
                             timeZone: "Asia/Kathmandu",
                             year: "numeric",
@@ -450,7 +450,7 @@ const OfficerComplaints = () => {
                     </td>
                   </tr>
                 );
-              }
+              },
             )}
             {(activeTab === "citizen" ? complaints : reports).length === 0 && (
               <tr>
@@ -605,7 +605,7 @@ const OfficerComplaints = () => {
                     {selectedComplaint.date ||
                       (selectedComplaint.created_at
                         ? new Date(
-                            selectedComplaint.created_at
+                            selectedComplaint.created_at,
                           ).toLocaleString()
                         : "N/A")}
                   </span>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../Home/Context/AuthContext";
+import { useAuth } from "../../Home/Context/AuthContext";
 
 
 export const useWardVerification = () => {

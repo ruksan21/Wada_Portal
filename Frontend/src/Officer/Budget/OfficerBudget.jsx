@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "./OfficerBudget.css";
-import OfficerLayout from "../OfficerLayout";
+import "./Budget.css";
+import OfficerLayout from "../Layout/OfficerLayout";
 import { useAuth } from "../../Home/Context/AuthContext";
 import { useWard } from "../../Home/Context/WardContext";
 import { API_ENDPOINTS } from "../../config/api";
