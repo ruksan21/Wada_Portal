@@ -880,11 +880,11 @@ export default function RegisterPage({
                   className="section-title"
                   style={{ fontSize: "1rem", marginTop: "20px" }}
                 >
-                  Work/Office Location
+                  {t("auth.work_office_location")}
                 </h3>
                 <div className="form-row two-cols">
                   <div className="form-group">
-                    <label>Province *</label>
+                    <label>{t("auth.province")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-map"></i>
                       <select
@@ -894,7 +894,7 @@ export default function RegisterPage({
                         value={workProvince}
                         onChange={handleWorkProvinceChange}
                       >
-                        <option value="">Select Province</option>
+                        <option value="">{t("auth.select_province")}</option>
                         {getProvinces().map((p) => (
                           <option key={p.name} value={p.name}>
                             {language === "NP" ? p.name_np || p.name : p.name}
@@ -910,7 +910,7 @@ export default function RegisterPage({
                   </div>
 
                   <div className="form-group">
-                    <label>District *</label>
+                    <label>{t("auth.district")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-map-pin"></i>
                       <select
@@ -921,7 +921,7 @@ export default function RegisterPage({
                         onChange={handleWorkDistrictChange}
                         disabled={!workProvince}
                       >
-                        <option value="">Select District</option>
+                        <option value="">{t("auth.select_district")}</option>
                         {workProvince &&
                           getDistricts(workProvince).map((d) => (
                             <option key={d.name} value={d.name}>
@@ -940,7 +940,7 @@ export default function RegisterPage({
 
                 <div className="form-row two-cols">
                   <div className="form-group">
-                    <label>Municipality *</label>
+                    <label>{t("auth.municipality")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-city"></i>
                       <select
@@ -951,7 +951,9 @@ export default function RegisterPage({
                         onChange={handleWorkMunicipalityChange}
                         disabled={!workDistrict}
                       >
-                        <option value="">Select Municipality</option>
+                        <option value="">
+                          {t("auth.select_municipality")}
+                        </option>
                         {workDistrict &&
                           getMunicipalities(workProvince, workDistrict).map(
                             (m) => (
@@ -972,7 +974,7 @@ export default function RegisterPage({
                   </div>
 
                   <div className="form-group">
-                    <label>Ward No *</label>
+                    <label>{t("auth.ward_no")} *</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-house"></i>
                       <select
@@ -983,10 +985,11 @@ export default function RegisterPage({
                         onChange={(e) => setWorkWard(e.target.value)}
                         disabled={!workMunicipality}
                       >
-                        <option value="">Select Ward</option>
+                        <option value="">{t("auth.select_ward")}</option>
                         {availableWorkWards.map((num) => (
                           <option key={num} value={num}>
-                            Ward {num}
+                            {t("nav.ward")}{" "}
+                            {language === "NP" ? toNepaliNumber(num) : num}
                           </option>
                         ))}
                       </select>
@@ -999,7 +1002,7 @@ export default function RegisterPage({
 
                 <div className="form-row two-cols">
                   <div className="form-group">
-                    <label>Office Location/Address</label>
+                    <label>{t("auth.office_location")}</label>
                     <div className="input-wrapper">
                       <i className="fa-solid fa-building"></i>
                       <input
@@ -1007,12 +1010,12 @@ export default function RegisterPage({
                         className="form-control"
                         value={workOfficeLocation}
                         onChange={(e) => setWorkOfficeLocation(e.target.value)}
-                        placeholder="Building name, floor, room no"
+                        placeholder={t("auth.office_location_placeholder")}
                       />
                     </div>
                   </div>
                   <div className="form-group">
-                    <label>ID Card Photo *</label>
+                    <label>{t("auth.id_card_photo")} *</label>
                     <label className="file-upload-wrapper">
                       <input
                         type="file"
@@ -1036,7 +1039,7 @@ export default function RegisterPage({
                         ) : (
                           <>
                             <i className="fa-solid fa-id-badge"></i>
-                            <span>Click to Upload ID</span>
+                            <span>{t("auth.click_to_upload_id")}</span>
                           </>
                         )}
                       </div>

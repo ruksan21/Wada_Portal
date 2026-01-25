@@ -114,6 +114,9 @@ export const translations = {
       terms_conditions: "I accept the Terms and Conditions",
       officer_id_placeholder: "OFF-XXXX",
       dept_placeholder: "e.g. Sanitation",
+      work_office_location: "Work/Office Location",
+      office_location_placeholder: "Building name, floor, room no",
+      click_to_upload_id: "Click to Upload ID",
     },
     common: {
       loading: "Loading...",
@@ -618,6 +621,9 @@ export const translations = {
       terms_conditions: "म नियम र सर्तहरू स्वीकार गर्दछु",
       officer_id_placeholder: "OFF-XXXX",
       dept_placeholder: "उदा. सरसफाई",
+      work_office_location: "कार्यलय स्थान/ठेगाना",
+      office_location_placeholder: "भवनको नाम, तला, कोठा नं",
+      click_to_upload_id: "परिचयपत्र अपलोड गर्न क्लिक गर्नुहोस्",
     },
     common: {
       loading: "लोड हुँदैछ...",
