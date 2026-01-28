@@ -1,0 +1,52 @@
+Project Structure for: new-react-app
+Generated on: 2026-01-23
+
+c:\xampp\htdocs\new-react-app
+├── .git
+├── .hintrc
+├── Backend
+│   ├── api
+│   ├── uploads
+│   ├── vendor
+│   ├── composer.json
+│   └── phpmailer_loader.php
+├── Frontend
+│   ├── node_modules
+│   ├── public
+│   ├── src
+│   │   ├── Admin
+│   │   │   ├── Admin.css
+│   │   │   ├── AdminComplaints.jsx
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── OfficerManagement.jsx
+│   │   │   ├── UserManagement.jsx
+│   │   │   ├── WardManagement.jsx
+│   │   │   └── ... (other Admin files)
+│   │   ├── Officer
+│   │   │   ├── Officer.css
+│   │   │   ├── OfficerDashboard.jsx
+│   │   │   ├── OfficerNotices.jsx
+│   │   │   ├── OfficerProfile.jsx
+│   │   │   └── ... (other Officer files)
+│   │   ├── Home
+│   │   │   ├── Auth
+│   │   │   ├── Component
+│   │   │   ├── Context
+│   │   │   ├── Nav
+│   │   │   ├── Pages
+│   │   │   ├── Profile
+│   │   │   └── utils
+│   │   ├── config
+│   │   ├── data
+│   │   │   └── translations.js
+│   │   ├── Image
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   └── vite.config.js
+└── README.md
