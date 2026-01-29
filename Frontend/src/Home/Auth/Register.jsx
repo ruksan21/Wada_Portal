@@ -173,20 +173,34 @@ export default function RegisterPage({
 
     if (!termsAccepted) newErrors.terms = t("auth.accept_terms");
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) {
-      // Scroll to the first error
-      const firstError = document.querySelector(
-        ".form-control.error, .error-message.show",
-      );
-      if (firstError) {
-        firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+    const newErrors = validate();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      if (newErrors.password) {
+        toast.error(newErrors.password);
+      } else if (newErrors.confirmPassword) {
+        toast.error(newErrors.confirmPassword);
+      } else {
+        toast.error(
+          t("auth.registration_failed") || "Please fix the errors in the form.",
+        );
       }
+
+      // Scroll to the first error
+      setTimeout(() => {
+        const firstError = document.querySelector(
+          ".form-control.error, .error-message.show",
+        );
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
       return;
     }
     setIsLoading(true);
